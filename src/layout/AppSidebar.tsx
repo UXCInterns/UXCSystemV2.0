@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
   {
     name: "Projects",
     icon: <TableIcon />,
-    path: "/basic-tables",
+    subItems: [{ name: "Project Board", path: "/project-board", pro: false }, { name: "Manpower", path: "/manpower", pro: false }],
   },
   {
     name: "Kanban",
@@ -55,12 +55,12 @@ const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "InnoPoll",
-    path: "/bar-chart"
+    path: "/innoPoll"
   },
   {
     icon: <SendIcon className="stroke-[1.4]"/>,
     name: "Telegram",
-    subItems: [{ name: "User Management", path: "", pro: false }],
+    subItems: [{ name: "User Management", path: "/telegram", pro: false }],
   },
 ];
 
