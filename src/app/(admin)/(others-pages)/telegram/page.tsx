@@ -8,7 +8,7 @@ import Pagination from "@/components/telegram/common/Pagination";
 import React, { useState } from "react";
 import { PlusIcon } from "@/icons";
 
-export default function BasicTables() {
+export default function TelegramTable() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (

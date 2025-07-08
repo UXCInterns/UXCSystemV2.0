@@ -53,7 +53,12 @@ import MoreDotIcon from "./more-dot.svg";
 import BellIcon from "./bell.svg";
 import SendIcon from "./send.svg";
 import MessageIcon from "./message.svg";
-
+import HouseIcon from "./house.svg";
+import ListToDoIcon from "./list-todo.svg";
+import LifeBuoyIcon from "./life-buoy.svg";
+import UserCogIcon from "./user-cog.svg";
+import WrenchIcon from "./wrench.svg";
+import BrainIcon from "./brain.svg";
 
 export {
   DownloadIcon,
@@ -111,4 +116,10 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  HouseIcon,
+  ListToDoIcon,
+  LifeBuoyIcon,
+  UserCogIcon,
+  WrenchIcon,
+  BrainIcon,
 };

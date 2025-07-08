@@ -2,20 +2,71 @@
 
 import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import CETAttendanceTable from "../../../../../components/attendance/cetattendace/cetattendance";
+import CETAttendanceTable, { initialData }  from "../../../../../components/attendance/cetattendace/cetattendance";
 import ComponentCard from "../../../../../components/attendance/cetattendace/common/ComponentCard";
 import SearchQuery from "@/components/attendance/cetattendace/common/searchQuery";
 import SortDropdown from "../../../../../components/attendance/cetattendace/common/sortDropdown";
 import Pagination from "@/components/attendance/cetattendace/common/Pagination";
 import ExportDropdown from "../../../../../components/attendance/cetattendace/common/exportButton";
 import ChartTab from "../../../../../components/attendance/cetattendace/common/PaceToggle";
-import { PlusIcon } from "@/icons";
+import NewVisitForm from "@/components/attendance/cetattendace/common/newVisitForm";
 
-export default function BasicTables() {
+import { PlusIcon } from "@/icons";
+import { useModal } from "@/hooks/useModal";
+
+interface Visit {
+  id: number;
+  programTitle: string;
+  noOfPax: number;
+  traineeHours: number;
+  startDate: string;
+  endDate: string;
+}
+
+export default function CETTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
+  const [tableData, setTableData] = useState<Visit[]>(initialData);
+  const { isOpen, openModal, closeModal } = useModal();
 
   const sortOptions = ["Newest", "Oldest", "Most Trainee Hours", "Least Trainee Hours","Most Attended", "Least Attended"];
+
+  const filteredData = tableData.filter((row) =>
+    row.programTitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getSortedData = () => {
+  const dataCopy = [...filteredData];
+    switch (sortBy) {
+      case "Newest":
+        return dataCopy.sort(
+          (a, b) =>
+            new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+        );
+      case "Oldest":
+        return dataCopy.sort(
+          (a, b) =>
+            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        );
+      case "Most Trainee Hours":
+        return dataCopy.sort((a, b) => b.traineeHours - a.traineeHours);
+      case "Least Trainee Hours":
+        return dataCopy.sort((a, b) => a.traineeHours - b.traineeHours);
+      case "Most Attended":
+        return dataCopy.sort((a, b) => b.noOfPax - a.noOfPax);
+      case "Least Attended":
+        return dataCopy.sort((a, b) => a.noOfPax - b.noOfPax);
+      default:
+        return dataCopy;
+    }
+  };
+
+  const sortedData = getSortedData();
+
+  const handleAddVisit = (newVisit: Omit<Visit, "id">) => {
+    setTableData((prev) => [...prev, { ...newVisit, id: prev.length + 1 }]);
+    closeModal();
+  };
 
   return (
     <div>
@@ -81,18 +132,18 @@ export default function BasicTables() {
 
           {/* Right-side button: Log New Visit */}
           <button
-            // onClick={openModal}
+            onClick={openModal}
             className="flex items-center bg-brand-500 text-white px-4 py-2.5 text-theme-sm font-medium rounded-lg hover:bg-blue-700"
           >
             Log New Visit <PlusIcon className="ml-2" />
           </button>
         </div>
 
-          <CETAttendanceTable
-            searchQuery={searchQuery}
-            selectedSort={sortBy}
-            onSortChange={setSortBy}
-          />
+          <CETAttendanceTable data={sortedData}/>
+
+          {isOpen && (
+            <NewVisitForm isOpen={isOpen} onClose={closeModal} onSubmit={handleAddVisit} />
+          )}
 
           <Pagination
             currentPage={1}

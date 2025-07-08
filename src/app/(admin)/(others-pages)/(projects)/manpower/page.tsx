@@ -8,7 +8,7 @@ import { ManpowerMetrics } from "@/components/projects/manpower/manpowerMetrics"
 import IndividualChart from "../../../../../components/projects/manpower/IndividualChart";
 import AvailabilityChartMetric from "@/components/projects/manpower/availabilityChartMetric";
 
-export default function BasicTables() {
+export default function Manpower() {
   return (
     <div>
       <PageBreadcrumb pageTitle="Manpower" />

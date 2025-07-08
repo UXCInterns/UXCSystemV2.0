@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -8,9 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../ui/table";
-import { useModal } from "@/hooks/useModal";
-import NewVisitForm from "./common/newVisitForm";
-import Modal from "@/components/ui/modal";
 
 interface Visit {
   id: number;
@@ -22,14 +19,14 @@ interface Visit {
 }
 
 // Define the table data using the interface
-const initialData: Visit[] = [
+export const initialData: Visit[] = [
   {
     id: 1,
     companyName: "Acme Corp",
     dateOfVisit: "10 March 2025",
     totalAttended: 32,
     durationHours: "2h 30m",
-    conversionStatus: "72%",
+    conversionStatus: "Training",
   },
   {
     id: 2,
@@ -37,7 +34,7 @@ const initialData: Visit[] = [
     dateOfVisit: "7 June 2024",
     totalAttended: 18,
     durationHours: "1h 45m",
-    conversionStatus: "55%",
+    conversionStatus: "Consultancy",
   },
   {
     id: 3,
@@ -45,58 +42,16 @@ const initialData: Visit[] = [
     dateOfVisit: "11 September 2006",
     totalAttended: 25,
     durationHours: "2h",
-    conversionStatus: "60%",
+    conversionStatus: "No Conversion",
   },
 ];
-export {initialData}
+// export {initialData}
 
 interface UXCAttendanceTableProps {
-  searchQuery: string;
-  selectedSort: string;
-  onSortChange: (value: string) => void;
-} 
+  data: Visit[];
+}
 
-export default function UXCAttendanceTable({
-  searchQuery,
-  selectedSort,
-  onSortChange,
-}: UXCAttendanceTableProps) {
-  const [tableData, setTableData] = useState<Visit[]>(initialData);
-  const { isOpen, openModal, closeModal } = useModal();
-
-  const filteredData = tableData.filter((row) =>
-    row.companyName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleAddVisit = (newVisit: Omit<Visit, "id">) => {
-    setTableData((prev) => [...prev, { ...newVisit, id: prev.length + 1 }]);
-    closeModal();
-  };
-
-  const getSortedData = () => {
-    const dataCopy = [...filteredData];
-    switch (selectedSort) {
-      case "Newest":
-        return dataCopy.sort(
-          (a, b) =>
-            new Date(b.dateOfVisit).getTime() - new Date(a.dateOfVisit).getTime()
-        );
-      case "Oldest":
-        return dataCopy.sort(
-          (a, b) =>
-            new Date(a.dateOfVisit).getTime() - new Date(b.dateOfVisit).getTime()
-        );
-      case "Most Attended":
-        return dataCopy.sort((a, b) => b.totalAttended - a.totalAttended);
-      case "Least Attended":
-        return dataCopy.sort((a, b) => a.totalAttended - b.totalAttended);
-      default:
-        return dataCopy;
-    }
-  };
-
-  const sortedData = getSortedData();
-
+const UXCAttendanceTable: React.FC<UXCAttendanceTableProps> = ({ data }) => {
   return (
        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
          <div className="max-w-auto overflow-x-auto">
@@ -125,7 +80,7 @@ export default function UXCAttendanceTable({
             </TableHeader>
  
              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] group">
-               {sortedData.map((row) => (
+               {data.map((row) => (
                  <TableRow
                    key={row.id}
                    className="transition-opacity duration-200 group-hover:opacity-30 hover:!opacity-100"
@@ -177,3 +132,5 @@ export default function UXCAttendanceTable({
        </div>
   );
 }
+
+export default UXCAttendanceTable;

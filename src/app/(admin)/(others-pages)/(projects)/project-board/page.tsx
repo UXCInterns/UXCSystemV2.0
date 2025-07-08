@@ -15,7 +15,7 @@ import { initialData } from "../../../../../components/projects/projectboard/cur
 import { futureData } from "../../../../../components/projects/projectboard/futureProjects";
 import { parse, isAfter, isBefore, startOfMonth, endOfMonth, addMonths } from "date-fns";
 
-export default function BasicTables() {
+export default function ProjectBoard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const currentProjectCount = initialData.length;

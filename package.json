@@ -22,6 +22,7 @@
     "apexcharts": "^4.3.0",
     "autoprefixer": "^10.4.20",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "dom-to-image-more": "^3.6.0",
     "flatpickr": "^4.6.13",
     "html2canvas": "^1.4.1",

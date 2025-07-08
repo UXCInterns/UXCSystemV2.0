@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../ui/table";
-import { useModal } from "@/hooks/useModal";
+// import { useModal } from "@/hooks/useModal";
 
 interface Visit {
   id: number;
@@ -20,7 +20,7 @@ interface Visit {
 }
 
 // Define the table data using the interface
-const initialData: Visit[] = [
+export const initialData: Visit[] = [
   {
     id: 1,
     programTitle: "SSG",
@@ -48,56 +48,10 @@ const initialData: Visit[] = [
 ];
 
 interface CETAttendanceTableProps {
-  searchQuery: string;
-  selectedSort: string;
-  onSortChange: (value: string) => void;
+  data: Visit[];
 } 
 
-export default function CETAttendanceTable({
-  searchQuery,
-  selectedSort,
-  onSortChange,
-}: CETAttendanceTableProps) {
-  const [tableData, setTableData] = useState<Visit[]>(initialData);
-  const { closeModal } = useModal();
-
-  const filteredData = tableData.filter((row) =>
-    row.programTitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleAddVisit = (newVisit: Omit<Visit, "id">) => {
-    setTableData((prev) => [...prev, { ...newVisit, id: prev.length + 1 }]);
-    closeModal();
-  };
-
-  const getSortedData = () => {
-    const dataCopy = [...filteredData];
-    switch (selectedSort) {
-      case "Newest":
-        return dataCopy.sort(
-          (a, b) =>
-            new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-        );
-      case "Oldest":
-        return dataCopy.sort(
-          (a, b) =>
-            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-        );
-      case "Most Trainee Hours":
-        return dataCopy.sort((a, b) => b.traineeHours - a.traineeHours);
-      case "Least Trainee Hours":
-        return dataCopy.sort((a, b) => a.traineeHours - b.traineeHours);
-      case "Most Attended":
-        return dataCopy.sort((a, b) => b.noOfPax - a.noOfPax);
-      case "Least Attended":
-        return dataCopy.sort((a, b) => a.noOfPax - b.noOfPax);
-      default:
-        return dataCopy;
-    }
-  };
-
-  const sortedData = getSortedData();
-
+const CETAttendanceTable: React.FC<CETAttendanceTableProps> = ({ data }) => {
   return (
        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
          <div className="max-w-auto overflow-x-auto">
@@ -126,7 +80,7 @@ export default function CETAttendanceTable({
             </TableHeader>
  
              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] group">
-               {sortedData.map((row) => (
+               {data.map((row) => (
                  <TableRow
                    key={row.id}
                    className="transition-opacity duration-200 group-hover:opacity-30 hover:!opacity-100"
@@ -178,3 +132,5 @@ export default function CETAttendanceTable({
        </div>
   );
 }
+
+export default CETAttendanceTable;

@@ -119,8 +119,8 @@ const sizeOptions: Option[] = [
 ];
 
 const conversionOptions: Option[] = [
-  { label: "Training", value: "training" },
-  { label: "Consultancy", value: "consultancy" },
+  { label: "Training", value: "Training" },
+  { label: "Consultancy", value: "Consultancy" },
 ];
 
 const NewVisitForm: React.FC<NewVisitFormProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -134,7 +134,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({ isOpen, onClose, onSubmit }
     startTime: "",
     endTime: "",
     session: "",
-    durationHours: "",
+    durationHours: "0h 0m",
     sector: "",
     industry: "",
     size: "",
@@ -148,6 +148,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({ isOpen, onClose, onSubmit }
   };
 
   const handleSelectChange = (field: keyof NewVisitFormData) => (selected: Option | null) => {
+    console.log(`Selected ${field}:`, selected);
     handleChange(field, selected ? selected.value : "");
   };
 
@@ -196,9 +197,9 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({ isOpen, onClose, onSubmit }
   };
 
   const requiredFields: (keyof NewVisitFormData)[] = [
-    "companyName",
-    "dateOfVisit",
-    "totalAttended",
+    // "companyName",
+    // "dateOfVisit",
+    // "totalAttended",
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -228,11 +229,17 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({ isOpen, onClose, onSubmit }
           {/* First Row */}
           <div className="flex space-x-6">
             <div className="flex-1">
-              <Label>Company Name<span className="text-red-500 ml-2">*</span></Label>
+              <Label>
+                Company Name<span className="text-red-500 ml-2">*</span>
+              </Label>
               <Input
                 type="text"
                 value={form.companyName}
-                onChange={(e) => handleChange("companyName", e.target.value)}
+                onChange={(e) => {
+                  const input = e.target.value;
+                  const capitalized = input.charAt(0).toUpperCase() + input.slice(1);
+                  handleChange("companyName", capitalized);
+                }}
               />
             </div>
             <div className="flex-1">

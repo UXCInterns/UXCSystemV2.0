@@ -3,6 +3,7 @@ import CETMetrics from "@/components/cettraining/CETMetrics";
 import React from "react";
 import MonthlyTarget from "@/components/cettraining/MonthlyTarget";
 import StatisticsChart from "@/components/cettraining/StatisticsChart";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
 export const metadata: Metadata = {
   title:
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function CETTraining() {
   return (
     <>
+    <PageBreadcrumb pageTitle="CET Training" />
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <div className="col-span-12 xl:col-span-6">
             <MonthlyTarget />

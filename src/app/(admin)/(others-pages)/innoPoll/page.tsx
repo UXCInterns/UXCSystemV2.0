@@ -9,7 +9,7 @@ import Pagination from "@/components/innopoll/common/Pagination";
 import React, { useState } from "react";
 import { PlusIcon } from "@/icons";
 
-export default function BasicTables() {
+export default function Innopoll() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
 

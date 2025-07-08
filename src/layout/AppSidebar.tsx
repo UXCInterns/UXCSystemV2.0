@@ -13,7 +13,8 @@ import {
   PieChartIcon,
   TableIcon,
   UserCircleIcon,
-  SendIcon
+  SendIcon,
+  HouseIcon
 } from "../icons/index";
 
 type NavItem = {
@@ -25,9 +26,14 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
+    icon: <HouseIcon />,
+    name: "Home",
+    path: "/",
+  },
+  {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "UXC Learning Journey", path: "/", pro: false }, { name: "CET Training", path: "/dashboard", pro: false,  }],
+    subItems: [{ name: "UXC Learning Journey", path: "/uxc-dashboard", pro: false }, { name: "CET Training", path: "/cet-dashboard", pro: false,  }],
   },
   {
     icon: <UserCircleIcon />,
@@ -47,7 +53,7 @@ const navItems: NavItem[] = [
   {
     name: "Kanban",
     icon: <ListIcon />,
-    path: "/blank",
+    path: "/kanban",
   },
 ];
 
@@ -58,7 +64,7 @@ const othersItems: NavItem[] = [
     path: "/innoPoll"
   },
   {
-    icon: <SendIcon className="stroke-[1.4]"/>,
+    icon: <SendIcon className="stroke-[1.5]"/>,
     name: "Telegram",
     subItems: [{ name: "User Management", path: "/telegram", pro: false }],
   },
