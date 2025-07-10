@@ -1,5 +1,7 @@
-import DatePicker from "@/components/form/date-picker";
 import React, { useState } from "react";
+import { Listbox } from "@headlessui/react";
+import clsx from "clsx";
+import Badge from "../../ui/badge/Badge";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -9,8 +11,38 @@ interface AddTaskModalProps {
     description: string;
     date: string;
     status: string;
+    priority: string;
   }) => void;
 }
+
+const statusOptions = ["To Do", "In Progress", "Review", "Completed"];
+const priorityOptions = ["Low", "Medium", "High", "Urgent"];
+
+const getPriorityColor = (priority: string) => {
+  switch (priority) {
+    case "High":
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300";
+    case "Medium":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300";
+    case "Low":
+      return "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300";
+    default:
+      return "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300";
+  }
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "To Do":
+      return "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300";
+    case "In Progress":
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300";
+    case "Review":
+      return "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300";
+    default:
+      return "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300";
+  }
+};
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({
   isOpen,
@@ -21,130 +53,223 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("To Do");
+  const [priority, setPriority] = useState("Low");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Simple validation
     if (!title.trim() || !date) return;
-
-    onAddTask({ title, description, date, status});
-
-    // Reset fields after submit
+    onAddTask({ title, description, date, status, priority });
     setTitle("");
     setDescription("");
     setDate("");
     setStatus("To Do");
-
+    setPriority("Low");
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto z-[99999]">
+    <div className={clsx("fixed inset-0 z-[99999] flex", !isOpen && "pointer-events-none")}>
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
+        className={clsx(
+          "fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ease-in-out",
+          isOpen ? "opacity-100" : "opacity-0"
+        )}
         onClick={onClose}
-      ></div>
-      <div className="relative z-10 w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-11">
-        <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-          Add a new task
-        </h4>
-        <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-          Effortlessly manage your to-do list: add a new task
-        </p>
+      />
+
+      {/* Slide-in Panel */}
+      <div
+        className={clsx(
+          "relative ml-auto h-screen w-[550px] bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 z-20 flex h-8 w-8 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-300"
-          aria-label="Close modal"
+          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:text-gray-300"
+          aria-label="Close"
         >
-          <svg
-            className="fill-current size-5 sm:size-6"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+          <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
             <path
               fillRule="evenodd"
               clipRule="evenodd"
-              d="M6.04 16.54a1 1 0 0 0 1.42 1.42L12 13.41l4.54 4.55a1 1 0 0 0 1.42-1.42L13.41 12l4.55-4.54a1 1 0 1 0-1.42-1.42L12 10.59 7.46 6.04a1 1 0 0 0-1.42 1.42L10.59 12l-4.55 4.54Z"
+              d="M6.04 16.54a1 1 0 001.42 1.42L12 13.41l4.54 4.55a1 1 0 001.42-1.42L13.41 12l4.55-4.54a1 1 0 10-1.42-1.42L12 10.59 7.46 6.04a1 1 0 10-1.42 1.42L10.59 12l-4.55 4.54Z"
             />
           </svg>
         </button>
 
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="custom-scrollbar h-[380px] overflow-y-auto px-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+        <div className="absolute top-16 left-0 w-full border-b border-gray-200 dark:border-white/10" />
+
+        {/* Form Content */}
+        <div className="flex flex-col pt-20 px-6 lg:px-10 pb-6 h-full">
+          <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+            <div className="flex flex-col space-y-6">
               {/* Title */}
-              <div className="sm:col-span-2">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Task Title
-                </label>
+              <div className="flex items-center gap-4">
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                  placeholder="Enter task title"
+                  className="h-11 w-full bg-transparent py-2.5 border-0 focus:outline-none text-[35px] text-gray-800 placeholder:text-gray-400 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                  placeholder="Enter new item"
                   required
                 />
               </div>
 
-              {/* Status */}
-                <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Status
-                    </label>
-                    <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
-                    >
-                    <option value="todo">To Do</option>
-                    <option value="inprogress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    </select>
-                </div>
-              
+              {/* Assigned To */}
+              <div className="flex items-center gap-4">
+                <label className="w-24 text-md font-medium text-gray-700 dark:text-gray-400">
+                  Assigned To
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. John"
+                  className="flex-1 h-11 rounded-lg border-0 focus:outline-none bg-transparent px-4 text-md text-gray-800 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+
+              {/* Status Dropdown with Colored Badge Items */}
+              <div className="flex items-center gap-4">
+                <label className="w-24 text-md font-medium text-gray-700 dark:text-gray-400">
+                  Status
+                </label>
+                <Listbox value={status} onChange={setStatus}>
+                  <div className="relative w-full">
+                    <Listbox.Button className="relative w-full ml-5 rounded-lg bg-white dark:bg-gray-900 py-2 pl-3 pr-10 text-left text-gray-900 dark:text-white focus:outline-none">
+                      <span
+                        className={clsx(
+                          "px-3 py-1 rounded-full text-sm font-medium",
+                          getStatusColor(status)
+                        )}
+                      >
+                        {status}
+                      </span>
+                    </Listbox.Button>
+                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
+                      {statusOptions.map((option) => (
+                        <Listbox.Option
+                          key={option}
+                          value={option}
+                          className={({ active }) =>
+                            clsx(
+                              "cursor-pointer select-none px-4 py-2",
+                              active ? "bg-gray-100 dark:bg-gray-700" : ""
+                            )
+                          }
+                        >
+                          <span
+                            className={clsx(
+                              "px-3 py-1 rounded-full text-sm font-medium",
+                              getStatusColor(option)
+                            )}
+                          >
+                            {option}
+                          </span>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </Listbox>
+              </div>
+
+              {/* Start Date */}
+              <div className="flex items-center gap-4">
+                <label className="w-24 text-md font-medium text-gray-700 dark:text-gray-400">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="flex-1 h-11 rounded-lg border-0 focus:outline-none bg-transparent px-4 text-md text-gray-800 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+
               {/* Due Date */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+              <div className="flex items-center gap-4">
+                <label className="w-24 text-md font-medium text-gray-700 dark:text-gray-400">
                   Due Date
                 </label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                  className="flex-1 h-11 rounded-lg border-0 focus:outline-none bg-transparent px-4 text-md text-gray-800 dark:bg-gray-900 dark:text-white/90"
                 />
               </div>
 
+              {/* Priority Dropdown with Colored Badge Items */}
+              <div className="flex items-center gap-4">
+                <label className="w-24 text-md font-medium text-gray-700 dark:text-gray-400">
+                  Priority
+                </label>
+                <Listbox value={priority} onChange={setPriority}>
+                  <div className="relative w-full">
+                    <Listbox.Button className="relative w-full ml-5 rounded-lg bg-white dark:bg-gray-900 py-2 pl-3 pr-10 text-left text-gray-900 dark:text-white focus:outline-none">
+                      <span
+                        className={clsx(
+                          "px-3 py-1 rounded-full text-sm font-medium",
+                          getPriorityColor(priority)
+                        )}
+                      >
+                        {priority}
+                      </span>
+                    </Listbox.Button>
+                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-sm ring-1 ring-black/5 focus:outline-none z-10">
+                      {priorityOptions.map((option) => (
+                        <Listbox.Option
+                          key={option}
+                          value={option}
+                          className={({ active }) =>
+                            clsx(
+                              "cursor-pointer select-none px-4 py-2",
+                              active ? "bg-gray-100 dark:bg-gray-700" : ""
+                            )
+                          }
+                        >
+                          <span
+                            className={clsx(
+                              "px-3 py-1 rounded-full text-sm font-medium",
+                              getPriorityColor(option)
+                            )}
+                          >
+                            {option}
+                          </span>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </Listbox>
+              </div>
+
               {/* Description */}
-              <div className="sm:col-span-2">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+              <div className="flex items-start gap-4">
+                <label className="w-24 pt-2 text-md font-medium text-gray-700 dark:text-gray-400">
                   Description
                 </label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   value={description}
+                  placeholder="Enter task description"
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                ></textarea>
+                  className="flex-1 rounded-lg border-0 focus:outline-none bg-transparent px-4 py-2.5 text-md text-gray-800 placeholder:text-gray-400 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                />
               </div>
             </div>
-          </div>
 
-          {/* Submit button */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm text-white hover:bg-brand-700"
-            >
-              Add Task
-            </button>
-          </div>
-        </form>
+            {/* Submit Button */}
+            <div className="mt-4 flex justify-end pt-2">
+              <button
+                type="submit"
+                className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm text-white hover:bg-brand-700"
+              >
+                Add Task
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

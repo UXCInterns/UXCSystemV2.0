@@ -53,8 +53,8 @@ const navItems: NavItem[] = [
   {
     name: "Kanban",
     icon: <ListIcon />,
-    path: "/kanban",
-  },
+    subItems: [{ name: "My Board", path: "/my-board", pro: false }, { name: "Shared Board", path: "/shared-board", pro: false }],
+  }
 ];
 
 const othersItems: NavItem[] = [
