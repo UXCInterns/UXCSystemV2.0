@@ -1,5 +1,5 @@
-import Calendar from "../../../../components/calendar/Calendar";
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import ChatLayout from "../chat/ChatLayout";
+// import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Metadata } from "next";
 import React from "react";
 
@@ -12,15 +12,7 @@ export const metadata: Metadata = {
 export default function page() {
   return (
     <div>
-      <PageBreadcrumb
-        pageTitle="Calendar"
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Calendar"},
-          
-        ]}
-      />
-      <Calendar />
+      <ChatLayout />
     </div>
   );
 }

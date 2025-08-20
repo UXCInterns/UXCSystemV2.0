@@ -18,7 +18,6 @@ type CardType = {
 
 type ColumnType = {
   title: string;
-  count: number;
   status: string;
   cards: CardType[];
 };
@@ -51,12 +50,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, setColumns, onAddCli
 
     if (updatedCard.status !== card.status) {
       updatedCols[colIndex].cards.splice(cardIndex, 1);
-      updatedCols[colIndex].count = updatedCols[colIndex].cards.length;
 
       const newColIndex = updatedCols.findIndex(col => col.status === updatedCard.status);
       if (newColIndex !== -1) {
         updatedCols[newColIndex].cards.push(updatedCard);
-        updatedCols[newColIndex].count = updatedCols[newColIndex].cards.length;
       }
     } else {
       updatedCols[colIndex].cards[cardIndex] = updatedCard;
@@ -69,7 +66,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, setColumns, onAddCli
   const handleDelete = (colIndex: number, cardIndex: number) => {
     const updatedCols = [...columns];
     updatedCols[colIndex].cards.splice(cardIndex, 1);
-    updatedCols[colIndex].count = updatedCols[colIndex].cards.length;
     setColumns(updatedCols);
   };
 
@@ -97,8 +93,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, setColumns, onAddCli
     movedCard.status = toStatus;
     toCol.cards.push(movedCard);
 
-    fromCol.count = fromCol.cards.length;
-    toCol.count = toCol.cards.length;
     setColumns(updatedColumns);
   };
 
@@ -114,8 +108,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, setColumns, onAddCli
           >
             <KanbanColumn
               title={col.title}
-              count={col.count}
-              onAddClick={() => onAddClick(col.status)} // ✅ fixed here
+              count={col.cards.length} // ✅ derive count here
+              onAddClick={() => onAddClick(col.status)}
             >
               {col.cards.map((card, cardIndex) => (
                 <div

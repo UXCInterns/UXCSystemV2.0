@@ -8,16 +8,30 @@ import SortDropdown from "../../../../components/innopoll/common/sortDropdown";
 import Pagination from "@/components/innopoll/common/Pagination";
 import React, { useState } from "react";
 import { PlusIcon } from "@/icons";
+import { useRouter } from "next/navigation";
 
 export default function Innopoll() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
 
   const sortOptions = ["Newest", "Oldest", "Most Participated", "Least Participated"];
+  const router = useRouter(); // ✅ Correct hook usage
+
+  const handleCreateSession = () => {
+    router.push("/innoPoll/create-session"); // ✅ navigate to create-session page
+  };
+
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="InnoPoll" />
+      <PageBreadcrumb
+        pageTitle="InnoPoll"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "InnoPoll" },
+          
+        ]}
+      />
       <div className="space-y-6">
        <ComponentCard
           header={
@@ -31,7 +45,7 @@ export default function Innopoll() {
               {/* Right group:Log New Visit */}
               <div className="flex items-center gap-4 mr-4">
                 <button
-                  // onClick={openModal}
+                  onClick={handleCreateSession}
                   className="flex items-center bg-brand-500 text-white px-4 py-2.5 text-theme-sm font-medium rounded-lg hover:bg-blue-700"
                 >
                   Create Session <PlusIcon className="ml-2" />

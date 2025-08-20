@@ -21,7 +21,7 @@ export default function StatisticsChart() {
     colors: ["#465FFF", "#9CB9FF"],
     chart: {
       fontFamily: "Outfit, sans-serif",
-      height: 310,
+      height: 110,
       type: chartType,
       toolbar: { show: false },
     },
@@ -83,12 +83,12 @@ export default function StatisticsChart() {
 
   const series = [
     {
-      name: "After",
-      data: [260, 240, 250, 240, 225, 240, 270, 240, 260, 280, 270, 240],
+      name: "Pace",
+      data: [26, 24, 25, 24, 22, 24, 27, 24, 26, 28, 27, 24],
     },
     {
-      name: "Before",
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 215],
+      name: "Informal",
+      data: [18, 19, 17, 16, 17, 16, 17, 20, 23, 21, 24, 21],
     },
   ];
 
@@ -97,10 +97,10 @@ export default function StatisticsChart() {
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Visitors By Date
+            Pace Vs Informal
           </h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Visitors attended by date
+            Comparison by Pace and Informal visits over the year.
           </p>
         </div>
         <div className="flex items-center justify-end gap-2">
@@ -114,7 +114,7 @@ export default function StatisticsChart() {
             options={options}
             series={series}
             type={chartType}
-            height={310}
+            height={147}
           />
         </div>
       </div>

@@ -89,7 +89,15 @@ export default function SharedBoardPage() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle={`Kanban - ${projectName}`} />
+      <PageBreadcrumb
+        pageTitle="Kanban"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Kanban", href: "/shared-board" },
+          { label: `${projectName}`, href: "" },
+          
+        ]}
+      />
 
       <div className="space-y-6 mt-6">
         <ComponentCard

@@ -14,7 +14,14 @@ export const metadata: Metadata = {
 export default function Alerts() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Alerts" />
+      <PageBreadcrumb
+        pageTitle="Alerts"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Alerts" },
+          
+        ]}
+      />
       <div className="space-y-5 sm:space-y-6">
         <ComponentCard title="Success Alert">
           <Alert

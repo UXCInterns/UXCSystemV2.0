@@ -71,8 +71,8 @@ export default function Home() {
 
           {/* Right Side: Date & Time */}
           <div className="text-right">
-            <p className="text-sm text-gray-700 dark:text-gray-300">{currentDate}</p>
-            <p className="text-lg font-medium text-gray-900 dark:text-white">{time}</p>
+            <p className="text-lg text-gray-900 dark:text-white">{currentDate}</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{time}</p>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function Home() {
         <ProjectTable />
       </div>
 
-      <div className="col-span-12 xl:col-span-4">
+      <div className="col-span-12 space-y-6 xl:col-span-4">
         <RoleDistributionChart />
       </div>
 

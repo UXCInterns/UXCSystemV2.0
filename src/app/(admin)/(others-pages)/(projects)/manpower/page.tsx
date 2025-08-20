@@ -11,7 +11,14 @@ import AvailabilityChartMetric from "@/components/projects/manpower/availability
 export default function Manpower() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Manpower" />
+      <PageBreadcrumb
+        pageTitle="Manpower"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Manpower"},
+          
+        ]}
+      />
 
       {/* Main content area */}
       <div className="space-y-6 mt-6">

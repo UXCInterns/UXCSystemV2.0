@@ -17,7 +17,14 @@ export const metadata: Metadata = {
 export default function Modals() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Modals" />
+      <PageBreadcrumb
+        pageTitle="Modals"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Modals" },
+          
+        ]}
+      />
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-6">
         <DefaultModal />
         <VerticallyCenteredModal />

@@ -70,7 +70,14 @@ export default function CETTable() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="CET Training" />
+      <PageBreadcrumb
+        pageTitle="CET Training"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "CET Training"},
+          
+        ]}
+      />
       <div className="space-y-6">
         <ComponentCard
           header={

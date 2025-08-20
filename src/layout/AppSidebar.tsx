@@ -14,7 +14,8 @@ import {
   TableIcon,
   UserCircleIcon,
   SendIcon,
-  HouseIcon
+  HouseIcon,
+  ChatIcon
 } from "../icons/index";
 
 type NavItem = {
@@ -54,7 +55,7 @@ const navItems: NavItem[] = [
     name: "Kanban",
     icon: <ListIcon />,
     subItems: [{ name: "My Board", path: "/my-board", pro: false }, { name: "Shared Board", path: "/shared-board", pro: false }],
-  }
+  },
 ];
 
 const othersItems: NavItem[] = [

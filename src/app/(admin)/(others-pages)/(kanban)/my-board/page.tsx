@@ -59,7 +59,14 @@ export default function Kanban() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Kanban" />
+      <PageBreadcrumb
+        pageTitle="Kanban"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Kanban"},
+          
+        ]}
+      />
 
       <div className="space-y-6 mt-6">
         <ComponentCard

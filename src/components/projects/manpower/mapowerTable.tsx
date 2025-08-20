@@ -203,7 +203,7 @@ export default function ManpowerTable() {
         </div>
       </div>
 
-    <div className="w-full max-h-[450px] overflow-y-auto custom-scrollbar">
+    <div className="w-full max-h-[474px] overflow-y-auto custom-scrollbar">
         <Table className="min-w-full table-fixed">
           <TableHeader className="sticky top-0 z-10 border-b bg-gray-200 dark:bg-gray-900 border-gray-100 dark:border-white/[0.05]">
             <TableRow>

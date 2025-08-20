@@ -10,7 +10,14 @@ import React, { useState } from "react";
 export default function Kanban() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Kanban" />
+      <PageBreadcrumb
+        pageTitle="Kanban"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Kanban"},
+          
+        ]}
+      />
 
       <div className="mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

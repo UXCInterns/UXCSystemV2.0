@@ -21,7 +21,14 @@ export const metadata: Metadata = {
 export default function FormElements() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="From Elements" />
+      <PageBreadcrumb
+        pageTitle="Form Elements"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Form Elements"},
+          
+        ]}
+      />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-1">
         <div className="space-y-6">
           <DefaultInputs />

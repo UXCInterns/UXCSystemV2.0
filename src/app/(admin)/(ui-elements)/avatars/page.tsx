@@ -13,7 +13,14 @@ export const metadata: Metadata = {
 export default function AvatarPage() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Avatar" />
+      <PageBreadcrumb
+        pageTitle="Avatars"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Avatars" },
+          
+        ]}
+      />
       <div className="space-y-5 sm:space-y-6">
         <ComponentCard title="Default Avatar">
           {/* Default Avatar (No Status) */}

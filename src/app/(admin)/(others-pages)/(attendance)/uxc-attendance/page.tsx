@@ -65,7 +65,14 @@ export default function UXCTable() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="UXC Learning Journey" />
+      <PageBreadcrumb
+        pageTitle="UXC Learning Journey"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "UXC Learning Journey"},
+          
+        ]}
+      />
       <div className="space-y-6">
         <ComponentCard
           header={

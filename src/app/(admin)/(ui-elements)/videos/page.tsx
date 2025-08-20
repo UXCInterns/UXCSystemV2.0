@@ -12,7 +12,14 @@ export const metadata: Metadata = {
 export default function VideoPage() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Videos" />
+      <PageBreadcrumb
+        pageTitle="Videos"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Videos" },
+          
+        ]}
+      />
 
       <VideosExample />
     </div>

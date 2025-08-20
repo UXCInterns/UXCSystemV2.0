@@ -7,7 +7,7 @@ import FutureProjectsTable from "../src/components/projects/projectboard/futureP
 import ComponentCard from "../src/components/projects/projectboard/common/ComponentCard";
 import SearchQuery from "@/components/projects/projectboard/common/searchQuery";
 import SortDropdown from "../src/components/projects/projectboard/common/sortDropdown";
-import { ProjectMetrics } from "../src/components/projects/projectboard/projectMetrics";
+import { ProjectMetrics } from "../src/components/projects/projectboard/ProjectMetrics";
 import StatusChartMetric from "../src/components/projects/projectboard/statusChartMetric";
 import PriorityChartMetric from "../src/components/projects/projectboard/priortyChartMetric";
 import { PlusIcon } from "@/icons";

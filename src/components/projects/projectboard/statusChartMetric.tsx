@@ -8,8 +8,7 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 import { InfoIcon, CheckCircleIcon } from "../../../icons";
-import { initialData } from "./currentProjects"; // Adjust path if needed
-import { futureData } from "./futureProjects"; // Adjust path if needed
+import { useProjectData } from "@/hooks/useProjectData";
 
 const getCurrentTheme = () => {
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -33,7 +32,7 @@ const statusConfig = {
   },
   "Pending": {
     icon: InfoIcon,
-    light: "rgb(245, 158, 11)", // yellow for better distinction
+    light: "rgb(245, 158, 11)",
     dark: "rgb(245, 158, 11)",
   },
 };
@@ -41,6 +40,7 @@ const statusConfig = {
 const StatusChartMetric = () => {
   const [theme, setTheme] = useState("light");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { data: allProjects, statusCounts, totalProjects } = useProjectData();
 
   useEffect(() => {
     setTheme(getCurrentTheme());
@@ -57,88 +57,96 @@ const StatusChartMetric = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Merge data from current and future projects
-  const allProjects = [...initialData, ...futureData];
+  // Convert statusCounts to the format needed for the pie chart
+  const pieData = [
+    {
+      name: "Completed",
+      value: statusCounts.completed,
+      color: statusConfig["Completed"]?.[theme],
+    },
+    {
+      name: "In Progress", 
+      value: statusCounts.inProgress,
+      color: statusConfig["In Progress"]?.[theme],
+    },
+    {
+      name: "Aborted",
+      value: statusCounts.aborted,
+      color: statusConfig["Aborted"]?.[theme],
+    },
+    {
+      name: "Pending",
+      value: statusCounts.pending,
+      color: statusConfig["Pending"]?.[theme],
+    },
+  ].filter(item => item.value > 0);
 
-  // Aggregate status counts
-  const statusCounts: Record<string, number> = {};
-  allProjects.forEach(({ status }) => {
-    statusCounts[status] = (statusCounts[status] || 0) + 1;
-  });
-
-  const pieData = Object.entries(statusCounts).map(([status, count]) => ({
-    name: status,
-    value: count,
-    color: statusConfig[status]?.[theme],
-  }));
-
-  const statusOrder = ["Completed", "In Progress", "Aborted", "Pending"];
-  pieData.sort(
-    (a, b) => statusOrder.indexOf(a.name) - statusOrder.indexOf(b.name)
-  );
-
-  const total = allProjects.length;
   const hoveredData = hoveredIndex !== null ? pieData[hoveredIndex] : null;
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-      <h4 className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-2">Project Status Distribution</h4>
+      <h4 className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-4 text-center">
+        Project Status Distribution
+      </h4>
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="relative w-full h-64 md:w-1/2">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                innerRadius="60%"
-                outerRadius="100%"
-                stroke="none"
-                startAngle={90}
-                endAngle={-270}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                {pieData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    fillOpacity={hoveredIndex === index ? 1 : 0.5}
-                    onMouseEnter={() => setHoveredIndex(index)}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-
-          {/* Center display */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-            <span className="font-semibold text-gray-600 dark:text-white/80">
-              {hoveredData ? hoveredData.name : "Total"}
-            </span>
-            <span className="text-3xl font-extrabold text-gray-800 dark:text-white/90">
-              {hoveredData ? hoveredData.value : total}
-            </span>
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex flex-col justify-center gap-4 md:w-1/2">
-          {pieData.map((entry, idx) => {
-            const Icon = statusConfig[entry.name]?.icon;
-            return (
-              <div key={idx} className="flex items-center gap-3">
-                <Icon
-                  className={`size-6 ${Icon === InfoIcon ? "rotate-180" : ""}`}
-                  style={{ color: entry.color }}
+      {/* Chart */}
+      <div className="relative w-full h-64 mb-6">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              innerRadius="60%"
+              outerRadius="100%"
+              stroke="none"
+              startAngle={90}
+              endAngle={-270}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              {pieData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.color}
+                  fillOpacity={hoveredIndex === index ? 1 : 0.5}
+                  onMouseEnter={() => setHoveredIndex(index)}
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium w-24">{entry.name}</span>
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+
+        {/* Center display */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+          <span className="font-semibold text-gray-600 dark:text-white/80">
+            {hoveredData ? hoveredData.name : "Total"}
+          </span>
+          <span className="text-3xl font-extrabold text-gray-800 dark:text-white/90">
+            {hoveredData ? hoveredData.value : totalProjects}
+          </span>
+        </div>
+      </div>
+
+      {/* Legend (2x2 grid) */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        {pieData.map((entry, idx) => {
+          const Icon = statusConfig[entry.name]?.icon;
+          return (
+            <div key={idx} className="flex items-center gap-3">
+              <Icon
+                className={`size-6 ${Icon === InfoIcon ? "rotate-180" : ""}`}
+                style={{ color: entry.color }}
+              />
+              <div>
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium block">
+                  {entry.name}
+                </span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {entry.value} ({((entry.value / total) * 100).toFixed(1)}%)
+                  {entry.value} ({((entry.value / totalProjects) * 100).toFixed(1)}%)
                 </span>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

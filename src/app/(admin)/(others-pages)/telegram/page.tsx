@@ -13,7 +13,14 @@ export default function TelegramTable() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Telegram" />
+      <PageBreadcrumb
+        pageTitle="Telegram"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Telegram" },
+          
+        ]}
+      />
       <div className="space-y-6">
        <ComponentCard
           header={
