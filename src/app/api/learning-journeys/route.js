@@ -158,11 +158,12 @@
 // }
 
 // src/app/api/learning-journeys/route.js
-import { supabase } from '../../../../lib/supabase/supabaseClient';
+// server-side only: safe with Service Role Key
+import { supabaseAdmin } from '../supabaseAdmin';
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('learning_journeys')
       .select('id, company_name, date_of_visit, total_attended, duration, consultancy, training')
       .order('date_of_visit', { ascending: false });
@@ -179,4 +180,5 @@ export async function GET() {
     );
   }
 }
+
 
