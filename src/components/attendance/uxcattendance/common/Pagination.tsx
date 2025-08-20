@@ -30,7 +30,7 @@ const Pagination: React.FC<PaginationProps> = ({
   }
 
   return (
-    <div className="flex justify-between items-center w-full mt-4">
+    <div className="flex justify-between items-center w-full p-4 border-t border-gray-200 dark:border-white/[0.05]">
       {/* Previous button */}
       <div>
         <button

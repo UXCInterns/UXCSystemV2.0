@@ -7,7 +7,7 @@ interface SearchQueryProps {
 
 const SearchQuery: React.FC<SearchQueryProps> = ({ value, onChange }) => {
   return (
-    <div className="ml-4 relative w-full xl:w-[300px]">
+    <div className="relative w-full xl:w-[300px]">
       <span className="absolute -translate-y-1/2 left-4 top-1/2 pointer-events-none">
         <svg
           className="fill-gray-500 dark:fill-gray-400"

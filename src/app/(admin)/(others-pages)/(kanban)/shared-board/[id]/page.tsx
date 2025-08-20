@@ -7,7 +7,7 @@ import TaskTab from "@/components/kanban/common/TaskToggle";
 import AddTaskModal from "@/components/kanban/common/AddTaskModal";
 import KanbanBoard from "@/components/kanban/SharedBoard";
 import { useEffect, useState } from "react";
-import { initialData } from "@/components/projects/projectboard/currentProjects";
+import { useProjectData } from "@/hooks/useProjectData";
 import type { ColumnType } from "@/hooks/useData";
 import { initialProjectBoards } from "@/hooks/useData";
 
@@ -17,6 +17,7 @@ export default function SharedBoardPage() {
   const [projectName, setProjectName] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("todo");
+  const { data: projects } = useProjectData();
 
   useEffect(() => {
     if (id && typeof id === "string") {
@@ -29,7 +30,7 @@ export default function SharedBoardPage() {
       }
 
       // Fetch project name from initialData
-      const project = initialData.find((p) => p.id.toString() === id.toString());
+      const project = projects.find((p) => p.id.toString() === id.toString());
       if (project) {
         setProjectName(project.projectName);
       } else {

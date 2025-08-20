@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
   {
     icon: <HouseIcon />,
     name: "Home",
-    path: "/",
+    path: "/home",
   },
   {
     icon: <GridIcon />,

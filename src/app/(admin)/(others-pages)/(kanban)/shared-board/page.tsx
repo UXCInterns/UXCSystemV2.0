@@ -3,11 +3,13 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/kanban/common/ComponentCard";
 import ProjectCard from "@/components/kanban/ProjectCard";
-import { initialData } from "@/components/projects/projectboard/currentProjects";
-import React, { useState } from "react";
+import { useProjectData } from "@/hooks/useProjectData";
+import React from "react";
 
 
 export default function Kanban() {
+  const { data: projects } = useProjectData();
+
   return (
     <div>
       <PageBreadcrumb
@@ -21,7 +23,7 @@ export default function Kanban() {
 
       <div className="mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {initialData.map((project) => (
+          {projects.map((project) => (
             <ProjectCard
               key={project.id}
               {...project}
