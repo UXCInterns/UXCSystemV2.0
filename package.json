@@ -41,6 +41,7 @@
     "react-resizable": "^3.0.5",
     "recharts": "^2.15.3",
     "swiper": "^11.2.0",
+    "swr": "^2.3.6",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {

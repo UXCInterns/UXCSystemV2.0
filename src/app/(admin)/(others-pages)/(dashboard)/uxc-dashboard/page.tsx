@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
-import { UXCMetrics } from "@/components/dashboard/UXCMetrics";
 import React from "react";
-import MonthlyTarget from "@/components/dashboard/MonthlyTarget";
-import MonthlySalesChart from "@/components/dashboard/MonthlySalesChart";
-import StatisticsChart from "@/components/dashboard/StatisticsChart";
+import type { Metadata } from "next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import { PeriodProvider } from "@/context/PeriodContext";
+
+import { StatsMetrics } from "@/components/dashboard/StatsMetrics";
 import { ConversionsOverview } from "@/components/dashboard/ConversionOverview";
 import { IndustryMetrics } from "@/components/dashboard/IndustryMetrics";
-import ComparisonMetrics from "@/components/dashboard/ComparisonMetrics";
+import VisitorsAttended from "@/components/dashboard/VisitorsAttended";
+import VisitorsByMonth from "@/components/dashboard/VisitorsByMonth";
+import VisitorsByDate from "@/components/dashboard/VisitorsByDate";
+import VisitsComparison from "@/components/dashboard/VisitsComparison";
 
 export const metadata: Metadata = {
   title:
@@ -27,35 +29,36 @@ export default function UXCDashboard() {
       />
 
       <div className="grid grid-cols-12 gap-4 md:gap-6">
+        <PeriodProvider>
+          <div className="col-span-12 space-y-6 xl:col-span-12">
+            <StatsMetrics />
+          </div>
 
-        <div className="col-span-12 space-y-6 xl:col-span-12">
-          <UXCMetrics />
-        </div>
+          <div className="col-span-12 xl:col-span-5">
+            <VisitorsAttended />
+          </div>
+          
+          <div className="col-span-12 space-y-6 xl:col-span-4">
+            <ConversionsOverview />
+          </div>
 
-        <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
-        </div>
-        
-        <div className="col-span-12 space-y-6 xl:col-span-5">
-          <ConversionsOverview />
-        </div>
+          <div className="col-span-12 xl:col-span-3">
+            <IndustryMetrics />
+          
+          </div>
 
-        <div className="col-span-12 xl:col-span-2">
-          <IndustryMetrics />
-        </div>
+          <div className="col-span-12 xl:col-span-6">
+            <VisitorsByMonth />
+          </div>
 
-        <div className="col-span-12 xl:col-span-6">
-          <MonthlySalesChart />
-        </div>
+          <div className="col-span-12 xl:col-span-6">
+            <VisitsComparison />
+          </div>
 
-        <div className="col-span-12 xl:col-span-6">
-          <ComparisonMetrics />
-        </div>
-
-        <div className="col-span-12 space-y-6">
-          {/* <MonthlySalesChart /> */}
-          <StatisticsChart />
-        </div>
+          <div className="col-span-12 space-y-6">
+            <VisitorsByDate />
+          </div>
+        </PeriodProvider>
       </div>
     </>
   );
