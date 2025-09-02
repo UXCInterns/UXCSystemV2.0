@@ -44,7 +44,6 @@ export default function UXCDashboard() {
 
           <div className="col-span-12 xl:col-span-3">
             <IndustryMetrics />
-          
           </div>
 
           <div className="col-span-12 xl:col-span-6">

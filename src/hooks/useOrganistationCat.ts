@@ -1,71 +1,154 @@
-//components/constants/organisationCategories.js
+// src\hooks\useOrganistationCat.ts
 export const SECTORS = [
-  'Non-Profit',
-  'Private',
-  'Professional Body',
   'Public',
+  'Private',
+  'Non-Profit',
   'Commercial',
-  'Statutory Board'  
+  'Statutory Board',
+  'Professional Body',
+  'Government-Linked',
+  'Non-Governmental Organization (NGO)',
+  'Charity',
+  'Social Enterprise',
+  'Community-Based Organization (CBO)',
+  'Cooperative',
+  'Higher Education',
+  'Research Institution',
+  'Think Tank',
+  'International / Intergovernmental Organization',
+  'Multilateral Organization',
+  'Development Agency',
+  'Others'
 ];
+
+
+export const SESSION_TYPES = [
+  'AM',
+  'PM'
+];  
 
 export const ORGANIZATION_SIZES = [
+  // Government & Public
   'Government-Linked Company (GLC)',
   'Government-Linked Institution (GLI)',
-  'Multinational Corporation (MNC)',
-  'Small-Medium Enterprise (SME)',
+
+  // Corporate Scale
   'Startup',
+  'Micro Enterprise',
+  'Small Enterprise',
+  'Medium Enterprise',
+  'Small-Medium Enterprise (SME)',
+  'Large Enterprise',
+  'Conglomerate',
+  'Multinational Corporation (MNC)',
+
+  // Market/Revenue-based
+  'Mid-Market Company',
+  'Mega Corporation',
+
+  // Geographic Scope
+  'Local Organization',
+  'Regional Organization',
+  'National Organization',
+  'International Organization',
+  'Global Organization',
+  'Others'
 ];
 
+
 export const INDUSTRIES = [
+  // Primary / Natural Resources
   'Agriculture & Farming',
-  'Arts & Culture',
-  'Aviation & Aerospace',
-  'Banking',
-  'Biomedical Sciences',
-  'Border Control & Immigration',
-  'Community Services',
-  'Consulting Services',
-  'Construction & Engineering',
-  'Cosmetics',
-  'Defense & Security',
-  'Digital & Technology',
-  'Diplomatic Services',
-  'Education',
-  'Education (Higher)',
-  'Education (Primary/Secondary)',
-  'Education Technology',
+  'Forestry',
+  'Fisheries & Aquaculture',
+  'Mining & Quarrying',
   'Energy & Resources',
   'Environmental Services',
-  'Financial Services',
-  'Food & Beverage',
-  'Healthcare & Medical',
-  'Industry Associations & Chambers',
-  'Information Technology',
+  'Agritech',
+  'Food Technology',
+
+  // Manufacturing & Industrial
+  'Manufacturing (General)',
+  'Manufacturing (Chemical & Pharmaceutical)',
+  'Manufacturing (Electronics & Technology)',
+  'Manufacturing (Food, Beverage & FMCG)',
+  'Manufacturing (Marine & Offshore)',
+  'Biomedical Sciences',
+  'Pharmaceutical',
+  'Biotechnology',
+  'Cosmetics',
+  'Industrial Engineering',
+  'Construction & Engineering',
   'Infrastructure & Utilities',
-  'Innovation & Enterprise',
+  'Utilities (Water, Electricity, Waste)',
+
+  // Transportation & Mobility
+  'Aviation & Aerospace',
+  'Maritime & Shipping',
+  'Transportation & Logistics',
+  'Automotive',
+
+  // Services & Commerce
+  'Banking',
+  'Financial Services',
   'Insurance',
   'Investment & Asset Management',
-  'Legal Services',
-  'Manufacturing',
-  'Manufacturing (Chemical/Pharma)',
-  'Manufacturing (Electronics/Technology)',
-  'Manufacturing (F&B/FMCG)',
-  'Manufacturing (Marine/Offshore)',
-  'Maritime',
-  'Maritime & Shipping',
-  'Media & Entertainment',
-  'Pharmaceutical',
+  'Fintech',
+  'Insurtech',
+  'Consulting Services',
   'Professional Services',
-  'Property & Real Estate',
-  'Public Administration',
-  'Public Safety & Security',
-  'Public Services',
-  'Research',
-  'Research & Development',
+  'Legal Services',
   'Retail & Consumer',
-  'Science & Technology',
-  'Sports & Recreation',
-  'Telecommunications',
+  'Wholesale & Distribution',
+  'E-commerce & Digital Platforms',
+  'Food & Beverage',
   'Tourism & Hospitality',
-  'Transportation & Logistics'
+  'Sports & Recreation',
+  'Arts & Culture',
+  'Media & Entertainment',
+  'Advertising & Marketing',
+  'Design, Fashion & Creative Industries',
+  'Real Estate & Property',
+
+  // Technology & Innovation
+  'Digital & Technology',
+  'Information Technology',
+  'Telecommunications',
+  'Science & Technology',
+  'Education Technology',
+  'Innovation & Enterprise',
+  'Research & Development',
+  'Cybersecurity',
+  'Quantum Computing & Advanced Tech',
+
+  // Education & Knowledge
+  'Education (Primary/Secondary)',
+  'Education (Higher)',
+  'Education',
+  'Research Institutions',
+  'Think Tanks',
+  'Industry Associations & Chambers',
+
+  // Health & Social
+  'Healthcare & Medical',
+  'Public Health',
+  'Community Services',
+  'Welfare & Social Services',
+
+  // Government & Public Services
+  'Public Administration',
+  'Public Services',
+  'Public Safety & Security',
+  'Border Control & Immigration',
+  'Diplomatic Services',
+  'Defense & Security',
+  'Transformation',
+
+  // Emerging / Cross-sector
+  'Sustainability & Climate',
+  'Circular Economy',
+  'Space Industry',
+
+  // Others
+  'Others'
 ];

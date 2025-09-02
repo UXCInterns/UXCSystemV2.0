@@ -3,17 +3,25 @@ import { supabaseAdmin } from "../supabaseAdmin";
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+    
+    // Primary period parameters
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const periodType = searchParams.get("periodType") || "calendar";
+    
+    // Comparison period parameters
+    const isComparison = searchParams.get("isComparison") === "true";
+    const comparisonStartDate = searchParams.get("comparisonStartDate");
+    const comparisonEndDate = searchParams.get("comparisonEndDate");
 
     // ⚡ Force no cache
     request.headers.set("Cache-Control", "no-store");
 
     // -------------------------
-    // Fetch Data (in parallel where possible)
+    // Fetch Data (in parallel)
     // -------------------------
-    const [mainRes, prevRes] = await Promise.all([
+    const queries = [
+      // Primary period data
       supabaseAdmin
         .from("learning_journeys")
         .select(
@@ -21,214 +29,172 @@ export async function GET(request) {
         )
         .gte("date_of_visit", startDate || "1900-01-01")
         .lte("date_of_visit", endDate || "2999-12-31")
-        .order("date_of_visit", { ascending: false }),
+        .order("date_of_visit", { ascending: false })
+    ];
 
-      // Pre-compute previous-period data only if needed
-      startDate && endDate
-        ? (() => {
-            const periodLength =
-              new Date(endDate).getTime() - new Date(startDate).getTime();
-            const prevStartDate = new Date(
-              new Date(startDate).getTime() - periodLength
-            )
-              .toISOString()
-              .split("T")[0];
-            const prevEndDate = new Date(
-              new Date(endDate).getTime() - periodLength
-            )
-              .toISOString()
-              .split("T")[0];
-
-            return supabaseAdmin
-              .from("learning_journeys")
-              .select("company_name, total_attended, date_of_visit")
-              .gte("date_of_visit", prevStartDate)
-              .lte("date_of_visit", prevEndDate);
-          })()
-        : Promise.resolve({ data: [], error: null }),
-    ]);
-
-    if (mainRes.error) throw mainRes.error;
-    if (prevRes.error) throw prevRes.error;
-
-    const data = mainRes.data || [];
-    const prevData = prevRes.data || [];
-
-    // -------------------------
-    // Processing functions
-    // -------------------------
-    const companies = data.map((row) => row.company_name);
-    const uniqueCompanies = Array.from(new Set(companies));
-
-    const totalVisitors = data.reduce(
-      (sum, row) => sum + (row.total_attended || 0),
-      0
-    );
-
-    const trainingSet = new Set(
-      data.filter((row) => row.training).map((row) => row.company_name)
-    );
-    const consultancySet = new Set(
-      data.filter((row) => row.consultancy).map((row) => row.company_name)
-    );
-
-    // Industry & Sector counts
-    const tally = (field) => {
-      const counts = {};
-      for (const row of data) {
-        if (!row[field]) continue;
-        if (!counts[row[field]]) counts[row[field]] = { count: 0, companies: [] };
-        counts[row[field]].count++;
-        if (!counts[row[field]].companies.includes(row.company_name)) {
-          counts[row[field]].companies.push(row.company_name);
-        }
-      }
-      return Object.entries(counts).sort((a, b) => b[1].count - a[1].count);
-    };
-
-    const sortedIndustries = tally("industry");
-    const sortedSectors = tally("sector");
-
-    // Period breakdown (simplify into a helper)
-    const isWithinPeriod = (dateString) => {
-      if (!startDate || !endDate) return true;
-      const d = new Date(dateString);
-      return d >= new Date(startDate) && d <= new Date(endDate);
-    };
-
-    let periodBreakdown = [];
-    if (periodType === "quarterly" && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const current = new Date(start);
-
-      while (current <= end) {
-        const month = current.getMonth();
-        const year = current.getFullYear();
-        const monthName = current.toLocaleDateString("en-GB", {
-          month: "short",
-        });
-        const fullPeriod = current.toLocaleDateString("en-GB", {
-          month: "short",
-          year: "numeric",
-        });
-
-        const monthData = data.filter((row) => {
-          if (!row.date_of_visit) return false;
-          const d = new Date(row.date_of_visit);
-          return (
-            d.getMonth() === month &&
-            d.getFullYear() === year &&
-            isWithinPeriod(row.date_of_visit)
-          );
-        });
-
-        periodBreakdown.push({
-          period: fullPeriod,
-          monthName,
-          total: monthData.reduce(
-            (sum, row) => sum + (row.total_attended || 0),
-            0
-          ),
-          companies: monthData.length,
-          uniqueCompanies: new Set(monthData.map((r) => r.company_name)).size,
-        });
-
-        current.setMonth(current.getMonth() + 1);
-      }
+    // Add comparison period query if comparison mode is enabled
+    if (isComparison && comparisonStartDate && comparisonEndDate) {
+      queries.push(
+        supabaseAdmin
+          .from("learning_journeys")
+          .select(
+            "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal"
+          )
+          .gte("date_of_visit", comparisonStartDate)
+          .lte("date_of_visit", comparisonEndDate)
+          .order("date_of_visit", { ascending: false })
+      );
     } else {
-      const currentYear = startDate
-        ? new Date(startDate).getFullYear()
-        : new Date().getFullYear();
-      const monthlyTotals = Array(12).fill(0);
-      const monthlyCompanies = Array(12).fill(0);
-      const monthlyUniqueCompanies = Array.from({ length: 12 }, () => new Set());
-
-      for (const row of data) {
-        if (row.date_of_visit && isWithinPeriod(row.date_of_visit)) {
-          const m = new Date(row.date_of_visit).getMonth();
-          monthlyTotals[m] += row.total_attended || 0;
-          monthlyCompanies[m]++;
-          monthlyUniqueCompanies[m].add(row.company_name);
-        }
-      }
-
-      periodBreakdown = monthlyTotals.map((total, idx) => ({
-        period: new Date(currentYear, idx, 1).toLocaleDateString("en-GB", {
-          month: "short",
-          year: "numeric",
-        }),
-        monthName: new Date(currentYear, idx, 1).toLocaleDateString("en-GB", {
-          month: "short",
-        }),
-        total,
-        companies: monthlyCompanies[idx],
-        uniqueCompanies: monthlyUniqueCompanies[idx].size,
-      }));
+      // Add empty promise to maintain array structure
+      queries.push(Promise.resolve({ data: [], error: null }));
     }
 
-    // Comparison metrics
-    let comparisonMetrics = null;
-    if (prevData.length > 0) {
-      const prevCompanies = prevData.map((r) => r.company_name);
-      const prevUnique = new Set(prevCompanies);
-      const prevVisitors = prevData.reduce(
-        (sum, r) => sum + (r.total_attended || 0),
+    const [mainRes, comparisonRes] = await Promise.all(queries);
+
+    if (mainRes.error) throw mainRes.error;
+    if (comparisonRes.error) throw comparisonRes.error;
+
+    const data = mainRes.data || [];
+    const comparisonData = comparisonRes.data || [];
+
+    // -------------------------
+    // Helper Functions
+    // -------------------------
+    const processDataSet = (dataset, periodStart = null, periodEnd = null) => {
+      const companies = dataset.map((row) => row.company_name);
+      const uniqueCompanies = Array.from(new Set(companies));
+
+      const totalVisitors = dataset.reduce(
+        (sum, row) => sum + (row.total_attended || 0),
         0
       );
 
-      comparisonMetrics = {
-        totalCompaniesChange:
-          prevCompanies.length > 0
-            ? (
-                ((companies.length - prevCompanies.length) /
-                  prevCompanies.length) *
-                100
-              ).toFixed(2)
-            : 0,
-        uniqueCompaniesChange:
-          prevUnique.size > 0
-            ? (
-                ((uniqueCompanies.length - prevUnique.size) /
-                  prevUnique.size) *
-                100
-              ).toFixed(2)
-            : 0,
-        totalVisitorsChange:
-          prevVisitors > 0
-            ? (
-                ((totalVisitors - prevVisitors) / prevVisitors) *
-                100
-              ).toFixed(2)
-            : 0,
+      const trainingSet = new Set(
+        dataset.filter((row) => row.training).map((row) => row.company_name)
+      );
+      const consultancySet = new Set(
+        dataset.filter((row) => row.consultancy).map((row) => row.company_name)
+      );
+
+      // Industry & Sector counts
+      const tally = (field) => {
+        const counts = {};
+        for (const row of dataset) {
+          if (!row[field]) continue;
+          if (!counts[row[field]]) counts[row[field]] = { count: 0, companies: [] };
+          counts[row[field]].count++;
+          if (!counts[row[field]].companies.includes(row.company_name)) {
+            counts[row[field]].companies.push(row.company_name);
+          }
+        }
+        return Object.entries(counts).sort((a, b) => b[1].count - a[1].count);
       };
-    }
 
-    // Session type breakdown (monthly totals)
-    const sessionTypeBreakdown = {};
-    for (const row of data) {
-      if (!row.date_of_visit) continue;
-      const d = new Date(row.date_of_visit);
-      const monthKey = d.toLocaleDateString("en-GB", {
-        month: "short",
-        year: "numeric",
-      });
+      const sortedIndustries = tally("industry");
+      const sortedSectors = tally("sector");
 
-      if (!sessionTypeBreakdown[monthKey]) {
-        sessionTypeBreakdown[monthKey] = { pace: 0, informal: 0 };
+      // Period breakdown
+      const isWithinPeriod = (dateString) => {
+        if (!periodStart || !periodEnd) return true;
+        const d = new Date(dateString);
+        return d >= new Date(periodStart) && d <= new Date(periodEnd);
+      };
+
+      let periodBreakdown = [];
+      if (periodType === "quarterly" && periodStart && periodEnd) {
+        const start = new Date(periodStart);
+        const end = new Date(periodEnd);
+        const current = new Date(start);
+
+        while (current <= end) {
+          const month = current.getMonth();
+          const year = current.getFullYear();
+          const monthName = current.toLocaleDateString("en-GB", {
+            month: "short",
+          });
+          const fullPeriod = current.toLocaleDateString("en-GB", {
+            month: "short",
+            year: "numeric",
+          });
+
+          const monthData = dataset.filter((row) => {
+            if (!row.date_of_visit) return false;
+            const d = new Date(row.date_of_visit);
+            return (
+              d.getMonth() === month &&
+              d.getFullYear() === year &&
+              isWithinPeriod(row.date_of_visit)
+            );
+          });
+
+          periodBreakdown.push({
+            period: fullPeriod,
+            monthName,
+            total: monthData.reduce(
+              (sum, row) => sum + (row.total_attended || 0),
+              0
+            ),
+            companies: monthData.length,
+            uniqueCompanies: new Set(monthData.map((r) => r.company_name)).size,
+          });
+
+          current.setMonth(current.getMonth() + 1);
+        }
+      } else {
+        // Monthly breakdown for other period types
+        const currentYear = periodStart
+          ? new Date(periodStart).getFullYear()
+          : new Date().getFullYear();
+        const monthlyTotals = Array(12).fill(0);
+        const monthlyCompanies = Array(12).fill(0);
+        const monthlyUniqueCompanies = Array.from({ length: 12 }, () => new Set());
+
+        for (const row of dataset) {
+          if (row.date_of_visit && isWithinPeriod(row.date_of_visit)) {
+            const m = new Date(row.date_of_visit).getMonth();
+            monthlyTotals[m] += row.total_attended || 0;
+            monthlyCompanies[m]++;
+            monthlyUniqueCompanies[m].add(row.company_name);
+          }
+        }
+
+        periodBreakdown = monthlyTotals.map((total, idx) => ({
+          period: new Date(currentYear, idx, 1).toLocaleDateString("en-GB", {
+            month: "short",
+            year: "numeric",
+          }),
+          monthName: new Date(currentYear, idx, 1).toLocaleDateString("en-GB", {
+            month: "short",
+          }),
+          total,
+          companies: monthlyCompanies[idx],
+          uniqueCompanies: monthlyUniqueCompanies[idx].size,
+        }));
       }
 
-      if (row.pace) {
-        sessionTypeBreakdown[monthKey].pace += row.total_attended || 0;
-      }
-      if (row.informal) {
-        sessionTypeBreakdown[monthKey].informal += row.total_attended || 0;
-      }
-    }
+      // Session type breakdown (monthly totals)
+      const sessionTypeBreakdown = {};
+      for (const row of dataset) {
+        if (!row.date_of_visit) continue;
+        const d = new Date(row.date_of_visit);
+        const monthKey = d.toLocaleDateString("en-GB", {
+          month: "short",
+          year: "numeric",
+        });
 
-    // ✅ Final Response
-    return new Response(
-      JSON.stringify({
+        if (!sessionTypeBreakdown[monthKey]) {
+          sessionTypeBreakdown[monthKey] = { pace: 0, informal: 0 };
+        }
+
+        if (row.pace) {
+          sessionTypeBreakdown[monthKey].pace += row.total_attended || 0;
+        }
+        if (row.informal) {
+          sessionTypeBreakdown[monthKey].informal += row.total_attended || 0;
+        }
+      }
+
+      return {
         training: Array.from(trainingSet),
         consultancy: Array.from(consultancySet),
         companies,
@@ -247,7 +213,7 @@ export async function GET(request) {
         allSectors: sortedSectors,
         totalVisitors,
         sessionTypeBreakdown,
-        timeline: data
+        timeline: dataset
           .filter((r) => r.date_of_visit && isWithinPeriod(r.date_of_visit))
           .map((r) => ({
             date: new Date(r.date_of_visit).toLocaleDateString("en-GB", {
@@ -259,8 +225,88 @@ export async function GET(request) {
             company_name: r.company_name,
           })),
         periodBreakdown,
+      };
+    };
+
+    // -------------------------
+    // Process Primary Data
+    // -------------------------
+    const primaryResults = processDataSet(data, startDate, endDate);
+
+    // -------------------------
+    // Process Comparison Data
+    // -------------------------
+    let comparisonResults = null;
+    let comparisonMetrics = null;
+
+    if (isComparison && comparisonData.length > 0) {
+      comparisonResults = processDataSet(comparisonData, comparisonStartDate, comparisonEndDate);
+
+      // Calculate comparison metrics
+      comparisonMetrics = {
+        totalCompaniesChange:
+          comparisonResults.totalCompanies > 0
+            ? (
+                ((primaryResults.totalCompanies - comparisonResults.totalCompanies) /
+                  comparisonResults.totalCompanies) *
+                100
+              ).toFixed(2)
+            : primaryResults.totalCompanies > 0 ? 100 : 0,
+        
+        uniqueCompaniesChange:
+          comparisonResults.uniqueCompanies.length > 0
+            ? (
+                ((primaryResults.uniqueCompanies.length - comparisonResults.uniqueCompanies.length) /
+                  comparisonResults.uniqueCompanies.length) *
+                100
+              ).toFixed(2)
+            : primaryResults.uniqueCompanies.length > 0 ? 100 : 0,
+        
+        totalVisitorsChange:
+          comparisonResults.totalVisitors > 0
+            ? (
+                ((primaryResults.totalVisitors - comparisonResults.totalVisitors) /
+                  comparisonResults.totalVisitors) *
+                100
+              ).toFixed(2)
+            : primaryResults.totalVisitors > 0 ? 100 : 0,
+
+        // Additional comparison metrics
+        trainingChange:
+          comparisonResults.training.length > 0
+            ? (
+                ((primaryResults.training.length - comparisonResults.training.length) /
+                  comparisonResults.training.length) *
+                100
+              ).toFixed(2)
+            : primaryResults.training.length > 0 ? 100 : 0,
+        
+        consultancyChange:
+          comparisonResults.consultancy.length > 0
+            ? (
+                ((primaryResults.consultancy.length - comparisonResults.consultancy.length) /
+                  comparisonResults.consultancy.length) *
+                100
+              ).toFixed(2)
+            : primaryResults.consultancy.length > 0 ? 100 : 0,
+      };
+    }
+
+    // ✅ Final Response
+    const response = {
+      // Primary period data
+      ...primaryResults,
+      
+      // Comparison data (if enabled)
+      ...(isComparison && {
+        comparison: comparisonResults,
         comparisonMetrics,
-        periodInfo: {
+        isComparison: true,
+      }),
+      
+      // Period information
+      periodInfo: {
+        primary: {
           type: periodType,
           startDate,
           endDate,
@@ -273,13 +319,36 @@ export async function GET(request) {
                 )
               : null,
         },
-      }),
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+        ...(isComparison && {
+          comparison: {
+            type: periodType, // Assuming same type for comparison
+            startDate: comparisonStartDate,
+            endDate: comparisonEndDate,
+            totalDays:
+              comparisonStartDate && comparisonEndDate
+                ? Math.ceil(
+                    (new Date(comparisonEndDate).getTime() -
+                      new Date(comparisonStartDate).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                : null,
+          },
+        }),
+      },
+    };
+
+    return new Response(JSON.stringify(response), {
+      headers: { 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      },
+    });
+
   } catch (error) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("API Error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

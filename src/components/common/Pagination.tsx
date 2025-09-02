@@ -13,24 +13,23 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const visiblePages: number[] = [];
 
-  // Always show current page ±1
-  const startPage = Math.max(currentPage - 1, 1);
-  const endPage = Math.min(currentPage + 2, totalPages);
-
-  for (let i = startPage; i <= endPage; i++) {
-    visiblePages.push(i);
-  }
-
-  // Add the last 3 pages if not already in view
-  const trailingPages = [];
-  for (let i = totalPages - 2; i <= totalPages; i++) {
-    if (i > endPage && i > 0 && !visiblePages.includes(i)) {
-      trailingPages.push(i);
+  if (totalPages <= 7) {
+    // Show all if small number of pages
+    for (let i = 1; i <= totalPages; i++) visiblePages.push(i);
+  } else if (currentPage <= 5) {
+    // Case: First 5 pages visible + last page
+    for (let i = 1; i <= 5; i++) visiblePages.push(i);
+    visiblePages.push(totalPages);
+  } else {
+    // Case: Show first page + last 5 pages
+    visiblePages.push(1);
+    for (let i = totalPages - 4; i <= totalPages; i++) {
+      visiblePages.push(i);
     }
   }
 
   return (
-    <div className="flex justify-between items-center w-full">
+    <div className="flex justify-between items-center w-full p-4 border-t border-gray-200 dark:border-white/[0.05]">
       {/* Previous button */}
       <div>
         <button
@@ -45,37 +44,26 @@ const Pagination: React.FC<PaginationProps> = ({
 
       {/* Page numbers */}
       <div className="flex items-center gap-2">
-        {visiblePages.map((page, index) => (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`px-4 py-2 rounded ${
-              currentPage === page
-                ? "bg-brand-500 text-white"
-                : "text-gray-700 dark:text-gray-400"
-            } flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500`}
-          >
-            {page}
-          </button>
-        ))}
+        {visiblePages.map((page, index) => {
+          const prev = visiblePages[index - 1];
+          const showEllipsis = prev && page - prev > 1;
 
-        {/* Ellipsis if last 3 pages are not directly after visible pages */}
-        {trailingPages.length > 0 && <span className="px-2 dark:text-gray-400">...</span>}
-
-        {/* Render trailing (last 3) pages */}
-        {trailingPages.map((page) => (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`px-4 py-2 rounded ${
-              currentPage === page
-                ? "bg-brand-500 text-white"
-                : "text-gray-700 dark:text-gray-400"
-            } flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500`}
-          >
-            {page}
-          </button>
-        ))}
+          return (
+            <div key={page} className="flex items-center gap-2">
+              {showEllipsis && <span className="px-2 dark:text-gray-400">...</span>}
+              <button
+                onClick={() => onPageChange(page)}
+                className={`px-4 py-2 rounded ${
+                  currentPage === page
+                    ? "bg-brand-500 text-white"
+                    : "text-gray-700 dark:text-gray-400"
+                } flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500`}
+              >
+                {page}
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Next button */}
@@ -85,7 +73,6 @@ const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === totalPages}
           className="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
         >
-          
           Next
           <ArrowRightIcon className="ml-2" />
         </button>

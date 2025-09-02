@@ -17,6 +17,7 @@ interface MetricProps {
   badgeText?: string;
   companies?: string[];
   loading?: boolean;
+  comparisonValue?: string; // New prop for comparison mode
 }
 
 const MetricCard: React.FC<MetricProps> = ({
@@ -27,6 +28,7 @@ const MetricCard: React.FC<MetricProps> = ({
   badgeText,
   companies,
   loading = false,
+  comparisonValue,
 }) => {
   const [flipped, setFlipped] = useState(false);
 
@@ -74,14 +76,23 @@ const MetricCard: React.FC<MetricProps> = ({
             </div>
           </div>
 
-          <h2 className="font-bold text-gray-800 text-xl dark:text-white/90">
-            {value}
-          </h2>
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="font-bold text-gray-800 text-xl dark:text-white/90">
+              {value}
+            </h2>
+            {comparisonValue && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                vs
+              </span>
+            )}
+          </div>
 
           {badgeText && (
-            <div className="mt-2">
-              <Badge color="primary">
-                <span className="text-xs">{badgeText}</span>
+            <div className="mt-0">
+              <Badge color={comparisonValue ? "warning" : "primary"}>
+                <span className="text-xs">
+                  {comparisonValue || badgeText}
+                </span>
               </Badge>
             </div>
           )}
@@ -121,22 +132,56 @@ interface MetricsData {
   sectorCompanies: string[];
   allIndustries: Array<[string, { count: number; companies: string[] }]>;
   allSectors: Array<[string, { count: number; companies: string[] }]>;
+  // Comparison data
+  comparison?: {
+    mostVisitedIndustry: string;
+    secondMostVisitedIndustry: string;
+    mostVisitedSector: string;
+    secondMostVisitedSector: string;
+    industryCompanies: string[];
+    sectorCompanies: string[];
+    allIndustries: Array<[string, { count: number; companies: string[] }]>;
+    allSectors: Array<[string, { count: number; companies: string[] }]>;
+  };
+  isComparison?: boolean;
 }
 
 export const IndustryMetrics = () => {
-  const { getPeriodRange, currentPeriod, getPeriodLabel } = usePeriod();
-  const [flipped, setFlipped] = useState(false);
+  const { 
+    getPeriodRange, 
+    currentPeriod, 
+    comparisonPeriod, 
+    isComparisonMode,
+    getPeriodLabel 
+  } = usePeriod();
 
+  // Get primary period range
   const { startDate, endDate } = getPeriodRange();
+  
+  // Build URL parameters
   const params = new URLSearchParams({
     startDate,
     endDate,
     periodType: currentPeriod.type,
   });
 
-  const { data, error, isLoading } = useSWR<MetricsData>(`/api/learning-journey-dashboard?${params}`, fetcher, {
-    refreshInterval: 30000, // refresh every 30s
-  });
+  // Add comparison parameters if in comparison mode
+  if (isComparisonMode && comparisonPeriod) {
+    params.append('isComparison', 'true');
+    
+    // Get comparison period range
+    const comparisonRange = getPeriodRange(comparisonPeriod);
+    params.append('comparisonStartDate', comparisonRange.startDate);
+    params.append('comparisonEndDate', comparisonRange.endDate);
+  }
+
+  const { data, error, isLoading } = useSWR<MetricsData>(
+    `/api/learning-journey-dashboard?${params}`, 
+    fetcher, 
+    {
+      refreshInterval: 30000, // refresh every 30s
+    }
+  );
 
   if (isLoading) {
     return (
@@ -179,24 +224,31 @@ export const IndustryMetrics = () => {
     );
   }
 
+  // Determine badge content based on comparison mode
+  const getIndustryBadge = () => {
+    if (data.isComparison && data.comparison?.mostVisitedIndustry) {
+      return data.comparison.mostVisitedIndustry;
+    }
+    return data.secondMostVisitedIndustry;
+  };
+
+  const getSectorBadge = () => {
+    if (data.isComparison && data.comparison?.mostVisitedSector) {
+      return data.comparison.mostVisitedSector;
+    }
+    return data.secondMostVisitedSector;
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      {/* <div className="px-1">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-          Industry & Sector Analysis
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {getPeriodLabel()}
-        </p>
-      </div> */}
-
       <MetricCard
         icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
         titleTop="Most Visited"
         titleBottom="Industry"
         value={data.mostVisitedIndustry || "No Data"}
-        badgeText={data.secondMostVisitedIndustry || undefined}
+        badgeText={getIndustryBadge() || "No Data"}
         companies={data.industryCompanies}
+        comparisonValue={data.isComparison ? data.comparison?.mostVisitedIndustry : undefined}
       />
 
       <MetricCard
@@ -204,73 +256,10 @@ export const IndustryMetrics = () => {
         titleTop="Most Visited"
         titleBottom="Sector"
         value={data.mostVisitedSector || "No Data"}
-        badgeText={data.secondMostVisitedSector || undefined}
+        badgeText={getSectorBadge() || "No Data"}
         companies={data.sectorCompanies}
+        comparisonValue={data.isComparison ? data.comparison?.mostVisitedSector : undefined}
       />
-
-      {/* Additional Insights */}
-      {/* {(data.allIndustries.length > 0 || data.allSectors.length > 0) && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h4 className="text-md font-semibold text-gray-800 dark:text-white mb-4">
-            Period Summary
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            {data.allIndustries.length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Top Industries ({data.allIndustries.length})
-                </h5>
-                <div className="space-y-2">
-                  {data.allIndustries.slice(0, 3).map(([industry, d], i) => (
-                    <div key={industry} className="flex justify-between items-center text-sm">
-                      <span className="text-gray-700 dark:text-gray-300 truncate">
-                        {industry}
-                      </span>
-                      <Badge color={i === 0 ? 'success' : i === 1 ? 'warning' : 'primary'}>
-                        {d.count} visits
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
-            {data.allSectors.length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Top Sectors ({data.allSectors.length})
-                </h5>
-                <div className="space-y-2">
-                  {data.allSectors.slice(0, 3).map(([sector, d], i) => (
-                    <div key={sector} className="flex justify-between items-center text-sm">
-                      <span className="text-gray-700 dark:text-gray-300 truncate">
-                        {sector}
-                      </span>
-                      <Badge color={i === 0 ? 'success' : i === 1 ? 'warning' : 'primary'}>
-                        {d.count} visits
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>
-                Total Industries: {data.allIndustries.length}
-              </span>
-              <span>
-                Total Sectors: {data.allSectors.length}
-              </span>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

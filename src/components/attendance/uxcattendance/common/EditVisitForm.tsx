@@ -9,18 +9,45 @@ import TextArea from "@/components/form/input/TextArea";
 import Select from "@/components/form/Select";
 import { SECTORS, ORGANIZATION_SIZES, INDUSTRIES, SESSION_TYPES } from "@/hooks/useOrganistationCat";
 
-interface NewVisitFormProps {
+interface Visit {
+  id: string;
+  company_name: string;
+  date_of_visit: string;
+  total_attended: number;
+  total_registered: number;
+  uen_number: string;
+  start_time: string;
+  end_time: string;
+  duration: string;
+  session_type: string;
+  consultancy: boolean;
+  training: boolean;
+  revenue: number;
+  sector: string;
+  size: string;
+  industry: string;
+  notes: string;
+  pace: boolean;
+  informal: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface EditVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (visitData: any) => void;
+  visit?: Visit | null; // Add visit prop for editing
 }
 
-const NewVisitForm: React.FC<NewVisitFormProps> = ({
+const EditVisitForm: React.FC<EditVisitFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  visit,
 }) => {
   const [formData, setFormData] = useState({
+    id: "",
     company_name: "",
     uen_number: "",
     industry: "",
@@ -42,6 +69,58 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // FIXED: Reset form data when modal closes or visit changes
+  useEffect(() => {
+    if (isOpen && visit) {
+      setFormData({
+        id: visit.id,
+        company_name: visit.company_name,
+        uen_number: visit.uen_number === "-" ? "" : visit.uen_number,
+        industry: visit.industry === "-" ? "" : visit.industry,
+        sector: visit.sector === "-" ? "" : visit.sector,
+        size: visit.size === "-" ? "" : visit.size,
+        date_of_visit: visit.date_of_visit,
+        start_time: visit.start_time,
+        end_time: visit.end_time,
+        duration: visit.duration === "-" ? "" : visit.duration,
+        session_type: visit.session_type === "-" ? "" : visit.session_type,
+        total_registered: visit.total_registered,
+        total_attended: visit.total_attended,
+        consultancy: visit.consultancy,
+        training: visit.training,
+        revenue: visit.revenue,
+        pace: visit.pace,
+        informal: visit.informal,
+        notes: visit.notes,
+      });
+      setErrors({}); // Clear any existing errors
+    } else if (!isOpen) {
+      // Reset form data when modal closes
+      setFormData({
+        id: "",
+        company_name: "",
+        uen_number: "",
+        industry: "",
+        sector: "",
+        size: "",
+        date_of_visit: "",
+        start_time: "",
+        end_time: "",
+        duration: "",
+        session_type: "",
+        total_registered: 0,
+        total_attended: 0,
+        consultancy: false,
+        training: false,
+        revenue: 0,
+        pace: false,
+        informal: false,
+        notes: "",
+      });
+      setErrors({});
+    }
+  }, [isOpen, visit]); // FIXED: Use both isOpen and visit as dependencies
 
   // Auto-calculate duration when start_time or end_time changes
   useEffect(() => {
@@ -124,41 +203,25 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
     
     if (validateForm()) {
       onSubmit(formData);
-      // Reset form
-      setFormData({
-        company_name: "",
-        uen_number: "",
-        industry: "",
-        sector: "",
-        size: "",
-        date_of_visit: "",
-        start_time: "",
-        end_time: "",
-        duration: "",
-        session_type: "",
-        total_registered: 0,
-        total_attended: 0,
-        consultancy: false,
-        training: false,
-        revenue: 0,
-        pace: false,
-        informal: false,
-        notes: "",
-      });
       onClose();
     }
   };
 
+  // FIXED: Don't render the form if there's no visit data
+  if (!visit) {
+    return null;
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-4xl max-h-[90vh] overflow-y-auto p-2 custom-scrollbar">
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+      <form key={`edit-${visit.id}-${isOpen}`} onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Log New Visit
+            Edit Visit
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Enter the details for the company visit
+            Update the details for this company visit
           </p>
         </div>
 
@@ -298,7 +361,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
                   <Input
                     type="number"
                     placeholder="0"
-                    value={formData.total_registered}
+                    value={formData.total_registered ?? ""}
                     onChange={handleInputChange("total_registered")}
                     min="0"
                     error={!!errors.total_registered}
@@ -310,7 +373,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
                   <Input
                     type="number"
                     placeholder="0"
-                    value={formData.total_attended}
+                    value={formData.total_attended ?? ""}
                     onChange={handleInputChange("total_attended")}
                     min="0"
                     error={!!errors.total_attended}
@@ -382,7 +445,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
                 <Input
                   type="number"
                   placeholder="0.00"
-                  value={formData.revenue}
+                  value={formData.revenue ?? ""}
                   onChange={handleInputChange("revenue")}
                   min="0"
                   step={0.01}
@@ -459,7 +522,7 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
               type="submit"
               className="px-6 py-2.5 text-sm font-medium text-white bg-brand-500 border border-transparent rounded-lg hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
             >
-              Save Visit
+              Update Visit
             </button>
           </div>
         </div>
@@ -468,4 +531,4 @@ const NewVisitForm: React.FC<NewVisitFormProps> = ({
   );
 };
 
-export default NewVisitForm;
+export default EditVisitForm;

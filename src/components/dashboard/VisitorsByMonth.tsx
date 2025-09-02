@@ -21,7 +21,14 @@ const MONTHS = [
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function VisitorsByMonth() {
-  const { getPeriodRange, currentPeriod, getPeriodLabel } = usePeriod();
+  const { 
+    getPeriodRange, 
+    currentPeriod, 
+    comparisonPeriod,
+    isComparisonMode,
+    getPeriodLabel 
+  } = usePeriod();
+
   const { startDate, endDate } = getPeriodRange();
 
   const params = useMemo(() => {
@@ -30,82 +37,139 @@ export default function VisitorsByMonth() {
       endDate,
       periodType: currentPeriod.type,
     });
+
+    // Add comparison parameters if comparison mode is enabled
+    if (isComparisonMode && comparisonPeriod) {
+      const comparisonRange = getPeriodRange(comparisonPeriod);
+      p.append('isComparison', 'true');
+      p.append('comparisonStartDate', comparisonRange.startDate);
+      p.append('comparisonEndDate', comparisonRange.endDate);
+    }
+
     return p.toString();
-  }, [startDate, endDate, currentPeriod.type]);
+  }, [startDate, endDate, currentPeriod.type, isComparisonMode, comparisonPeriod, getPeriodRange]);
 
   const { data, error, isLoading } = useSWR(`/api/learning-journey-dashboard?${params}`, fetcher, {
     refreshInterval: 30000, // auto-refresh every 30s
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
   });
 
-  const { periodData, labels } = useMemo(() => {
-    if (!data?.periodBreakdown) return { periodData: [], labels: MONTHS };
+  const { primaryData, comparisonData, labels } = useMemo(() => {
+    const processBreakdown = (breakdown: any[], type: string): { processedData: number[], labels: string[] } => {
+      if (!breakdown) return { processedData: [], labels: MONTHS };
 
-    const breakdown = data.periodBreakdown;
+      if (type === "quarterly") {
+        const quarterData: number[] = [];
+        const quarterLabels: string[] = [];
 
-    if (currentPeriod.type === "quarterly") {
-      const quarterData: number[] = [];
-      const quarterLabels: string[] = [];
+        breakdown.forEach((item: any) => {
+          if (item.monthName && typeof item.total === "number") {
+            quarterLabels.push(item.monthName);
+            quarterData.push(item.total);
+          }
+        });
 
-      breakdown.forEach((item: any) => {
-        if (item.monthName && typeof item.total === "number") {
-          quarterLabels.push(item.monthName);
-          quarterData.push(item.total);
+        while (quarterLabels.length < 3) {
+          quarterLabels.push("N/A");
+          quarterData.push(0);
         }
-      });
 
-      while (quarterLabels.length < 3) {
-        quarterLabels.push("N/A");
-        quarterData.push(0);
+        return { processedData: quarterData, labels: quarterLabels };
       }
 
-      return { periodData: quarterData, labels: quarterLabels };
-    }
+      if (type === "financial") {
+        const yearlyData = Array(12).fill(0) as number[];
+        const finLabels = [
+          "Apr", "May", "Jun", "Jul", "Aug", "Sept",
+          "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"
+        ];
 
-    if (currentPeriod.type === "financial") {
-      const yearlyData = Array(12).fill(0);
-      const finLabels = [
-        "Apr", "May", "Jun", "Jul", "Aug", "Sept",
-        "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"
-      ];
+        breakdown.forEach((item: any) => {
+          if (item.monthName && typeof item.total === "number") {
+            const monthIndex = MONTHS.indexOf(item.monthName);
+            if (monthIndex !== -1) {
+              const finIndex = (monthIndex + 9) % 12;
+              yearlyData[finIndex] = item.total;
+            }
+          }
+        });
 
+        return { processedData: yearlyData, labels: finLabels };
+      }
+
+      if (type === "custom") {
+        // For custom date ranges, show data by month name from the breakdown
+        const customData: number[] = [];
+        const customLabels: string[] = [];
+
+        breakdown.forEach((item: any) => {
+          if (item.monthName && typeof item.total === "number") {
+            customLabels.push(item.monthName);
+            customData.push(item.total);
+          }
+        });
+
+        return { processedData: customData, labels: customLabels };
+      }
+
+      // Default calendar year
+      const yearlyData = Array(12).fill(0) as number[];
       breakdown.forEach((item: any) => {
         if (item.monthName && typeof item.total === "number") {
           const monthIndex = MONTHS.indexOf(item.monthName);
-          if (monthIndex !== -1) {
-            const finIndex = (monthIndex + 9) % 12;
-            yearlyData[finIndex] = item.total;
-          }
+          if (monthIndex !== -1) yearlyData[monthIndex] = item.total;
         }
       });
 
-      return { periodData: yearlyData, labels: finLabels };
+      return { processedData: yearlyData, labels: MONTHS };
+    };
+
+    const primaryResult = processBreakdown(data?.periodBreakdown, currentPeriod.type);
+    let comparisonResult: { processedData: number[], labels: string[] } = { processedData: [], labels: [] };
+
+    if (isComparisonMode && data?.comparison?.periodBreakdown) {
+      comparisonResult = processBreakdown(
+        data.comparison.periodBreakdown, 
+        comparisonPeriod?.type || currentPeriod.type
+      );
     }
 
-    // Default calendar year
-    const yearlyData = Array(12).fill(0);
-    breakdown.forEach((item: any) => {
-      if (item.monthName && typeof item.total === "number") {
-        const monthIndex = MONTHS.indexOf(item.monthName);
-        if (monthIndex !== -1) yearlyData[monthIndex] = item.total;
-      }
-    });
-
-    return { periodData: yearlyData, labels: MONTHS };
-  }, [data, currentPeriod.type]);
+    return {
+      primaryData: primaryResult.processedData,
+      comparisonData: comparisonResult.processedData,
+      labels: primaryResult.labels
+    };
+  }, [data, currentPeriod.type, comparisonPeriod?.type, isComparisonMode]);
 
   const getChartTitle = () => {
+    if (isComparisonMode && comparisonPeriod) {
+      return `Visitors by Month - Comparison`;
+    }
+
     switch (currentPeriod.type) {
       case "quarterly":
         return `Visitors by Month (${getPeriodLabel()})`;
       case "financial":
         return `Visitors by Month (Financial Year ${currentPeriod.year}-${currentPeriod.year + 1})`;
+      case "custom":
+        return `Visitors by Month (Custom Range)`;
       default:
         return `Visitors by Month (${currentPeriod.year})`;
     }
   };
 
+  const getSubtitle = () => {
+    if (isComparisonMode && comparisonPeriod) {
+      return `${getPeriodLabel()} vs ${getPeriodLabel(comparisonPeriod)}`;
+    }
+    return getPeriodLabel();
+  };
+
   const options: ApexOptions = {
-    colors: ["#465fff"],
+    colors: isComparisonMode && comparisonData.length > 0 
+      ? ["#465fff", "#FF6B6B"] 
+      : ["#465fff"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",
@@ -135,9 +199,10 @@ export default function VisitorsByMonth() {
     },
     legend: {
       show: true,
-      position: "top",
-      horizontalAlign: "left",
+      position: "bottom",
+      horizontalAlign: "center",
       fontFamily: "Outfit",
+      markers: {size: 8}
     },
     yaxis: {
       title: { text: undefined },
@@ -145,7 +210,10 @@ export default function VisitorsByMonth() {
     },
     grid: { yaxis: { lines: { show: true } } },
     fill: { opacity: 1 },
-    tooltip: { x: { show: false }, y: { formatter: (val: number) => `${val} visitors` } },
+    tooltip: { 
+      x: { show: false }, 
+      y: { formatter: (val: number) => `${val} visitors` },
+    },
     noData: {
       text: "No data available for this period",
       align: "center",
@@ -154,7 +222,21 @@ export default function VisitorsByMonth() {
     },
   };
 
-  const series = [{ name: "Visitors", data: periodData }];
+  const series = useMemo(() => {
+    const result = [{ name: "Primary Period", data: primaryData }];
+    
+    if (isComparisonMode && comparisonData.length > 0) {
+      result.push({ name: "Comparison Period", data: comparisonData });
+    }
+    
+    return result;
+  }, [primaryData, comparisonData, isComparisonMode]);
+
+  // Calculate totals and peak months
+  const primaryTotal = primaryData.reduce((sum, val) => sum + val, 0);
+  const comparisonTotal  = comparisonData.reduce((sum, val) => sum + val, 0);
+  const primaryPeakIndex = primaryData.indexOf(Math.max(...primaryData));
+  const comparisonPeakIndex = comparisonData.length > 0 ? comparisonData.indexOf(Math.max(...comparisonData)) : -1;
 
   if (isLoading) {
     return (
@@ -192,7 +274,7 @@ export default function VisitorsByMonth() {
             {getChartTitle()}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {getPeriodLabel()}
+            {getSubtitle()}
           </p>
         </div>
       </div>
@@ -209,22 +291,54 @@ export default function VisitorsByMonth() {
       </div>
 
       <div className="pb-4 border-t border-gray-100 dark:border-gray-700 pt-3">
-        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-          <span>
-            Total Period Visitors:{" "}
-            <span className="font-semibold text-gray-800 dark:text-white">
-              {periodData.reduce((sum, val) => sum + val, 0)}
-            </span>
-          </span>
-          <span>
-            Peak Month:{" "}
-            <span className="font-semibold text-gray-800 dark:text-white">
-              {periodData.length > 0 && Math.max(...periodData) > 0
-                ? labels[periodData.indexOf(Math.max(...periodData))] || "N/A"
-                : "N/A"}
-            </span>
-          </span>
+        {isComparisonMode && comparisonData.length > 0 ? (
+          // Comparison mode footer
+        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+          {/* Primary Period - Left */}
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded bg-blue-500"></div>
+            <div>
+              Primary Peak Month:{" "}
+              <span className="font-semibold text-gray-800 dark:text-white">
+                {primaryData.length > 0 && Math.max(...primaryData) > 0
+                  ? labels[primaryPeakIndex] || "N/A"
+                  : "N/A"}
+              </span>
+            </div>
+          </div>
+
+          {/* Comparison Period - Right */}
+          <div className="flex items-center gap-2 justify-end">
+            <div className="w-2 h-2 rounded bg-error-400"></div>
+            <div>
+              Comparison Peak Month:{" "}
+              <span className="font-semibold text-gray-800 dark:text-white">
+                {comparisonData.length > 0 && Math.max(...comparisonData) > 0
+                  ? labels[comparisonPeakIndex] || "N/A"
+                  : "N/A"}
+              </span>
+            </div>
+          </div>
         </div>
+        ) : (
+          // Single mode footer
+          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+            <span>
+              Total Period Visitors:{" "}
+              <span className="font-semibold text-gray-800 dark:text-white">
+                {primaryTotal}
+              </span>
+            </span>
+            <span>
+              Peak Month:{" "}
+              <span className="font-semibold text-gray-800 dark:text-white">
+                {primaryData.length > 0 && Math.max(...primaryData) > 0
+                  ? labels[primaryPeakIndex] || "N/A"
+                  : "N/A"}
+              </span>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
