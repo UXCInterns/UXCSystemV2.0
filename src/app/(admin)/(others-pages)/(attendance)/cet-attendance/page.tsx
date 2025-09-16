@@ -1,13 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import CETAttendanceTable  from "../../../../../components/attendance/cetattendace/cetattendance";
-import ComponentCard from "../../../../../components/attendance/cetattendace/common/ComponentCard";
-import ExportDropdown from "../../../../../components/attendance/cetattendace/common/exportButton";
-import ChartTab from "../../../../../components/attendance/cetattendace/common/PaceToggle";
+import CETAttendanceTable from "@/components/attendance/cetattendace/cetattendance";
+import ComponentCard from "@/components/attendance/common/ComponentCard";
+import ExportDropdown from "@/components/attendance/common/ExportButton";
+import ChartTab from "@/components/attendance/cetattendace/common/PaceToggle";
 
 export default function CETTable() {
+  const [selectedProgramType, setSelectedProgramType] = useState<"pace" | "non_pace">("pace");
+
+  const handleToggleChange = (type: "pace" | "non_pace") => {
+    setSelectedProgramType(type);
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -24,10 +30,10 @@ export default function CETTable() {
               {/* Left group: Search, Filter, Sort */}
               <div className="flex items-center gap-4">
                 <h4 className="text-lg font-semibold text-gray-800 dark:text-white ml-5">
-                  CET Training
+                  CET Training {selectedProgramType === "pace" ? "PACE" : "NON-PACE"}
                 </h4>
               </div>
-
+               
               {/* Right group: Export & Log New Visit */}
               <div className="flex items-center gap-4 mr-4">
                 <ExportDropdown
@@ -42,12 +48,18 @@ export default function CETTable() {
                     }
                   }}
                 />
-                <ChartTab />
+                <ChartTab 
+                  selected={selectedProgramType}
+                  onToggle={handleToggleChange}
+                />
               </div>
             </div>
           }
         >
-        <CETAttendanceTable data={[]}/>
+        <CETAttendanceTable 
+          data={[]}
+          programTypeFilter={selectedProgramType}
+        />
         </ComponentCard>
       </div>
     </div>

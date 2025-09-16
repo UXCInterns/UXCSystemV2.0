@@ -1,44 +1,53 @@
+// components/WorkshopTableHeader.tsx
 import React from 'react';
 import SearchQuery from "@/components/attendance/common/SearchQuery";
 import SortDropdown from "@/components/attendance/common/SortDropdown";
 import Button from "@/components/ui/button/Button";
 import { PlusIcon } from "@/icons";
 
-interface VisitTableHeaderProps {
+interface WorkshopTableHeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   sortBy: string;
-  sortOptions: string[];
   onSortChange: (sort: string) => void;
-  hasActiveFilters: boolean;
   activeFilterCount: number;
   onFilterClick: () => void;
-  onAddVisitClick: () => void;
+  onAddClick: () => void;
   isLoading: boolean;
 }
 
-export const VisitTableHeader: React.FC<VisitTableHeaderProps> = ({
+const sortOptions = [
+  "Newest", 
+  "Oldest", 
+  "Most Trainee Hours", 
+  "Least Trainee Hours",
+  "Most Participants", 
+  "Least Participants"
+];
+
+const WorkshopTableHeader: React.FC<WorkshopTableHeaderProps> = ({
   searchQuery,
   onSearchChange,
   sortBy,
-  sortOptions,
   onSortChange,
-  hasActiveFilters,
   activeFilterCount,
   onFilterClick,
-  onAddVisitClick,
-  isLoading,
+  onAddClick,
+  isLoading
 }) => {
   return (
-    <div className="flex items-center justify-between gap-4 px-3 py-4">
+    <div className="flex items-center justify-between gap-4 p-3">
+      {/* Left side: Search */}
       <div className="flex items-center">
         <SearchQuery value={searchQuery} onChange={onSearchChange} />
       </div>
+
+      {/* Right side: Filter + Sort */}
       <div className="flex items-center gap-4">
         <Button 
           size="sm" 
           className="px-4 py-2.5 relative" 
-          variant={hasActiveFilters ? "primary" : "outline"}
+          variant="outline"
           onClick={onFilterClick}
         >
           <svg
@@ -62,26 +71,24 @@ export const VisitTableHeader: React.FC<VisitTableHeaderProps> = ({
           </svg>
           Filter
           {activeFilterCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {activeFilterCount}
             </span>
           )}
         </Button>
-        <SortDropdown
-          options={sortOptions}
-          selected={sortBy}
-          onSelect={onSortChange}
-        />
-        <Button 
-          className="flex items-center px-4 py-2.5 disabled:opacity-50" 
-          variant="primary"
-          size="sm"
-          onClick={onAddVisitClick}
+
+        <SortDropdown options={sortOptions} selected={sortBy} onSelect={onSortChange} />
+        
+        <button
+          onClick={onAddClick}
           disabled={isLoading}
+          className="flex items-center bg-brand-500 text-white px-4 py-2.5 text-theme-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Processing..." : "Log New Visit"} <PlusIcon className="ml-2" />
-        </Button>
+          Add New Workshop <PlusIcon className="ml-2" />
+        </button>
       </div>
     </div>
   );
 };
+
+export default WorkshopTableHeader;

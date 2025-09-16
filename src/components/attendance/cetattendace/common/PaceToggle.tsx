@@ -1,30 +1,29 @@
-import { useState } from "react";
+interface ChartTabProps {
+  selected: "pace" | "non_pace";
+  onToggle: (type: "pace" | "non_pace") => void;
+}
 
-const ChartTab: React.FC = () => {
-  const [selected, setSelected] = useState<
-    "optionOne" | "optionTwo"
-  >("optionOne");
-
-  const getButtonClass = (option: "optionOne" | "optionTwo") =>
+const ChartTab: React.FC<ChartTabProps> = ({ selected, onToggle }) => {
+  const getButtonClass = (option: "pace" | "non_pace") =>
     selected === option
       ? "shadow-theme-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800"
       : "text-gray-500 dark:text-gray-400";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900">
+    <div className="flex items-center gap-0.5 rounded-lg bg-gray-200 p-0.5 dark:bg-gray-900">
       <button
-        onClick={() => setSelected("optionOne")}
-        className={`px-4 py-2.5 font-medium w-auto rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionOne"
+        onClick={() => onToggle("pace")}
+        className={`px-4 py-2.5 font-medium w-auto rounded-md text-theme-sm hover:text-gray-900 dark:hover:text-white ${getButtonClass(
+          "pace"
         )}`}
       >
         PACE
       </button>
-
+       
       <button
-        onClick={() => setSelected("optionTwo")}
-        className={`px-3 py-2.5 font-medium w-auto rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionTwo"
+        onClick={() => onToggle("non_pace")}
+        className={`px-3 py-2.5 font-medium w-auto rounded-md text-theme-sm hover:text-gray-900 dark:hover:text-white ${getButtonClass(
+          "non_pace"
         )}`}
       >
         NON-PACE

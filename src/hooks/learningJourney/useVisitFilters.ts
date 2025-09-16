@@ -2,7 +2,7 @@
 // This is for the UXC LJ Attendance Table
 
 import { useMemo, useState } from 'react';
-import { Visit, FilterOptions } from '../types/visit';
+import { Visit, FilterOptions } from '../../types/visit';
 
 export const useVisitFilters = (visits: Visit[]) => {
   const [activeFilters, setActiveFilters] = useState<FilterOptions>({

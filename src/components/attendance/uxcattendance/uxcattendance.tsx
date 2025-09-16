@@ -5,13 +5,13 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../ui/tab
 import Pagination from "@/components/common/Pagination";
 import FilterComponent from "./common/FilterComponent";
 import VisitDetailsModal from "./common/ViewDetails";
-import NewVisitForm from "./common/newVisitForm";
+import NewVisitForm from "./common/NewVisitForm";
 import EditVisitForm from "./common/EditVisitForm";
 
 // Import our custom hooks and components
-import { useVisits } from '@/hooks/useVisits';
-import { useVisitFilters } from '@/hooks/useVisitFilters';
-import { useVisitTable } from '@/hooks/useVisitTable';
+import { useVisits } from '@/hooks/learningJourney/useVisits';
+import { useVisitFilters } from '@/hooks/learningJourney/useVisitFilters';
+import { useVisitTable } from '@/hooks/learningJourney/useVisitTable';
 import { VisitTableHeader } from './common/VisitTableHeader';
 import { ActiveFilters } from '../uxcattendance/common/ActiveFilters';
 import { Visit } from '@/types/visit';
@@ -126,17 +126,6 @@ const UXCAttendanceTable: React.FC = () => {
     });
   };
 
-  // Loading and error states
-  if (isLoading && !visits.length) {
-    return (
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-        <div className="flex items-center justify-center p-8">
-          <div className="text-gray-500 dark:text-gray-400">Loading visits...</div>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -196,7 +185,16 @@ const UXCAttendanceTable: React.FC = () => {
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] group">
-            {paginatedData.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <td colSpan={6} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-center items-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                    <span className="ml-2">Loading workshops...</span>
+                  </div>
+                </td>
+              </TableRow>
+            ) : paginatedData.length === 0 ? (
               <TableRow>
                 <td colSpan={6} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
                   {hasActiveFilters || searchQuery 

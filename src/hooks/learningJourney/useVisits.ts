@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
-import { Visit } from '../types/visit';
+import { Visit } from '../../types/visit';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);

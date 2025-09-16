@@ -6,7 +6,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Checkbox from "@/components/form/input/Checkbox";
 import { Modal } from "@/components/ui/modal/index";
-import { SECTORS, SESSION_TYPES, ORGANIZATION_SIZES, INDUSTRIES } from "@/hooks/useOrganistationCat";
+import { SECTORS, SESSION_TYPES, ORGANIZATION_SIZES, INDUSTRIES } from "@/hooks/learningJourney/useOrganistationCat";
 
 export interface FilterOptions {
   sessionTypes: string[];
