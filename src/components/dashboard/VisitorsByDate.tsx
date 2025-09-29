@@ -220,7 +220,7 @@ export default function VisitorsByDate() {
       }
     },
     markers: { 
-      size: chartType === "area" ? 0 : 4, 
+      size: chartType === "area" ? 4 : 4, 
       strokeColors: "#fff", 
       strokeWidth: 2, 
       hover: { size: 6 } 

@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
-import CETMetrics from "@/components/cettraining/CETMetrics";
-import React from "react";
-import MonthlyTarget from "@/components/cettraining/MonthlyTarget";
-import StatisticsChart from "@/components/cettraining/StatisticsChart";
+"use client";
+import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
-export const metadata: Metadata = {
-  title:
-    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
-};
+import TotalTraineeHours from "@/components/cettraining/TotalTraineeHours";
+import TraineeHoursByMonth from "@/components/cettraining/TraineeHoursByMonth";
+import VisitorsByMonth from "@/components/cettraining/VisitorsByMonth";
+import CourseTypeMetrics from "@/components/cettraining/CourseTypeMetrics";
+
+import { PeriodProvider } from "@/context/PeriodContext";
+import { StatMetrics } from "@/components/cettraining/StatsMetrics";
+import { BIALevelMetrics } from "@/components/cettraining/BIALevelMetrics";
+import { DurationMetrics } from "@/components/cettraining/DurationMetrics";
 
 export default function CETTraining() {
   return (
@@ -19,20 +20,46 @@ export default function CETTraining() {
         items={[
           { label: "Home", href: "/" },
           { label: "CET Training"},
-          
         ]}
       />
       <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 xl:col-span-6">
-            <MonthlyTarget />
-        </div>
-        <div className="col-span-12 space-y-6 xl:col-span-6">
-            <CETMetrics />
-        </div>
+        <PeriodProvider>
+          <CETTrainingContent />
+        </PeriodProvider>
+      </div>
+    </>
+  );
+}
 
-        <div className="col-span-12">
-            <StatisticsChart />
-        </div>
+// Separate component to handle the state inside PeriodProvider
+function CETTrainingContent() {
+  const [selectedProgram, setSelectedProgram] = useState<"pace" | "non_pace">("pace");
+
+  return (
+    <>
+      <div className="col-span-12 space-y-6 xl:col-span-12">
+        <StatMetrics 
+          selectedProgram={selectedProgram} 
+          setSelectedProgram={setSelectedProgram} 
+        />
+      </div>
+      <div className="col-span-12 xl:col-span-7">
+        <VisitorsByMonth programType={selectedProgram} />
+      </div>
+      <div className="col-span-12 xl:col-span-5">
+        <TotalTraineeHours programType={selectedProgram} />
+      </div>
+      <div className="col-span-12 xl:col-span-4">
+        <CourseTypeMetrics programType={selectedProgram} />
+      </div>
+      <div className="col-span-12 xl:col-span-5">
+        <BIALevelMetrics programType={selectedProgram} />
+      </div>
+      <div className="col-span-12 xl:col-span-3">
+        <DurationMetrics programType={selectedProgram} />
+      </div>
+      <div className="col-span-12">
+        <TraineeHoursByMonth programType={selectedProgram} />
       </div>
     </>
   );
