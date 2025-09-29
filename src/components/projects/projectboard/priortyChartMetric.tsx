@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import Badge from "../../ui/badge/Badge";
-import { useProjectData } from "@/hooks/useProjectData";
+import { useProjectData } from "@/hooks/project/useProjectData";
+import { Project } from "@/types/project";
 import ViewModeToggle from "./futureProjects";
 
 const ProjectGanttChart = () => {
-  const { data: projectsData } = useProjectData(); // ✅ use hook
-  const [viewMode, setViewMode] = useState<"year" | "month">("year"); // ✅ fixed type
+  const { projects } = useProjectData(); 
+  const [viewMode, setViewMode] = useState<"year" | "month">("year"); 
   const [selectedMonth, setSelectedMonth] = useState(8);
-  const currentYear = 2025;
+  const currentYear = new Date().getFullYear()
 
   const getTimelineData = () => {
     if (viewMode === "year") {
@@ -97,9 +98,9 @@ const ProjectGanttChart = () => {
 
   const timeline = getTimelineData();
 
-  const filteredProjects = projectsData.filter((project) => {
-    const projectStart = new Date(project.startDate);
-    const projectEnd = new Date(project.endDate);
+  const filteredProjects = projects.filter((project:Project) => {
+    const projectStart = new Date(project.start_date);
+    const projectEnd = new Date(project.end_date);
     return (
       projectStart <= timeline.endDate && projectEnd >= timeline.startDate
     );
@@ -181,10 +182,10 @@ const ProjectGanttChart = () => {
           {/* Project Rows - scrollable area */}
           <div className="max-h-64 overflow-y-auto custom-scrollbar pr-1">
             <div className="space-y-3">
-              {filteredProjects.map((project) => {
+              {filteredProjects?.map((project:Project) => {
                 const position = calculatePosition(
-                  project.startDate,
-                  project.endDate,
+                  project.start_date,
+                  project.end_date,
                   timeline.startDate,
                   timeline.endDate
                 );
@@ -199,14 +200,14 @@ const ProjectGanttChart = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <h5 className="font-medium text-gray-800 dark:text-white/90 text-sm truncate">
-                            {project.projectName}
+                            {project.project_name}
                           </h5>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge
                               size="sm"
-                              color={getPriorityColor(project.priority)}
+                              color={getPriorityColor(project.status)}
                             >
-                              {project.priority}
+                              {project.status}
                             </Badge>
                           </div>
                         </div>
@@ -238,8 +239,8 @@ const ProjectGanttChart = () => {
                       >
                         {/* Tooltip on Hover */}
                         <div className="invisible group-hover:visible absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                          {new Date(project.startDate).toLocaleDateString()} -{" "}
-                          {new Date(project.endDate).toLocaleDateString()}
+                          {new Date(project.start_date).toLocaleDateString()} -{" "}
+                          {new Date(project.end_date).toLocaleDateString()}
                           <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                         </div>
                       </div>

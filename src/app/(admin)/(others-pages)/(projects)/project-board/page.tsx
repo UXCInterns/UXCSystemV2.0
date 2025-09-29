@@ -191,7 +191,7 @@ export default function UXCDashboard() {
   return (
     <>
       <PageBreadcrumb
-        pageTitle="UXC Learning Journey"
+        pageTitle="UXC'S PROJECTS"
         items={[
           { label: "Home", href: "/" },
           { label: "UXC Learning Journey" },

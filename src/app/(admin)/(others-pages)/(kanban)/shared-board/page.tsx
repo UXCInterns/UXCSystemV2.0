@@ -3,7 +3,7 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/kanban/common/ComponentCard";
 import ProjectCard from "@/components/kanban/ProjectCard";
-import { useProjectData } from "@/hooks/useProjectData";
+import { useProjectData } from "@/hooks/project/useProjectData";
 import React from "react";
 
 
