@@ -3,16 +3,18 @@
 import React from "react";
 import Badge from "@/components/ui/badge/Badge";
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
-import { useProjectData } from "@/hooks/useProjectData";
+import { useProjectData } from "@/hooks/project/useProjectData";
+import { Project } from "@/types/project";
+import { projectData } from "@/components/home/ProjectTable";
 
 export const ProjectMetrics = () => {
-  const { data, totalProjects, statusCounts } = useProjectData();
+  const {projects } = useProjectData();
 
-  // Current Projects (only In Progress)
-  const currentProjects = statusCounts.inProgress;
+  // // Current Projects (only In Progress)
+  // const currentProjects = statusCounts.inProgress;
 
-  // Future Projects (only Pending)
-  const futureProjects = statusCounts.pending;
+  // // Future Projects (only Pending)
+  // const futureProjects = statusCounts.pending;
 
   // Calculate projects due next month
   const nextMonth = new Date();
@@ -20,14 +22,14 @@ export const ProjectMetrics = () => {
   const startOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 1);
   const endOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
 
-  const projectsDueNextMonth = data.filter(project => {
-    const endDate = new Date(project.endDate);
-    return endDate >= startOfNextMonth && endDate <= endOfNextMonth;
-  }).length;
+const projectsDueNextMonth = projects.filter((project: Project) => {
+  const endDate = new Date(project.end_date);
+  return endDate >= startOfNextMonth && endDate <= endOfNextMonth;
+}).length;
 
   // Percentage changes (mock/demo)
-  const currentProjectsChange = ((currentProjects / totalProjects) * 100).toFixed(1);
-  const futureProjectsChange = ((futureProjects / totalProjects) * 100).toFixed(1);
+  // const currentProjectsChange = ((currentProjects / totalProjects) * 100).toFixed(1);
+  // const futureProjectsChange = ((futureProjects / totalProjects) * 100).toFixed(1);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
@@ -46,17 +48,17 @@ export const ProjectMetrics = () => {
         {/* Numbers stacked */}
         <div className="flex items-end justify-between mt-4">
           <div>
-            <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
+            {/* <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
               {currentProjects}
-            </h4>
+            </h4> */}
             <span className="text-sm text-gray-400 dark:text-gray-500">
               In Progress
             </span>
           </div>
-          <Badge color="info" size="sm">
+          {/* <Badge color="info" size="sm">
             <ArrowUpIcon />
             {currentProjectsChange}%
-          </Badge>
+          </Badge> */}
         </div>
       </div>
 
@@ -73,17 +75,17 @@ export const ProjectMetrics = () => {
 
         <div className="flex items-end justify-between mt-4">
           <div>
-            <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
+            {/* <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
               {futureProjects}
-            </h4>
+            </h4> */}
             <span className="text-sm text-gray-400 dark:text-gray-500">
               Pending
             </span>
           </div>
-          <Badge color="warning" size="sm">
+          {/* <Badge color="warning" size="sm">
             <ArrowUpIcon />
             {futureProjectsChange}%
-          </Badge>
+          </Badge> */}
         </div>
       </div>
 
@@ -100,9 +102,9 @@ export const ProjectMetrics = () => {
 
         <div className="flex items-end justify-between mt-4">
           <div>
-            <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
+            {/* <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
               {totalProjects}
-            </h4>
+            </h4> */}
             <span className="text-sm text-gray-400 dark:text-gray-500">
               All time
             </span>

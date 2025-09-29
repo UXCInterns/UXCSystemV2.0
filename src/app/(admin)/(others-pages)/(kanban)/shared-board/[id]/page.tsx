@@ -7,7 +7,7 @@ import TaskTab from "@/components/kanban/common/TaskToggle";
 import AddTaskModal from "@/components/kanban/common/AddTaskModal";
 import KanbanBoard from "@/components/kanban/SharedBoard";
 import { useEffect, useState } from "react";
-import { useProjectData } from "@/hooks/useProjectData";
+import { useProjectData } from "@/hooks/project/useProjectData";
 import type { ColumnType } from "@/hooks/useData";
 import { initialProjectBoards } from "@/hooks/useData";
 

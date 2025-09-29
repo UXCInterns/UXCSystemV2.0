@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 import { InfoIcon, CheckCircleIcon } from "../../../icons";
-import { useProjectData } from "@/hooks/useProjectData";
+import { useProjectData } from "@/hooks/project/useProjectData";
 
 const getCurrentTheme = () => {
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -40,7 +40,7 @@ const statusConfig = {
 const StatusChartMetric = () => {
   const [theme, setTheme] = useState("light");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const { data: allProjects, statusCounts, totalProjects } = useProjectData();
+  const { projects, statusCounts, totalProjects } = useProjectData();
 
   useEffect(() => {
     setTheme(getCurrentTheme());
