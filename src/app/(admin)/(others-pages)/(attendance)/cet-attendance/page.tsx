@@ -35,7 +35,7 @@ export default function CETTable() {
               </div>
                
               {/* Right group: Export & Log New Visit */}
-              <div className="flex items-center gap-4 mr-4">
+              <div className="flex items-center gap-2 mr-4">
                 <ExportDropdown
                   options={["Export as PDF", "Export as CSV", "Export as XLSX"]}
                   onSelect={(format) => {

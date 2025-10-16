@@ -235,7 +235,7 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
               />
             </div>
 
-            <div className="flex flex-col items-start gap-4 sm:flex-row xl:flex-col max-h-[220px] overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-2 md:grid-cols-4 xl:flex xl:flex-col gap-4 w-full xl:w-auto max-h-[220px] xl:overflow-y-auto custom-scrollbar">
               {biaLevels.map((level: any, index: number) => {
                 const percentage = totalWorkshops > 0 
                   ? Math.round((level.count / totalWorkshops) * 100) 
