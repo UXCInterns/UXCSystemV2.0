@@ -192,9 +192,11 @@ const ProjectGanttChart = () => {
 
                 return (
                   <div
-                    key={project.id}
+                    key={project.project_id}
                     className="flex items-center group hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg px-2 py-1 transition-colors"
+                  
                   >
+                    
                     {/* Project Info */}
                     <div className="w-40 flex-shrink-0 pr-4">
                       <div className="flex items-center justify-between">

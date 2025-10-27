@@ -24,7 +24,7 @@ export const useProjectData = () => {
 
   
   const mapProjectData = (row: any): Project => ({
-    id: row.id,
+    project_id: row.project_id,
     project_name: row.project_name,
     start_date: row.start_date,
     end_date: row.end_date,

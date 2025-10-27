@@ -3,18 +3,18 @@
 import React from "react";
 import Badge from "@/components/ui/badge/Badge";
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
-import { useProjectData } from "@/hooks/project/useProjectData";
+import { useProjectData, } from "@/hooks/project/useProjectData";
 import { Project } from "@/types/project";
 import { projectData } from "@/components/home/ProjectTable";
 
 export const ProjectMetrics = () => {
-  const {projects } = useProjectData();
+  const {projects,totalProjects ,statusCounts } = useProjectData();
 
   // // Current Projects (only In Progress)
-  // const currentProjects = statusCounts.inProgress;
+  const currentProjects = statusCounts.inProgress;
 
   // // Future Projects (only Pending)
-  // const futureProjects = statusCounts.pending;
+  const futureProjects = statusCounts.pending;
 
   // Calculate projects due next month
   const nextMonth = new Date();
@@ -28,8 +28,8 @@ const projectsDueNextMonth = projects.filter((project: Project) => {
 }).length;
 
   // Percentage changes (mock/demo)
-  // const currentProjectsChange = ((currentProjects / totalProjects) * 100).toFixed(1);
-  // const futureProjectsChange = ((futureProjects / totalProjects) * 100).toFixed(1);
+  const currentProjectsChange = ((currentProjects / totalProjects) * 100).toFixed(1);
+  const futureProjectsChange = ((futureProjects / totalProjects) * 100).toFixed(1);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
@@ -41,24 +41,24 @@ const projectsDueNextMonth = projects.filter((project: Project) => {
             <GroupIcon className="text-blue-600 size-6 dark:text-blue-400" />
           </div>
           <span className="text-md font-medium text-gray-600 dark:text-gray-400">
-            Current Projects
+            Current Projects 
           </span>
         </div>
 
         {/* Numbers stacked */}
         <div className="flex items-end justify-between mt-4">
           <div>
-            {/* <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
+            <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
               {currentProjects}
-            </h4> */}
+            </h4>
             <span className="text-sm text-gray-400 dark:text-gray-500">
               In Progress
             </span>
           </div>
-          {/* <Badge color="info" size="sm">
+          <Badge color="info" size="sm">
             <ArrowUpIcon />
             {currentProjectsChange}%
-          </Badge> */}
+          </Badge>
         </div>
       </div>
 
@@ -69,23 +69,23 @@ const projectsDueNextMonth = projects.filter((project: Project) => {
             <BoxIconLine className="text-purple-600 size-6 dark:text-purple-400" />
           </div>
           <span className="text-md font-medium text-gray-600 dark:text-gray-400">
-            Future Projects
+            Future Projects 
           </span>
         </div>
 
         <div className="flex items-end justify-between mt-4">
           <div>
-            {/* <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
+            <h4 className="font-bold text-gray-800 text-3xl dark:text-white/90">
               {futureProjects}
-            </h4> */}
+            </h4>
             <span className="text-sm text-gray-400 dark:text-gray-500">
               Pending
             </span>
           </div>
-          {/* <Badge color="warning" size="sm">
+          <Badge color="warning" size="sm">
             <ArrowUpIcon />
             {futureProjectsChange}%
-          </Badge> */}
+          </Badge>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ const projectsDueNextMonth = projects.filter((project: Project) => {
           </div>
           <Badge color="success" size="sm">
             <ArrowUpIcon />
-            100%
+            100% hard coded bruh
           </Badge>
         </div>
       </div>
