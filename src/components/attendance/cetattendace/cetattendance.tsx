@@ -7,13 +7,13 @@ import { WorkshopsTableProps } from "@/types/workshop";
 import { useWorkshopData } from "@/hooks/workshop/useWorkshopData";
 import { useWorkshopModals } from "@/hooks/workshop/useWorkshopModals";
 import { useWorkshopPagination } from "@/hooks/workshop/useWorkshopPagination";
-import WorkshopTableHeader from "./common/WorkshopTableHeader";
-import WorkshopTableBody from "./common/WorkshopTableBody";
-import WorkshopModals from "./common/WorkshopModals";
-import { WorkshopActiveFilters } from "./common/ActiveFilters";
+import WorkshopTableHeader from "./WorkshopTableHeader";
+import WorkshopTableBody from "./WorkshopTableBody";
+import WorkshopModals from "./WorkshopModals";
+import { WorkshopActiveFilters } from "./ActiveFilters";
 import Pagination from "@/components/common/Pagination";
 import { ITEMS_PER_PAGE } from "@/constants/workshopConstants";
-import { WorkshopFilterOptions } from "./common/FilterComponent";
+import { WorkshopFilterOptions } from "./FilterComponent";
 
 const WorkshopsTable: React.FC<WorkshopsTableProps> = ({ 
   data = [], 

@@ -26,10 +26,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Inactivity timeout in milliseconds (15 minutes)
-const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000;
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = ['/signin', '/signup', '/reset-password'];
+const PUBLIC_ROUTES = ['/signin'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

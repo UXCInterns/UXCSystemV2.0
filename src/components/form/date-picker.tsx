@@ -24,17 +24,31 @@ export default function DatePicker({
   placeholder,
 }: PropsType) {
   useEffect(() => {
-    const flatPickr = flatpickr(`#${id}`, {
+    const element = document.querySelector(`#${id}`);
+    if (!element) return;
+
+    const flatPickr = flatpickr(element as HTMLElement, {
       mode: mode || "single",
       static: true,
       monthSelectorType: "static",
       dateFormat: "j F Y",
       defaultDate,
       onChange,
+      // CRITICAL FIX: Force flatpickr to use local timezone, not UTC
+      parseDate: (datestr: string, format: string): Date => {
+        // Parse the date string as a local date
+        if (typeof datestr === 'string' && datestr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = datestr.split('-').map(Number);
+          return new Date(year, month - 1, day);
+        }
+        // Fallback to default parsing, but ensure it returns a Date
+        const parsed = flatpickr.parseDate(datestr, format);
+        return parsed || new Date();
+      },
     });
 
     return () => {
-      if (!Array.isArray(flatPickr)) {
+      if (flatPickr && !Array.isArray(flatPickr)) {
         flatPickr.destroy();
       }
     };
