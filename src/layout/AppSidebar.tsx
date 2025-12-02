@@ -65,6 +65,12 @@ const othersItems: NavItem[] = [
     name: "Telegram",
     subItems: [{ name: "User Management", path: "/telegram", pro: false }],
   },
+  {
+    icon: <PieChartIcon />,
+    name: "Workshop",
+    path: "/feedback"
+  },
+  
 ];
 
 const AppSidebar: React.FC = () => {
