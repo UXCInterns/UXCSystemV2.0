@@ -17,6 +17,7 @@ import {
   HouseIcon,
   ChatIcon
 } from "../icons/index";
+import { ShoppingCart, ShoppingCartIcon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -42,19 +43,14 @@ const navItems: NavItem[] = [
     subItems: [{ name: "UXC Learning Journey", path: "/uxc-attendance", pro: false }, { name: "CET Training", path: "/cet-attendance", pro: false }],
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-  {
     name: "Projects",
     icon: <TableIcon />,
     subItems: [{ name: "Project Board", path: "/project-board", pro: false }, { name: "Manpower", path: "/manpower", pro: false }],
   },
   {
-    name: "Kanban",
-    icon: <ListIcon />,
-    subItems: [{ name: "My Board", path: "/my-board", pro: false }, { name: "Shared Board", path: "/shared-board", pro: false }],
+    name: "E-Commerce",
+    icon: <ShoppingCart />,
+    path: "/e-commerce",
   },
 ];
 
@@ -100,6 +96,7 @@ const AppSidebar: React.FC = () => {
                   ? "lg:justify-center"
                   : "lg:justify-start"
               }`}
+              suppressHydrationWarning
             >
               <span
                 className={` ${
@@ -131,6 +128,7 @@ const AppSidebar: React.FC = () => {
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                 }`}
+                suppressHydrationWarning
               >
                 <span
                   className={`${
@@ -170,6 +168,7 @@ const AppSidebar: React.FC = () => {
                           ? "menu-dropdown-item-active"
                           : "menu-dropdown-item-inactive"
                       }`}
+                      suppressHydrationWarning
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
@@ -216,8 +215,7 @@ const AppSidebar: React.FC = () => {
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
     // Check if the current path matches any submenu item
@@ -276,22 +274,23 @@ const AppSidebar: React.FC = () => {
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
-            ? "w-[290px]"
+            ? "w-[280px]"
             : isHovered
-            ? "w-[290px]"
+            ? "w-[280px]"
             : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      suppressHydrationWarning
     >
       <div
         className={`py-6 flex  ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
         }`}
       >
-        <Link href="/">
+        <Link href="/home">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
