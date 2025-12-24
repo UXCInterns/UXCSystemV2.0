@@ -50,6 +50,12 @@ const othersItems: NavItem[] = [
     name: "InnoPoll",
     path: "/innoPoll"
   },
+  {
+    icon: <PieChartIcon />,
+    name: "Workshop",
+    path: "/feedback"
+  },
+  
 ];
 
 const AppSidebar: React.FC = () => {
