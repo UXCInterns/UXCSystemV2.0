@@ -2,7 +2,7 @@
 // This is for the UXC LJ Attendance Table
 
 import { useMemo, useState, useEffect } from 'react';
-import { Visit } from '../../types/visit';
+import { Visit } from '../../types/LearningJourneyAttendanceTypes/visit';
 
 export const useVisitTable = (visits: Visit[]) => {
   const [searchQuery, setSearchQuery] = useState("");

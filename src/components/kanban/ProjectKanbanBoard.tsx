@@ -1,20 +1,19 @@
 "use client";
 
 import React from "react";
-import { KanbanProvider } from '@/components/ui/shadcn-io/kanban';
-import { useTasks } from '@/hooks/kanban/useTasks';
-import { useComments } from '@/hooks/kanban/useComments';
-import { TaskSidePanel } from '@/components/kanban/section/TaskSidePanel';
-import AddTaskPanel from '@/components/kanban/section/AddTaskPanel';
-import KanbanBoardHeader from '@/components/kanban/kanban/KanbanBoardHeader';
-import KanbanBoardContent from '@/components/kanban/kanban/KanbanBoardContent';
-import KanbanLoadingError from '@/components/kanban/kanban/KanbanLoadingError';
-import { useKanbanState } from '@/hooks/kanban/useKanbanState';
-import { useCurrentUser } from '@/hooks/kanban/useCurrentUser';
-import { useProjectData } from '@/hooks/kanban/useProjectData';
-import { useTaskOperations } from '@/hooks/kanban/useTaskOperations';
-import { useCommentOperations } from '@/hooks/kanban/useCommentOperations';
-import { useTaskFilters } from '@/hooks/kanban/useTaskFilters';
+import { useTasks } from '@/hooks/KanbanBoardHooks/useTasks';
+import { useComments } from '@/hooks/KanbanBoardHooks/useComments';
+import { TaskSidePanel } from '@/components/kanban/TaskDetailsSidePanel/TaskSidePanel';
+import AddTaskPanel from '@/components/kanban/AddTaskSidePanel/AddTaskPanel';
+import KanbanBoardHeader from '@/components/kanban/KanbanBoardView/KanbanBoardHeader';
+import KanbanBoardContent from '@/components/kanban/KanbanBoardView/KanbanBoardContent';
+import KanbanLoadingError from '@/components/kanban/KanbanBoardView/KanbanLoadingError';
+import { useKanbanState } from '@/hooks/KanbanBoardHooks/KanbanBoard/useKanbanState';
+import { useCurrentUser } from '@/hooks/KanbanBoardHooks/KanbanBoard/useCurrentUser';
+import { useProjectData } from '@/hooks/KanbanBoardHooks/KanbanBoard/useProjectData';
+import { useTaskOperations } from '@/hooks/KanbanBoardHooks/KanbanBoard/useTaskOperations';
+import { useCommentOperations } from '@/hooks/KanbanBoardHooks/KanbanBoard/useCommentOperations';
+import { useTaskFilters } from '@/hooks/KanbanBoardHooks/KanbanBoard/useTaskFilters';
 
 export default function ProjectKanbanBoard({ projectId }: { projectId: string }) {
   // State management

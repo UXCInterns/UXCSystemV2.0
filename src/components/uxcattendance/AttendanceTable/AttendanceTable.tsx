@@ -1,0 +1,157 @@
+"use client";
+
+import React, { useMemo } from "react";
+import { Table } from "@/components/ui/table";
+import Pagination from "@/components/common/Pagination";
+import { useVisits } from '@/hooks/learningJourney/useVisits';
+import { useVisitFilters } from '@/hooks/learningJourney/FilterComponent/useVisitFilters';
+import { useVisitTable } from '@/hooks/learningJourney/useVisitTable';
+import { VisitTableHeader } from './VisitTableHeader';
+import { ActiveFilters } from '../FilterComponent/ActiveFilters';
+import { useTableState } from '@/hooks/learningJourney/AttendanceTable/useTableState';
+import { useVisitHandlers } from '@/hooks/learningJourney/AttendanceTable/useVisitHandlers';
+import { useFilterHandlers } from '@/hooks/learningJourney/AttendanceTable/useFilterHandlers';
+import ErrorState from './ErrorState';
+import TableStats from './TableStats';
+import TableHeaderRow from './TableHeaderRow';
+import VisitsTableBody from './VisitsTableBody';
+import ModalsContainer from './ModalsContainer';
+
+const UXCAttendanceTable: React.FC = () => {
+  // Custom hooks for state management
+  const {
+    expandedVisit,
+    isAddVisitOpen,
+    editVisit,
+    isFilterOpen,
+    openViewModal,
+    closeViewModal,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    openFilterModal,
+    closeFilterModal,
+  } = useTableState();
+
+  const { visits, isLoading, error, addVisit, updateVisit, deleteVisit } = useVisits();
+  
+  const {
+    activeFilters,
+    setActiveFilters,
+    applyFilters,
+    hasActiveFilters,
+    activeFilterCount,
+    clearFilters,
+  } = useVisitFilters(visits);
+  
+  const {
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    currentPage,
+    setCurrentPage,
+    sortOptions,
+    processTableData,
+  } = useVisitTable(visits);
+
+  // Event handlers
+  const { handleAddVisit, handleEditVisit, handleDeleteVisit } = useVisitHandlers({
+    addVisit,
+    updateVisit,
+    deleteVisit,
+    onAddSuccess: closeAddModal,
+    onEditSuccess: closeEditModal,
+  });
+
+  const { handleApplyFilters, handleClearFilters, handleRemoveFilter } = useFilterHandlers({
+    setActiveFilters,
+    clearFilters,
+    setCurrentPage,
+  });
+
+  // Data processing
+  const filteredData = useMemo(() => {
+    return applyFilters(visits, activeFilters);
+  }, [visits, activeFilters, applyFilters]);
+
+  const { paginatedData, sortedData, totalPages } = useMemo(() => {
+    return processTableData(filteredData);
+  }, [filteredData, processTableData]);
+
+  if (error) {
+    return <ErrorState error={error} />;
+  }
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="max-w-auto overflow-x-auto">
+        <VisitTableHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          sortOptions={sortOptions}
+          onSortChange={setSortBy}
+          hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
+          onFilterClick={openFilterModal}
+          onAddVisitClick={openAddModal}
+          isLoading={isLoading}
+        />
+
+        {hasActiveFilters && (
+          <ActiveFilters
+            filters={activeFilters}
+            onRemoveFilter={handleRemoveFilter}
+            onClearAll={handleClearFilters}
+          />
+        )}
+
+        <TableStats
+          currentCount={paginatedData.length}
+          filteredCount={sortedData.length}
+          totalCount={visits.length}
+          hasActiveFilters={hasActiveFilters}
+        />
+
+        <Table className="table-fixed">
+          <TableHeaderRow />
+          <VisitsTableBody
+            visits={paginatedData}
+            isLoading={isLoading}
+            hasActiveFilters={hasActiveFilters}
+            searchQuery={searchQuery}
+            onView={openViewModal}
+            onEdit={openEditModal}
+            onDelete={handleDeleteVisit}
+          />
+        </Table>
+      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
+      <ModalsContainer
+        isFilterOpen={isFilterOpen}
+        onFilterClose={closeFilterModal}
+        currentFilters={activeFilters}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+        expandedVisit={expandedVisit}
+        onViewClose={closeViewModal}
+        isAddVisitOpen={isAddVisitOpen}
+        onAddClose={closeAddModal}
+        onAddSubmit={handleAddVisit}
+        editVisit={editVisit}
+        onEditClose={closeEditModal}
+        onEditSubmit={handleEditVisit}
+      />
+    </div>
+  );
+};
+
+export default UXCAttendanceTable;

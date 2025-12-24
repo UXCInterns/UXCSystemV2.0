@@ -4,9 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useUser } from '@/hooks/useUser';
 import { UXCMetrics } from '@/components/home/UXCMetrics';
-import MonthlySalesChart from '@/components/home/MonthlySalesChart';
-import ProjectTable from '@/components/home/ProjectTable';
-import RoleDistributionChart from '@/components/home/RoleMetricChart';
+import { ProjectsGrid } from '@/components/home/MonthlySalesChart';
+import { TasksGrid } from '@/components/home/Checklist';
+import { ProjectsTimelineChart } from '@/components/home/RoleMetricChart';
+import { WorkloadBalance } from '@/components/home/ProjectTable';
+// import RecentUpdates from '@/components/home/Chart';
+
+// import ProjectTable from '@/components/home/ProjectTable';
 
 export default function Home() {
   const { name, profileImage } = useUser();
@@ -79,16 +83,22 @@ export default function Home() {
 
       <div className="col-span-12 space-y-6 xl:col-span-8">
         <UXCMetrics />
-        <MonthlySalesChart />
-        <ProjectTable />
+        <ProjectsGrid />
+        {/* <ProjectTable /> */}
       </div>
 
       <div className="col-span-12 space-y-6 xl:col-span-4">
-        <RoleDistributionChart />
+        <TasksGrid />
+      </div>
+      <div className="col-span-12 space-y-6 xl:col-span-4">
+        <WorkloadBalance />
+      </div>
+      <div className="col-span-12 space-y-6 xl:col-span-8">
+        <ProjectsTimelineChart />
       </div>
 
-      <div className="col-span-12 space-y-6">
-        {/* Footer / additional sections if any */}
+      <div className="col-span-12 space-y-6 xl:col-span-4">
+
       </div>
     </div>
   );

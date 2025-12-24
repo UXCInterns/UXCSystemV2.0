@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import CETAttendanceTable from "@/components/attendance/cetattendace/cetattendance";
-import ComponentCard from "@/components/attendance/common/ComponentCard";
-import ExportDropdown from "@/components/attendance/common/ExportButton";
-import ChartTab from "@/components/attendance/cetattendace/PaceToggle";
+import CETAttendanceTable from "@/components/cetattendace/WorkshopsTable/WorkshopsTable";
+import ComponentCard from "@/components/common/ComponentCard";
+import ExportDropdown from "@/components/common/ExportButton";
+import ChartTab from "@/components/cetattendace/PaceToggle";
 
 export default function CETTable() {
   const [selectedProgramType, setSelectedProgramType] = useState<"pace" | "non_pace">("pace");

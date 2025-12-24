@@ -2,10 +2,10 @@
 
 import React from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { ManpowerMetrics } from "@/components/manpower/ManpowerMetrics";
-import MapowerTable from "@/components/manpower/MapowerTable";
-import IndividualRoleDistributionChart from "@/components/manpower/IndividualRoleDistributionChart";
-import StatusDistributionChart from "@/components/manpower/StatusDistributionChart";
+import { ManpowerMetrics } from "@/components/manpower/ManpowerMetrics/ManpowerMetrics";
+import MapowerTable from "@/components/manpower/ManpowerTable/MapowerTable";
+import IndividualRoleDistributionChart from "@/components/manpower/RoleDistributionChart/RoleDistributionChart";
+import StatusDistributionChart from "@/components/manpower/StatusDistributionChart/StatusDistributionChart";
 
 export default function Manpower() {
   return (

@@ -2,9 +2,9 @@
 
 import React from "react";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import UXCAttendanceTable from "@/components/attendance/uxcattendance/uxcattendance";
-import ComponentCard from "@/components/attendance/common/ComponentCard";
-import ExportDropdown from "@/components/attendance/common/ExportButton";
+import UXCAttendanceTable from "@/components/uxcattendance/AttendanceTable/AttendanceTable";
+import ComponentCard from "@/components/common/ComponentCard";
+import ExportDropdown from "@/components/common/ExportButton";
 
 export default function UXCTable() {
   return (

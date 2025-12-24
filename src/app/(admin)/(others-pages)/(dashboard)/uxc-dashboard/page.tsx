@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { PeriodProvider } from "@/context/PeriodContext";
 
-import { StatsMetrics } from "@/components/dashboard/StatsMetrics";
-import { ConversionsOverview } from "@/components/dashboard/ConversionOverview";
-import { IndustryMetrics } from "@/components/dashboard/IndustryMetrics";
-import VisitorsAttended from "@/components/dashboard/VisitorsAttended";
-import VisitorsByMonth from "@/components/dashboard/VisitorsByMonth";
-import VisitorsByDate from "@/components/dashboard/VisitorsByDate";
+import { StatsMetrics } from "@/components/dashboard/StatsMetrics/StatsMetrics";
+import { ConversionsOverview } from "@/components/dashboard/ConversionOverview/ConversionOverview";
+import { IndustryMetrics } from "@/components/dashboard/IndustryMetrics/IndustryMetrics";
+import VisitorsAttended from "@/components/dashboard/VisitorsAttended/VisitorsAttended";
+import VisitorsByMonth from "@/components/dashboard/VisitorsByMonth/VisitorsByMonth";
+import VisitorsByDate from "@/components/dashboard/VisitorsByDate/VisitorsByDate";
 import VisitsComparison from "@/components/dashboard/VisitsComparison";
 
 export const metadata: Metadata = {

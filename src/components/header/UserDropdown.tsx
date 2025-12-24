@@ -45,7 +45,7 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
         suppressHydrationWarning
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        <span className="mr-3 overflow-hidden rounded-full h-11 w-11 border-gray-200 dark:border-gray-700 border-1 inline-block">
           <Image 
             width={44} 
             height={44} 

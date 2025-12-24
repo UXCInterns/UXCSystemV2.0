@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Project, Profile } from "@/types/project";
-import ProjectSidePanel from "./sections/ProjectSidePanel";
-import TeamMemberModal from "./sections/TeamMemberModal";
-import AddProjectPanel from "./sections/AddProjectPanel";
-import ProjectsTableView from "./ProjectsTableView";
+import { Project, Profile } from "@/types/ProjectsTypes/project";
+import ProjectSidePanel from "./ProjectDetailsSidePanel/ProjectSidePanel";
+import TeamMemberModal from "./ProjectDetailsSidePanel/TeamMemberModal";
+import AddProjectPanel from "./AddProjectSidePanel/AddProjectPanel";
+import ProjectsTableView from "./ProjectsTableView/ProjectsTableView";
 import { emitProjectUpdate, onProjectUpdate } from "@/lib/projectEvents";
 import { supabase } from "../../../lib/supabase/supabaseClient";
-import { useProjectManagement } from "@/hooks/projects/useProjectManagement";
-import { useTeamManagement } from "@/hooks/projects/useTeamManagement";
-import { getProjectStatusBadgeProps } from '@/utils/badgeHelpers';
+import { useProjectManagement } from "@/hooks/ProjectsHooks/useProjectManagement";
+import { useTeamManagement } from "@/hooks/ProjectsHooks/useTeamManagement";
+import { getProjectStatusBadgeProps } from '@/utils/CommonUtils/badgeUtils';
 
 export default function ProjectsTable() {
   const [searchQuery, setSearchQuery] = useState("");

@@ -5,19 +5,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
   PieChartIcon,
   TableIcon,
   UserCircleIcon,
-  SendIcon,
-  HouseIcon,
-  ChatIcon
+  HouseIcon
 } from "../icons/index";
-import { ShoppingCart, ShoppingCartIcon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -47,11 +42,6 @@ const navItems: NavItem[] = [
     icon: <TableIcon />,
     subItems: [{ name: "Project Board", path: "/project-board", pro: false }, { name: "Manpower", path: "/manpower", pro: false }],
   },
-  {
-    name: "E-Commerce",
-    icon: <ShoppingCart />,
-    path: "/e-commerce",
-  },
 ];
 
 const othersItems: NavItem[] = [
@@ -59,11 +49,6 @@ const othersItems: NavItem[] = [
     icon: <PieChartIcon />,
     name: "InnoPoll",
     path: "/innoPoll"
-  },
-  {
-    icon: <SendIcon className="stroke-[1.5]"/>,
-    name: "Telegram",
-    subItems: [{ name: "User Management", path: "/telegram", pro: false }],
   },
 ];
 

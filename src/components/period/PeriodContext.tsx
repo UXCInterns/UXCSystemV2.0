@@ -472,9 +472,9 @@ const PeriodSelector: React.FC = () => {
       {/* Main Period Button */}
       <Button 
         onClick={() => setIsOpen(!isOpen)} 
-        size="sm" 
+        size="md" 
         variant="outline" 
-        className="flex items-center rounded-lg w-full lg:w-auto"
+        className="flex items-center w-full lg:w-auto"
       >
         <CalendarIcon className="w-4 h-4" />
         <span>{getPeriodLabel()}</span>
@@ -489,9 +489,9 @@ const PeriodSelector: React.FC = () => {
       <div className="flex flex-row gap-2 w-full lg:w-auto">
         <Button 
           onClick={handleComparisonToggle}
-          size="sm" 
+          size="md" 
           variant={isComparisonMode ? "primary" : "outline"}
-          className="px-4 rounded-lg w-full lg:w-auto"
+          className="w-full lg:w-auto"
         >
           <GitCompareIcon className="w-4 h-4" />
           Compare
@@ -503,9 +503,9 @@ const PeriodSelector: React.FC = () => {
             handleReset();
             window.location.reload();
           }} 
-          size="sm" 
+          size="md" 
           variant="primary" 
-          className="px-4 rounded-lg w-full lg:w-auto"
+          className="w-full lg:w-auto"
         >
           <RotateCcwIcon className="w-4 h-4" />
           Reset
@@ -514,7 +514,7 @@ const PeriodSelector: React.FC = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-800 w-96">
+        <div className="absolute left-0 top-full z-50 mt-2 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-800 w-96">
           <div className="p-4 space-y-4">
             {/* Tabs (if comparison mode is enabled) */}
             {isComparisonMode && (
