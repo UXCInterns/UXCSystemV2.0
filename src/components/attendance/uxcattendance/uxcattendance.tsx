@@ -3,17 +3,17 @@
 import React, { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../ui/table";
 import Pagination from "@/components/common/Pagination";
-import FilterComponent from "./common/FilterComponent";
-import VisitDetailsModal from "./common/ViewDetails";
-import NewVisitForm from "./common/NewVisitForm";
-import EditVisitForm from "./common/EditVisitForm";
+import FilterComponent from "./FilterComponent";
+import VisitDetailsModal from "./ViewDetails";
+import NewVisitForm from "./NewVisitForm";
+import EditVisitForm from "./EditVisitForm";
 
 // Import our custom hooks and components
 import { useVisits } from '@/hooks/learningJourney/useVisits';
 import { useVisitFilters } from '@/hooks/learningJourney/useVisitFilters';
 import { useVisitTable } from '@/hooks/learningJourney/useVisitTable';
-import { VisitTableHeader } from './common/VisitTableHeader';
-import { ActiveFilters } from '../uxcattendance/common/ActiveFilters';
+import { VisitTableHeader } from './VisitTableHeader';
+import { ActiveFilters } from './ActiveFilters';
 import { Visit } from '@/types/visit';
 
 const UXCAttendanceTable: React.FC = () => {

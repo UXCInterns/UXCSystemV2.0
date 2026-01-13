@@ -371,7 +371,7 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
                 {selectedProgram === "pace" ? "PACE" : "NON-PACE"} Program Overview
               </p>
             </div>
-            <div className="flex sm:flex-grow sm:justify-end gap-2">
+            <div className="flex flex-col sm:flex-row sm:flex-grow sm:justify-end gap-2">
               <PeriodSelector />
               <ChartTab 
                 selected={selectedProgram} 

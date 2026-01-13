@@ -3,7 +3,7 @@ import React from "react";
 interface TextareaProps {
   placeholder?: string; // Placeholder text
   rows?: number; // Number of rows
-  value?: string; // Current value
+  value?: string | null; // Current value (can be null)
   onChange?: (value: string) => void; // Change handler
   className?: string; // Additional CSS classes
   disabled?: boolean; // Disabled state
@@ -42,7 +42,7 @@ const TextArea: React.FC<TextareaProps> = ({
       <textarea
         placeholder={placeholder}
         rows={rows}
-        value={value}
+        value={value ?? ""} // Convert null to empty string
         onChange={handleChange}
         disabled={disabled}
         className={textareaClasses}

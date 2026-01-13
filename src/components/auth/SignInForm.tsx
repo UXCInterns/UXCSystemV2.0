@@ -1,77 +1,63 @@
 "use client";
 
 import Button from "@/components/ui/button/Button";
-import { ChevronLeftIcon } from "@/icons";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { supabase } from "../../../lib/supabase/supabaseClient";
-import { handleOAuthRedirect } from "../../../lib/supabase/handleOAuthRedirect";
-import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const router = useRouter();
-
-  useEffect(() => {
-    handleOAuthRedirect();
-  }, []);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setErrorMessage("");
 
     try {
-      const redirectTo =
-        process.env.NODE_ENV === "development"
-          ? process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URI_LOCAL
-          : process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URI_PROD;
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "http://localhost:3000/home" // redirect after login
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
       if (error) {
+        console.error("❌ OAuth error:", error);
         setErrorMessage(error.message);
+        setLoading(false);
       }
+      // User will be redirected to Google - don't set loading to false
     } catch (err: any) {
+      console.error("❌ Sign in error:", err);
       setErrorMessage(err.message || "Something went wrong.");
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
-      <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <ChevronLeftIcon />
-          Back to dashboard
-        </Link>
-      </div>
-
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div className="mb-5 sm:mb-8">
-          <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+          <h1 className="mb-4 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
             Sign In
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Sign in with your Google account!
+            Sign in with your Google account to continue
           </p>
         </div>
 
-        {errorMessage && <p className="text-sm text-red-500 mb-4">{errorMessage}</p>}
+        {errorMessage && (
+          <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-1 sm:gap-5">
           <Button
-            className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-900 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+            className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-900 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleGoogleSignIn}
             disabled={loading}
           >

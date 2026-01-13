@@ -5,7 +5,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import CETAttendanceTable from "@/components/attendance/cetattendace/cetattendance";
 import ComponentCard from "@/components/attendance/common/ComponentCard";
 import ExportDropdown from "@/components/attendance/common/ExportButton";
-import ChartTab from "@/components/attendance/cetattendace/common/PaceToggle";
+import ChartTab from "@/components/attendance/cetattendace/PaceToggle";
 
 export default function CETTable() {
   const [selectedProgramType, setSelectedProgramType] = useState<"pace" | "non_pace">("pace");
@@ -35,7 +35,7 @@ export default function CETTable() {
               </div>
                
               {/* Right group: Export & Log New Visit */}
-              <div className="flex items-center gap-4 mr-4">
+              <div className="flex items-center gap-2 mr-4">
                 <ExportDropdown
                   options={["Export as PDF", "Export as CSV", "Export as XLSX"]}
                   onSelect={(format) => {

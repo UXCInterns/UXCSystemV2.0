@@ -65,7 +65,9 @@ export default function DatePicker({
     });
 
     return () => {
-      flatPickr.destroy();
+      if (flatPickr && !Array.isArray(flatPickr)) {
+        flatPickr.destroy();
+      }
     };
   }, [mode, onChange, defaultDate]);
 

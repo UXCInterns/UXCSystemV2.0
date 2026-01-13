@@ -211,9 +211,17 @@ const PeriodSelector: React.FC = () => {
     if (tab === 'primary') {
       switch (field) {
         case 'type': 
+          // Clear custom date range when switching away from custom
+          if (selectedType === 'custom' && value !== 'custom') {
+            clearDateRange('primary');
+          }
           setSelectedType(value); 
           // Auto-sync comparison type when primary type changes
           if (isComparisonMode) {
+            // Also clear comparison date range if switching away from custom
+            if (comparisonType === 'custom' && value !== 'custom') {
+              clearDateRange('comparison');
+            }
             setComparisonType(value);
           }
           break;
@@ -223,7 +231,13 @@ const PeriodSelector: React.FC = () => {
       }
     } else {
       switch (field) {
-        case 'type': setComparisonType(value); break;
+        case 'type': 
+          // Clear comparison date range when switching away from custom
+          if (comparisonType === 'custom' && value !== 'custom') {
+            clearDateRange('comparison');
+          }
+          setComparisonType(value); 
+          break;
         case 'year': setComparisonYear(value); break;
         case 'quarter': setComparisonQuarter(value); break;
         case 'dateRange': setComparisonDateRange(value); break;
@@ -296,6 +310,18 @@ const PeriodSelector: React.FC = () => {
     }
 
     setIsOpen(false);
+    
+    // Clear custom date ranges after closing (with slight delay to ensure modal is closed)
+    setTimeout(() => {
+      setCustomDateRange('');
+      setComparisonDateRange('');
+      if (primaryDateRef.current) {
+        (primaryDateRef.current as any)._flatpickr?.clear();
+      }
+      if (comparisonDateRef.current) {
+        (comparisonDateRef.current as any)._flatpickr?.clear();
+      }
+    }, 100);
   };
 
   const handleComparisonToggle = () => {
@@ -418,9 +444,6 @@ const PeriodSelector: React.FC = () => {
                 className="dark:bg-dark-900"
                 value={state.year.toString()}
               />
-              <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-                <ChevronDownIcon />
-              </span>
             </div>
           </div>
         )}
@@ -437,9 +460,6 @@ const PeriodSelector: React.FC = () => {
                 className="dark:bg-dark-900"
                 value={state.quarter.toString()}
               />
-              <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-                <ChevronDownIcon />
-              </span>
             </div>
           </div>
         )}
@@ -448,13 +468,13 @@ const PeriodSelector: React.FC = () => {
   };
 
   return (
-    <div className="relative flex items-center gap-2">
+    <div className="relative flex flex-col lg:flex-row items-center gap-2">
       {/* Main Period Button */}
       <Button 
         onClick={() => setIsOpen(!isOpen)} 
         size="sm" 
         variant="outline" 
-        className="flex items-center rounded-lg"
+        className="flex items-center rounded-lg w-full lg:w-auto"
       >
         <CalendarIcon className="w-4 h-4" />
         <span>{getPeriodLabel()}</span>
@@ -466,29 +486,31 @@ const PeriodSelector: React.FC = () => {
         <ChevronDownIcon className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </Button>
 
-      <Button 
-        onClick={handleComparisonToggle}
-        size="sm" 
-        variant={isComparisonMode ? "primary" : "outline"}
-        className="px-4 rounded-lg"
-      >
-        <GitCompareIcon className="w-4 h-4" />
-        Compare
-      </Button>
+      <div className="flex flex-row gap-2 w-full lg:w-auto">
+        <Button 
+          onClick={handleComparisonToggle}
+          size="sm" 
+          variant={isComparisonMode ? "primary" : "outline"}
+          className="px-4 rounded-lg w-full lg:w-auto"
+        >
+          <GitCompareIcon className="w-4 h-4" />
+          Compare
+        </Button>
 
-      {/* Reset Button */}
-      <Button 
-        onClick={() => {
-          handleReset();
-          window.location.reload();
-        }} 
-        size="sm" 
-        variant="primary" 
-        className="px-4 rounded-lg"
-      >
-        <RotateCcwIcon className="w-4 h-4" />
-        Reset
-      </Button>
+        {/* Reset Button */}
+        <Button 
+          onClick={() => {
+            handleReset();
+            window.location.reload();
+          }} 
+          size="sm" 
+          variant="primary" 
+          className="px-4 rounded-lg w-full lg:w-auto"
+        >
+          <RotateCcwIcon className="w-4 h-4" />
+          Reset
+        </Button>
+      </div>
 
       {/* Dropdown */}
       {isOpen && (
