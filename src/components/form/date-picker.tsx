@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Label from './Label';
@@ -15,6 +15,14 @@ type PropsType = {
   placeholder?: string;
 };
 
+// ✅ Move helper above useState
+const formatDate = (date: Date) => {
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
 export default function DatePicker({
   id,
   mode,
@@ -23,27 +31,36 @@ export default function DatePicker({
   defaultDate,
   placeholder,
 }: PropsType) {
-  useEffect(() => {
-    const element = document.querySelector(`#${id}`);
-    if (!element) return;
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    const flatPickr = flatpickr(element as HTMLElement, {
-      mode: mode || "single",
+  const [value, setValue] = useState(
+    defaultDate
+      ? typeof defaultDate === 'string'
+        ? defaultDate
+        : Array.isArray(defaultDate)
+          ? (defaultDate as Date[]).map(d => formatDate(d)).join(', ')
+          : formatDate(defaultDate as Date)
+      : ''
+  );
+
+  useEffect(() => {
+    const flatPickr = flatpickr(inputRef.current!, {
+      mode: mode || 'single',
       static: true,
-      monthSelectorType: "static",
-      dateFormat: "j F Y",
+      monthSelectorType: 'static',
+      dateFormat: 'j F Y',
       defaultDate,
-      onChange,
-      // CRITICAL FIX: Force flatpickr to use local timezone, not UTC
-      parseDate: (datestr: string, format: string): Date => {
-        // Parse the date string as a local date
-        if (typeof datestr === 'string' && datestr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          const [year, month, day] = datestr.split('-').map(Number);
-          return new Date(year, month - 1, day);
+      onChange: (selectedDates, dateStr, instance) => {
+        setValue(dateStr); // update displayed value
+
+        // call user onChange if provided
+        if (onChange) {
+          if (Array.isArray(onChange)) {
+            onChange.forEach(fn => fn(selectedDates, dateStr, instance));
+          } else {
+            onChange(selectedDates, dateStr, instance);
+          }
         }
-        // Fallback to default parsing, but ensure it returns a Date
-        const parsed = flatpickr.parseDate(datestr, format);
-        return parsed || new Date();
       },
     });
 
@@ -52,7 +69,7 @@ export default function DatePicker({
         flatPickr.destroy();
       }
     };
-  }, [mode, onChange, id, defaultDate]);
+  }, [mode, onChange, defaultDate]);
 
   return (
     <div>
@@ -60,8 +77,11 @@ export default function DatePicker({
 
       <div className="relative">
         <input
+          ref={inputRef}
           id={id}
           placeholder={placeholder}
+          value={value} 
+          onChange={(e) => setValue(e.target.value)} 
           className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30  bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700  dark:focus:border-brand-800"
         />
 
