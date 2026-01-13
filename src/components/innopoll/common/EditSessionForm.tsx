@@ -3,45 +3,70 @@
 import DatePicker from "@/components/form/date-picker";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FIXED_QUESTIONS } from "@/constants/fixedQuestions";
+import QuestionInput from "../createSession/questions";
 
-const CreateSurveySidebar = () => {
-  const [sessionTitle, setSessionTitle] = useState("");
+const UpdateSessionSidebar = () => {
+  const [sessionName, setSessionName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const router = useRouter();
+ const [questions, setQuestions] = useState([
+    {
+      question:
+        "Does your company embrace discussions on experimentations to generate and test new ideas, concepts, business models, etc. to innovate?",
+      statements: [
+        {
+          text: `An Innovation Culture fosters an atmosphere where employees feel empowered to take risks, collaborate, and continuously seek out opportunities for improvement and innovation in products, processes, or services. This is essential to staying competitive in today's rapidly changing landscape.`,
+          title: `INNOVATION CULTURE`,
+          desc: `Embrace Innovation`,
+        },
+      ],
+    },
+    {
+      question:
+        "How often does your company use business models, startup methodologies, design thinking or any other innovation tools and methods?",
+      statements: [
+        {
+          text: `Innovation Practices often involve fostering a culture of innovation, conducting research and development, leveraging on technology and tools and processes for collaboration to thrive in an ever changing environmental and economic uncertainty to achieve sustainable advancements for all users.`,
+          title: `INNOVATION PRACTICES`,
+          desc: `Practice Innovation Tools & Methods`,
+        },
+      ],
+    },
+    {
+      question:
+        "How often do leaders in your organisation encourage the need for innovation and provide the resources to support innovation efforts?",
+      statements: [
+        {
+          text: `Innovation leadership inspires organisations to foster a creative culture. They not only champion and support creative thinking but also provide strategic direction, allocate resources, and create an environment where experimentation and calculated risk-taking are encouraged.`,
+          title: `INNOVATION LEADERSHIP`,
+          desc: `Leaders who Champion Innovation`,
+        },
+      ],
+    },
+  ]); // defaultQuestions = your 3 initial questions
 
 
+  const router = useRouter(); // ✅ Correct hook usage
 
-
-
-  // 🔄 Reset all fields
   const handleCancel = () => {
-    setSessionTitle("");
+    setSessionName("");
     setStartDate("");
     setEndDate("");
   };
 
-  // 🧭 Cancel and go back to feedback page
-  const handleCancelSurvey = () => {
-    router.push("/feedback"); //returning back to the survey creation page
-  };
+  const handleCreateSession = async() => {
+    console.log({ sessionName, startDate, endDate });
 
-
-  const handleCreateSurvey = async () => {
-
-
-    if (!sessionTitle) {
-      alert("Please enter a session title");
-      return;
-    }
-
-    try {
+if(!sessionName){
+  alert("please enter a session title")
+  return
+}
+try {
       //  Create the session
       const sessionResponse = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: sessionTitle }),
+        body: JSON.stringify({ title: sessionName}),
       });
 
       if (!sessionResponse.ok) {
@@ -56,16 +81,8 @@ const CreateSurveySidebar = () => {
 
       const quizData = {
         session_id: sessionId,
-        title: `${sessionTitle} Survey`,
-        questions: FIXED_QUESTIONS.map((q) => ({
-          id: q.id,
-          text: q.text.replace("%[Trainer]Q7_1%", "John Doe"), // replace trainer placeholder dynamically
-          type: q.type,
-          required: true,
-          enabled: true,
-        })),
-
-        trainers: [],
+        title: `${sessionName} Survey`,
+        questions, //to fix this
         scale_type: "5-point Likert",
         custom_scale: null,
         start_date: startDate,
@@ -108,24 +125,27 @@ const CreateSurveySidebar = () => {
       console.error("Error creating session/quiz:", error);
       alert("Error creating session or quiz. Please try again.");
     }
+
   };
 
+ 
 
-
-
+  const handleCancelSession = () => {
+    router.push("/innoPoll"); // ✅ navigate to create-session page
+  };
 
   return (
     <div className="flex flex-col p-2 max-w-full mx-auto">
       <form className="flex flex-col gap-6">
-        {/* Session Title */}
+        {/* Session Name */}
         <div className="w-full">
           <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-            Workshop Name
+            Session Name
           </label>
           <input
             type="text"
-            value={sessionTitle}
-            onChange={(e) => setSessionTitle(e.target.value)}
+            value={sessionName}
+            onChange={(e) => setSessionName(e.target.value)}
             placeholder="Enter session name"
             className="w-full dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
           />
@@ -140,17 +160,14 @@ const CreateSurveySidebar = () => {
             <DatePicker
               id="start-date-picker"
               placeholder="Select a date"
-
               onChange={(dates) => {
                 if (dates.length > 0) {
-                  const localDate = `${dates[0].getFullYear()}-${(dates[0].getMonth() + 1).toString().padStart(2, '0')}-${dates[0].getDate().toString().padStart(2, '0')}`;
-                  setStartDate(localDate);
-
+                  setStartDate(dates[0].toISOString().split("T")[0]);
                 } else {
-                  setEndDate("");
+                  setStartDate("");
                 }
               }}
-
+              
             />
           </div>
         </div>
@@ -166,9 +183,7 @@ const CreateSurveySidebar = () => {
               placeholder="Select a date"
               onChange={(dates) => {
                 if (dates.length > 0) {
-                  const localDate = `${dates[0].getFullYear()}-${(dates[0].getMonth() + 1).toString().padStart(2, '0')}-${dates[0].getDate().toString().padStart(2, '0')}`;
-                  setEndDate(localDate);
-
+                  setEndDate(dates[0].toISOString().split("T")[0]);
                 } else {
                   setEndDate("");
                 }
@@ -183,16 +198,15 @@ const CreateSurveySidebar = () => {
             type="button"
             onClick={() => {
               handleCancel();
-              handleCancelSurvey();
+              handleCancelSession();
             }}
             className="w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
           >
             Cancel
           </button>
-
           <button
             type="button"
-            onClick={handleCreateSurvey}
+            onClick={handleCreateSession}
             className="w-full bg-brand-500 hover:bg-brand-600 flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white"
           >
             Create Session
@@ -203,4 +217,4 @@ const CreateSurveySidebar = () => {
   );
 };
 
-export default CreateSurveySidebar;
+export default UpdateSessionSidebar;

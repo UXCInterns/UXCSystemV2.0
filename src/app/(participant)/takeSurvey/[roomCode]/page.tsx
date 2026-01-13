@@ -73,20 +73,13 @@ export default function JoinPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4">
-          Welcome to the Workshop Feedback!
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          InnoPoll 
         </h1>
-        <p className="mb-6 text-gray-700">
-          Thank you for participating. This survey has 3 parts:
-        </p>
-        <ul className="text-left mb-6 list-disc list-inside text-gray-700">
-          <li>Workshop feedback (3 statements)</li>
-          <li>Trainer feedback (3 statements per trainer)</li>
-          <li>Qualitative feedback (3 open-ended questions)</li>
-        </ul>
+       
         <p className="mb-6 text-gray-700">
           It should take approximately <strong>3–5 minutes</strong> to complete.
-          Please ensure you have a quiet moment to provide thoughtful responses.
+         
         </p>
 
         {!loading ? (

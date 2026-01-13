@@ -10,7 +10,6 @@ export async function POST(request) {
       session_id,
       title,
       questions = [],
-      trainers = [],
       scale_type = null,
       custom_scale = null,
       start_date = startDate,
@@ -18,8 +17,8 @@ export async function POST(request) {
 
     } = await request.json();
 
-console.log("this is the start date",start_date  )
-console.log("this is the end date",end_date  )
+    console.log("this is the start date", start_date)
+    console.log("this is the end date", end_date)
 
     //  Basic validation
     if (!session_id || !title) {
@@ -38,19 +37,19 @@ console.log("this is the end date",end_date  )
     }
 
     // Handle room_code
-    let room_code;
-    if (quizId) {
-      const { data: existingQuiz, error: fetchError } = await supabaseAdmin
-        .from('quizzes')
-        .select('room_code')
-        .eq('id', quizId)
-        .single();
+    const { data: existingQuiz, error: fetchError } = await supabaseAdmin
+      .from('quizzes')
+      .select('room_code')
+      .eq('session_id', session_id)
+      .maybeSingle();
 
-      if (fetchError) throw fetchError;
-      room_code = existingQuiz.room_code;
-    } else {
-      room_code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    }
+    if (fetchError) throw fetchError;
+
+    const room_code =
+      existingQuiz?.room_code ??
+      Math.random().toString(36).substring(2, 8).toUpperCase();
+
+
 
 
 
@@ -66,19 +65,20 @@ console.log("this is the end date",end_date  )
           session_id,
           title,
           questions,
-          trainers,
           scale_type,
           custom_scale,
           start_date,
           end_date,
           room_code,
         },
-        { onConflict: 'id' }
+        { onConflict: 'session_id' }
       )
       .select()
       .single();
 
     if (quizError) throw quizError;
+
+
 
     return NextResponse.json(
       { message: "Quiz created/updated successfully", quiz, room_code },

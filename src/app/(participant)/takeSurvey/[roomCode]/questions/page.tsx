@@ -1,15 +1,9 @@
-//app/takeSurvey/[roomCode]/questions/page.tsx
-// Survey Questions Page
 "use client";
 
-import React from "react";
-import { useParams } from "next/navigation";
-import { WorkshopStep } from "@/components/feedback/WorkshopStep";
-import { TrainerStep } from "@/components/feedback/TrainerStep";
-import { QualitativeStep } from "@/components/feedback/QualitativeStep";
-import { useSurvey } from "@/hooks/feedback/useSurvey";
-import { FIXED_QUESTIONS } from "@/constants/fixedQuestions"; // your questions
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Question } from "@/types/question";
+
 
 const likertOptions = [
   { label: "Strongly Disagree", color: "bg-rose-100 hover:bg-rose-200 border-rose-300" },
@@ -19,204 +13,331 @@ const likertOptions = [
   { label: "Strongly Agree", color: "bg-emerald-100 hover:bg-emerald-200 border-emerald-300" },
 ];
 
-const trainers = [{ id: "t1", name: "SUM TING WONG" }];
-
 export default function FeedbackPage() {
+  const router = useRouter()
   const { roomCode } = useParams();
 
-  // useSurvey with fixed questions
-  const {
-    currentStep,
-    trainerIndex,
-    workshopAnswers,
-    trainerAnswers,
-    qualitative,
-    next,
-    back,
-    handleNextClick,
-    handleWorkshopCircleClick,
-    handleTrainerCircleClick,
-    setQualitative,
-    setTrainerAnswers,
-    workshopQuestions,
-    trainerQuestions,
-    qualitativeQuestions,
-    consolidateAnswers
-  } = useSurvey(trainers, FIXED_QUESTIONS);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showStatements, setShowStatements] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
 
-  const validateStep = () => {
-    if (currentStep === "workshop") {
-      const incomplete = workshopQuestions.some(q => q.required && (workshopAnswers[q.id] === 0));
-      if (incomplete) {
-        alert("Please answer all workshop questions before proceeding.");
-        return false;
+
+  const [isReading, setIsReading] = useState(true);
+  const [canTap, setCanTap] = useState(false);
+  const [progress, setProgress] = useState(0); // For progress bar
+
+  const [showThankYou, setShowThankYou] = useState(false);
+
+
+
+
+
+  // Fetch questions and initialize answers
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch(`/api/feedback/${roomCode}`);
+        if (!res.ok) throw new Error("Failed to fetch survey data");
+
+        const data = await res.json();
+        if (data?.quiz?.questions) {
+          setQuestions(data.quiz.questions);
+          setAnswers(new Array(data.quiz.questions.length).fill(undefined)); // pre-initialize
+        } else {
+          setQuestions([]);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load survey. Please try again.");
+      } finally {
+        setLoading(false);
       }
-    } else if (currentStep === "trainer") {
-      const currentTrainer = trainers[trainerIndex];
-      const answers = trainerAnswers[currentTrainer.id] || {};
-      const incomplete = trainerQuestions.some(q => q.required && (!answers[q.id] || answers[q.id] === 0));
-      if (incomplete) {
-        alert(`Please answer all questions for ${currentTrainer.name} before proceeding.`);
-        return false;
-      }
-    } else if (currentStep === "qualitative") {
-      const incomplete = qualitativeQuestions.some(q => q.required && !qualitative[q.id]?.trim());
-      if (incomplete) {
-        alert("Please fill in all qualitative feedback questions before submitting.");
-        return false;
-      }
+    };
+
+    if (roomCode) fetchQuestions();
+  }, [roomCode]);
+
+  //the timer will then start
+  useEffect(() => {
+    if (!startTime && questions.length > 0) {
+      setStartTime(new Date());
     }
-    return true;
-  };
+  }, [questions, startTime]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateStep()) return;
 
-    console.log("Workshop Answers:", workshopAnswers);
-    console.log("Trainer Answers:", trainerAnswers);
-    console.log("Qualitative Feedback:", qualitative);
+  // Reading phase with progress bar (5 seconds)
+  useEffect(() => {
+    if (!isReading) return;
 
-     const allAnswers = consolidateAnswers();
+    setCanTap(false);
+    setProgress(0);
 
-     const participantID = localStorage.getItem("participantId")
+    const duration = 5000; // 5 seconds
+    let startTime: number | null = null;
 
-     //creating the submission object here!
-      const submission = {
-    participant_id: participantID,      
-    answers: allAnswers,            // all answers combined
-    room_code: roomCode,            // from useParams()
-    time_taken: 300,                // e.g., calculate survey duration dynamically
-    completed: true,
-    created_at: new Date().toISOString(),
-            
-  };
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const newProgress = Math.min((elapsed / duration) * 100, 100);
+      setProgress(newProgress);
 
-    try {
-    const res = await fetch("/api/sessions/SubmitQuiz", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(submission),
+      if (elapsed < duration) {
+        requestAnimationFrame(step);
+      } else {
+        setCanTap(true);
+      }
+    };
+
+    const animationFrame = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isReading]);
+
+
+
+
+  const handleLikertChange = (questionIndex: number, value: number) => {
+    const percentValue = (value - 1) * 25;
+    setAnswers(prev => {
+      const newArr = [...prev];
+      newArr[questionIndex] = percentValue;
+      return newArr;
     });
+  };
 
-    if (!res.ok) {
-      const data = await res.json();
-      alert(`Error submitting survey: ${data.error}`);
+  const goNext = () => {
+    if (answers[currentStep] === undefined) {
+      alert("Please answer the question before continuing.");
+      return;
+    }
+    if (currentStep + 1 < questions.length) {
+      setCurrentStep(currentStep + 1);
+      setIsReading(true);
+      setProgress(0);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (answers[currentStep] === undefined) {
+      alert("Please answer the question before submitting.");
       return;
     }
 
-    alert("Thank you for your feedback!");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to submit survey. Please try again.");
-  }
+    const participantID = localStorage.getItem("participantId");
+
+    const endTime = new Date();
+    const timeTaken = startTime
+      ? Math.floor((endTime.getTime() - startTime.getTime()) / 1000) // in seconds
+      : 0;
+
+    const submission = {
+      participant_id: participantID,
+      room_code: roomCode,
+      answers,
+      time_taken: timeTaken,
+      completed: true,
+      created_at: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch("/api/sessions/SubmitQuiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submission),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(`Error submitting survey: ${data.error}`);
+        return;
+      }
+
+      setShowThankYou(true);
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit survey. Please try again.");
+    }
   };
 
-  const handleNextClickWithValidation = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (validateStep()) next();
-  };
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Loading Questions...</p>
+      </main>
+    );
+  }
+
+  if (!questions.length) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>No questions found for this Innopoll.</p>
+      </main>
+    );
+  }
+
+  if (showThankYou) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 text-center">
+          <h1 className="text-2xl font-bold text-emerald-600 mb-4">
+            Thank You!
+          </h1>
+
+          <p className="text-gray-600 mb-8">
+            Response submitted successfully.
+          </p>
+
+          <button
+            onClick={() => router.push(`/results/${roomCode}`)}
+            className="w-full px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition"
+          >
+            View Results
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+
+  const currentQuestion = questions[currentStep];
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 sm:p-6">
-      {/* Progress Indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          {["Workshop", "Trainers", "Feedback"].map((label, i) => (
-            <div key={i} className="flex items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                  i <= (currentStep === "workshop" ? 0 : currentStep === "trainer" ? 1 : 2)
-                    ? "bg-emerald-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                {i + 1}
-              </div>
-              {i < 2 && (
-                <div
-                  className={`w-16 sm:w-24 h-1 mx-2 ${
-                    i < (currentStep === "workshop" ? 0 : currentStep === "trainer" ? 1 : 2)
-                      ? "bg-emerald-600"
-                      : "bg-gray-200"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Survey Card */}
       <div className="w-full max-w-lg sm:max-w-3xl bg-white shadow-lg rounded-2xl p-6 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-          Evaluation Survey
+          INNOPOLL
         </h1>
-        <p className="text-gray-500 text-center mb-8 text-sm">
-          Your feedback helps us improve our workshops
-        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 w-full">
-          <div key={currentStep} className="animate-fadeIn">
-            {currentStep === "workshop" && (
-              <WorkshopStep
-                statements={workshopQuestions}
-                answers={workshopAnswers}
-                onChange={handleWorkshopCircleClick}
-                likertOptions={likertOptions}
-              />
-            )}
-            {currentStep === "trainer" && (
-              <TrainerStep
-                trainer={trainers[trainerIndex]}
-                statements={trainerQuestions}
-                answers={trainerAnswers[trainers[trainerIndex].id] || {}}
-                onChange={(qId, val) =>
-                  handleTrainerCircleClick(trainers[trainerIndex].id, qId, val)
-                }
-                likertOptions={likertOptions}
-              />
-            )}
-            {currentStep === "qualitative" && (
-              <QualitativeStep
-                questions={qualitativeQuestions}
-                answers={qualitative}
-                onChange={(id, value) =>
-                  setQualitative(prev => ({ ...prev, [id]: value }))
-                }
-              />
-            )}
-          </div>
+        <div className="mt-10 sm:mt-14"></div>
 
-          {/* Navigation Buttons */}
-          <div className="flex flex-col sm:flex-row justify-between mt-6 gap-2">
-            {currentStep !== "workshop" && (
-              <button
-                type="button"
-                onClick={back}
-                className="px-6 py-2.5 bg-white border-2 border-emerald-300 text-emerald-700 rounded-lg font-medium hover:bg-emerald-50 transition-all w-full sm:w-auto"
-              >
-                Back
-              </button>
+
+
+        {isReading ? (
+          <div
+            onClick={() => canTap && setIsReading(false)}
+            className="flex flex-col min-h-[60vh] sm:h-96 cursor-pointer select-none px-4"
+          >
+            {/* this is the one that should be the statement.text */}
+            {/* <p className="text-2xl font-semibold text-gray-800 mb-4">{currentQuestion.question}</p>  */}
+
+            {currentQuestion.statements?.map((s, i) => (
+              <p key={i} className="text-lg font-semibold text-gray-800 mb-6">
+                {s.text}
+              </p>
+            ))}
+
+            {/* Loading Bar */}
+            <div className="w-full h-2 bg-gray-300 rounded-full mt-6 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 transition-all duration-100"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            {canTap && (
+              <>
+                {/* Mobile */}
+                <button
+                  onClick={() => setIsReading(false)}
+                  className="mt-8 px-6 py-3 bg-emerald-600 text-white rounded-xl sm:hidden"
+                >
+                  Continue
+                </button>
+
+                {/* Desktop */}
+                <div className="mt-10 text-gray-400 text-sm hidden sm:block">
+                  Tap anywhere to continue
+                </div>
+              </>
             )}
-            {currentStep !== "qualitative" ? (
-              <button
-                type="button"
-                onClick={handleNextClickWithValidation}
-                className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium hover:shadow-lg transition-all w-full sm:w-auto"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-md hover:shadow-xl transition-all w-full sm:w-auto"
-              >
-                Submit Feedback
-              </button>
-            )}
+
           </div>
-        </form>
+        ) : (
+          <>
+            {/* Show question again in answer phase */}
+            <div className="text-center mb-6">
+              <p className="text-lg sm:text-xl font-semibold text-gray-800 mb-6">
+
+                {currentQuestion.question}
+              </p>
+
+              {currentQuestion.statements?.length > 0 && (
+                <div className="w-full mt-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent tap-anywhere trigger
+                      setShowStatements(prev => !prev);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-2 border rounded-lg text-sm text-gray-700 bg-gray-50"
+                  >
+                    <span>View Definition</span>
+                    <span className="text-lg">{showStatements ? "−" : "+"}</span>
+                  </button>
+
+                  {showStatements && (
+                    <div className="mt-2 p-4 border rounded-lg bg-gray-50 text-left">
+                      {currentQuestion.statements.map((s, i) => (
+                        <p key={i} className="text-gray-600 text-sm mb-4">
+                          {s.text}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+
+            <div className="flex flex-row gap-4 mt-6 overflow-x-auto">
+
+              {likertOptions.map((opt, optIdx) => {
+                const selected = answers[currentStep] === optIdx * 25;
+                return (
+                  <label
+                    key={optIdx}
+                    onClick={() => handleLikertChange(currentStep, optIdx + 1)}
+                    className="flex items-center sm:flex-col gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50"
+                  >
+                    <div
+                      className={`
+    w-14 h-14 min-w-[3.5rem] min-h-[3.5rem] shrink-0
+    rounded-full border flex items-center justify-center
+    transition-all duration-200
+    ${selected ? opt.color : "bg-white"}
+  `}
+                    />
+
+                    <span className="text-sm text-center">{opt.label}</span>
+                  </label>
+
+                );
+              })}
+            </div>
+
+            <div className="mt-8 flex justify-end">
+
+              {currentStep + 1 < questions.length ? (
+                <button
+                  onClick={goNext}
+                  className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-xl"
+                >
+                  Submit
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </main>
   );
