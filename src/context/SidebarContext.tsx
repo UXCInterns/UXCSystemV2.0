@@ -7,6 +7,8 @@ type SidebarContextType = {
   isHovered: boolean;
   activeItem: string | null;
   openSubmenu: string | null;
+   hideHeader: boolean;
+  setHideHeader: (value: boolean) => void;
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
   setIsHovered: (isHovered: boolean) => void;
@@ -28,6 +30,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [hideHeader, setHideHeader]=useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -67,10 +70,12 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     <SidebarContext.Provider
       value={{
         isExpanded: isMobile ? false : isExpanded,
+        hideHeader,
         isMobileOpen,
         isHovered,
         activeItem,
         openSubmenu,
+        setHideHeader,
         toggleSidebar,
         toggleMobileSidebar,
         setIsHovered,

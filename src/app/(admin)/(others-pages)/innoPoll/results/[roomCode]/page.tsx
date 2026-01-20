@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRealtimePollResults } from '@/hooks/innopoll/useRealTimeResults';
 import { useParams } from 'next/navigation';
 import RadialChart from '@/components/innopoll/RadialChart';
+import { useSidebar } from '@/context/SidebarContext';
 
 interface RadialChartProps {
   score: number;
@@ -30,21 +31,21 @@ const questionCategoryMap: Record<string, string> = {
 const BASE_QUESTIONS = [
   {
     key: 'culture',
-    title: 'CULTURE', 
+    title: 'CULTURE',
     desc: 'Average score',
     color: '#ea580c',
     gradient: 'from-orange-400 to-yellow-500',
   },
   {
     key: 'capability',
-    title: 'CAPABILITY',
+    title: 'PRACTICES',
     desc: 'Average score',
     color: '#2563eb',
     gradient: 'from-blue-400 to-indigo-500',
   },
   {
     key: 'process',
-    title: 'PROCESS',
+    title: 'LEADERSHIP',
     desc: 'Average score',
     color: '#059669',
     gradient: 'from-green-400 to-emerald-500',
@@ -55,7 +56,31 @@ const BASE_QUESTIONS = [
 const InnovationPollPreview: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const params = useParams();
+  const [isFullpage, setIsFullpage] = useState(false);
   const roomCode = params.roomCode as string;
+
+  const { setHideHeader } = useSidebar();
+
+  useEffect(() => {
+    setHideHeader(isFullpage);
+
+    return () => setHideHeader(false);
+  }, [isFullpage, setHideHeader]);
+
+  //Escape full page 
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsFullpage(false); // exit fullscreen
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc); // cleanup
+    };
+  }, []);
 
   const {
     pollData,
@@ -67,24 +92,18 @@ const InnovationPollPreview: React.FC = () => {
   console.log('Poll Data:', pollData);
 
 
-const liveScores = BASE_QUESTIONS.map(base => {
-  const matchingQuestion = Object.values(pollData).find(
-    q => questionCategoryMap[q.title.toUpperCase()] === base.title
-  );
-  return {
-    title: base.title,
-    desc: base.desc,
-    score: matchingQuestion ? Math.round(matchingQuestion.avgScore) : 0,
-    color: base.color,
-    gradient: base.gradient,
-  };
-});
-
-
-
-
-
-
+  const liveScores = BASE_QUESTIONS.map(base => {
+    const matchingQuestion = Object.values(pollData).find(
+      q => questionCategoryMap[q.title.toUpperCase()] === base.title
+    );
+    return {
+      title: base.title,
+      desc: base.desc,
+      score: matchingQuestion ? Math.round(matchingQuestion.avgScore) : 0,
+      color: base.color,
+      gradient: base.gradient,
+    };
+  });
 
 
   if (isLoading) {
@@ -105,21 +124,44 @@ const liveScores = BASE_QUESTIONS.map(base => {
 
   return (
     <div
-      className={`w-full h-screen ${darkMode
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
-        : 'bg-gradient-to-br from-orange-50 via-white to-green-50'
-        } flex flex-col items-center justify-between py-12 px-16 relative overflow-hidden transition-colors duration-500`}
+      className={`
+    ${isFullpage ? 'fixed inset-0 z-[9999]' : 'relative'}
+    w-full h-full
+    ${darkMode ? 'bg-slate-900' : 'bg-white'}
+    flex flex-col items-center justify-between
+    ${isFullpage ? 'pt-16' : ''}
+  `}
     >
+
+
+
+
       {/* Mode Toggle Button */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        className={`absolute top-8 right-8 z-20 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${darkMode
-          ? 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-          : 'bg-slate-800/10 text-slate-800 hover:bg-slate-800/20 border border-slate-800/20'
-          }`}
-      >
-        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
+
+      <div className="absolute top-8 right-8 z-50 flex flex-col gap-4">
+        {/* Dark Mode Button */}
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className={`px-6 py-3 rounded-full font-semibold transition-all duration-300
+      ${darkMode
+              ? 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+              : 'bg-slate-800/10 text-slate-800 hover:bg-slate-800/20 border border-slate-800/20'
+            }`}
+        >
+          {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+        </button>
+
+        {/* Fullscreen Button */}
+        <button
+          onClick={() => setIsFullpage(!isFullpage)}
+          className="px-6 py-3 rounded-full font-semibold border border-gray-400 bg-white/10 hover:bg-white/20"
+        >
+          {isFullpage ? 'Exit Fullpage' : 'Go Fullpage'}
+        </button>
+      </div>
+
+
+
 
       {/* Animated background elements */}
       <div
@@ -132,7 +174,7 @@ const liveScores = BASE_QUESTIONS.map(base => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center justify-between h-full">
+      <div className="relative z-10 w-full h-full flex flex-col">
         {/* Title Section */}
         <div className="text-center mb-8">
           <div
@@ -162,12 +204,15 @@ const liveScores = BASE_QUESTIONS.map(base => {
         </div>
 
         {/* Three Circles Grid */}
-        <div className="grid grid-cols-3 gap-16 w-full mb-8">
+        <div className={`
+    grid grid-cols-3 gap-6 mb-8
+    ${isFullpage ? 'max-w-5xl mx-auto' : 'w-full'}
+  `}>
           {liveScores.map((score, index) => (
 
             <div key={index} className="flex flex-col items-center group">
               {/* Chart */}
-              <div className="w-72 h-72 mb-6 transform group-hover:scale-105 transition-transform duration-300">
+              <div className={"w-80 h-80 mb-6 transform group-hover:scale-105 transition-transform duration-300"}>
                 <RadialChart score={score.score} color={score.color} />
               </div>
 

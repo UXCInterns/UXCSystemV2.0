@@ -63,7 +63,7 @@ export default function JoinPage() {
         clearInterval(interval);
         // Navigate after a short delay (let React finish)
         setTimeout(() => {
-          router.push(`/takeSurvey/${roomCode}/questions`); 
+          router.push(`/participant/takeSurvey/${roomCode}/questions`); 
         }, 300);
       }
     }, 100);

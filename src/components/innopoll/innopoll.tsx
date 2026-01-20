@@ -22,6 +22,8 @@ interface Visit {
   roomCode: string;
   participantsAttended: number;
   status: string;
+  created_by: string;
+  creator_avatar: string | null;
 }
 
 
@@ -72,12 +74,14 @@ export default function InnoPoll({
 
 
         const formatted = data.map((item: any) => ({
-          id: item.session_id,               
-          sessionName: item.session_title,    
-          dateCreated: formatDate(item.session_created_at),       
+          id: item.session_id,
+          sessionName: item.session_title,
+          dateCreated: formatDate(item.session_created_at),
           roomCode: item.room_code,
-          participantsAttended: item.participant_count, 
-          status: item.session_status         
+          participantsAttended: item.participant_count,
+          status: item.session_status,
+          created_by: item.creator_name,
+          creator_avatar: item.creator_avatar,
         }));
 
 
@@ -122,12 +126,12 @@ export default function InnoPoll({
 
   const sortedData = getSortedData();
 
-  const router = useRouter(); 
+  const router = useRouter();
 
   const handleViewSession = (roomCode: string) => {
     router.push(`/join/${roomCode}`);
   };
-  
+
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -141,6 +145,7 @@ export default function InnoPoll({
                 "Room Code",
                 "Participants",
                 "Status",
+                "Created By",
                 "Actions",
               ].map((header) => (
                 <TableCell
@@ -189,6 +194,31 @@ export default function InnoPoll({
                   </Badge>
                 </TableCell>
                 <TableCell className="px-5 py-4 text-theme-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center justify-center gap-3">
+                    {/* Avatar */}
+                    {row.creator_avatar ? (
+                      <img
+                        src={row.creator_avatar}
+                        alt={row.created_by}
+                        className="w-10 h-10 rounded-full transition-transform hover:scale-105"
+
+
+                      />
+                    ) : (
+                      /* Fallback avatar */
+                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-semibold text-gray-700 dark:text-gray-200">
+                        {row.created_by?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+
+                    {/* Name */}
+                    <span className="whitespace-nowrap">
+                      {row.created_by}
+                    </span>
+                  </div>
+                </TableCell>
+
+                <TableCell className="px-5 py-4 text-theme-sm text-gray-500 dark:text-gray-400">
                   <div className="flex justify-center gap-5 items-center">
                     <button
                       onClick={() => router.push(`innoPoll/results/${row.roomCode}`)}
@@ -198,7 +228,7 @@ export default function InnoPoll({
                       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 512 512"><path fill="currentColor" d="M480 496H48a32 32 0 0 1-32-32V32a16 16 0 0 1 32 0v432h432a16 16 0 0 1 0 32" /><path fill="currentColor" d="M156 432h-40a36 36 0 0 1-36-36V244a36 36 0 0 1 36-36h40a36 36 0 0 1 36 36v152a36 36 0 0 1-36 36m144 0h-40a36 36 0 0 1-36-36V196a36 36 0 0 1 36-36h40a36 36 0 0 1 36 36v200a36 36 0 0 1-36 36m143.64 0h-40a36 36 0 0 1-36-36V132a36 36 0 0 1 36-36h40a36 36 0 0 1 36 36v264a36 36 0 0 1-36 36" /></svg>
                     </button>
                     <button
-                     onClick={() => router.push(`innoPoll/admin/${row.roomCode}`)}
+                      onClick={() => router.push(`innoPoll/admin/${row.roomCode}`)}
                       aria-label="View Participants"
                       className="hover:text-yellow-600 dark:hover:text-yellow-400"
                     >

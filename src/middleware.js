@@ -33,5 +33,6 @@ export const config = {
     '/manpower/:path*',
     '/profile/:path*',
     '/signin',
+    '/innoPoll/:path*',
   ],
 };
