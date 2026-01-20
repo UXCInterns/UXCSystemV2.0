@@ -5,9 +5,61 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const CreateSessionSidebar = () => {
+  const router = useRouter();
+
+  // Helper function to format date as YYYY-MM-DD
+  const formatDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`; // YYYY-MM-DD format
+  };
+
+  // Default dates
+  const today = new Date();
+  const sevenDaysLater = new Date(today.getTime()); // clone today
+  sevenDaysLater.setDate(today.getDate() + 7);
+
   const [sessionName, setSessionName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(formatDate(today));
+  const [endDate, setEndDate] = useState(formatDate(sevenDaysLater));
+  const [questions, setQuestions] = useState([
+    {
+      question:
+        "Does your company embrace discussions on experimentations to generate and test new ideas, concepts, business models, etc. to innovate?",
+      statements: [
+        {
+          text: `An Innovation Culture fosters an atmosphere where employees feel empowered to take risks, collaborate, and continuously seek out opportunities for improvement and innovation in products, processes, or services. This is essential to staying competitive in today's rapidly changing landscape.`,
+          title: `INNOVATION CULTURE`,
+          desc: `Embrace Innovation`,
+        },
+      ],
+    },
+    {
+      question:
+        "How often does your company use business models, startup methodologies, design thinking or any other innovation tools and methods?",
+      statements: [
+        {
+          text: `Innovation Practices often involve fostering a culture of innovation, conducting research and development, leveraging on technology and tools and processes for collaboration to thrive in an ever changing environmental and economic uncertainty to achieve sustainable advancements for all users.`,
+          title: `INNOVATION PRACTICES`,
+          desc: `Practice Innovation Tools & Methods`,
+        },
+      ],
+    },
+    {
+      question:
+        "How often do leaders in your organisation encourage the need for innovation and provide the resources to support innovation efforts?",
+      statements: [
+        {
+          text: `Innovation leadership inspires organisations to foster a creative culture. They not only champion and support creative thinking but also provide strategic direction, allocate resources, and create an environment where experimentation and calculated risk-taking are encouraged.`,
+          title: `INNOVATION LEADERSHIP`,
+          desc: `Leaders who Champion Innovation`,
+        },
+      ],
+    },
+  ]);
+
+
 
   const handleCancel = () => {
     setSessionName("");
@@ -15,15 +67,87 @@ const CreateSessionSidebar = () => {
     setEndDate("");
   };
 
-  const handleCreateSession = () => {
+  const handleCreateSession = async () => {
     console.log({ sessionName, startDate, endDate });
+
+    if (!sessionName) {
+      alert("please enter a session title")
+      return
+    }
+    try {
+      //  Create the session
+      const sessionResponse = await fetch("/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: sessionName }),
+      });
+
+      if (!sessionResponse.ok) {
+        const errData = await sessionResponse.json();
+        throw new Error(errData.error || "Failed to create session");
+      }
+
+      const sessionResult = await sessionResponse.json();
+
+      const sessionId = sessionResult?.session?.id;
+
+
+      const quizData = {
+        session_id: sessionId,
+        title: `${sessionName} `,
+        questions, //to fix this
+        scale_type: "5-point Likert",
+        custom_scale: null,
+        start_date: startDate,
+        end_date: endDate,
+      };
+
+
+
+
+      //  Send quizData to backend
+      const quizResponse = await fetch("/api/sessions/upsert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(quizData), // ✅ send object directly
+      });
+
+      console.log(quizData)
+      //  If error, log response
+      if (!quizResponse.ok) {
+        const text = await quizResponse.text();
+        console.error("Backend response on quiz creation error:", text);
+        throw new Error("Failed to create quiz");
+      }
+
+      const quizResult = await quizResponse.json();
+
+      if (quizResponse.ok) {
+        const roomCode = quizResult?.room_code || quizResult?.quiz?.room_code;
+
+
+        // Redirect user to landind page to scan qr code 
+        router.push(`/join/${roomCode}`);
+
+      } else {
+        console.error(" Quiz creation failed:", quizResult);
+        alert("Failed to create quiz");
+      }
+
+    } catch (error) {
+      console.error("Error creating session/quiz:", error);
+      alert("Error creating session or quiz. Please try again.");
+    }
+
   };
 
-  const router = useRouter(); // ✅ Correct hook usage
+
 
   const handleCancelSession = () => {
     router.push("/innoPoll"); // ✅ navigate to create-session page
   };
+
+
 
   return (
     <div className="flex flex-col p-2 max-w-full mx-auto">
@@ -51,14 +175,8 @@ const CreateSessionSidebar = () => {
             <DatePicker
               id="start-date-picker"
               placeholder="Select a date"
-              onChange={(dates) => {
-                if (dates.length > 0) {
-                  setStartDate(dates[0].toISOString().split("T")[0]);
-                } else {
-                  setStartDate("");
-                }
-              }}
-              
+              defaultDate={today} // ✅ string, not Date
+              onChange={(dates: Date[]) => setStartDate(formatDate(dates[0]))}
             />
           </div>
         </div>
@@ -72,13 +190,8 @@ const CreateSessionSidebar = () => {
             <DatePicker
               id="end-date-picker"
               placeholder="Select a date"
-              onChange={(dates) => {
-                if (dates.length > 0) {
-                  setEndDate(dates[0].toISOString().split("T")[0]);
-                } else {
-                  setEndDate("");
-                }
-              }}
+              defaultDate={sevenDaysLater} // ✅ string, not Date
+              onChange={(dates: Date[]) => setEndDate(formatDate(dates[0]))}
             />
           </div>
         </div>
