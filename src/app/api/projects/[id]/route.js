@@ -1,6 +1,16 @@
 // app/api/projects/[id]/route.js
 import { supabaseAdmin } from '../../supabaseAdmin';
 
+// Helper to get user from auth header
+async function getUserFromRequest(request) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader) return null;
+  
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+  return user;
+}
+
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
@@ -132,29 +142,50 @@ export async function PATCH(request, { params }) {
       project_lead_id,
       start_date,
       end_date,
-      // progress,
-      // status,
       notes,
+      _current_user_id, // ✅ Get user ID from request
     } = body;
 
-    // Build update object with only provided fields
-    const updateData = {};
-    if (project_name !== undefined) updateData.project_name = project_name;
-    if (project_description !== undefined) updateData.project_description = project_description;
-    if (project_manager_id !== undefined) updateData.project_manager_id = project_manager_id;
-    if (project_lead_id !== undefined) updateData.project_lead_id = project_lead_id;
-    if (start_date !== undefined) updateData.start_date = start_date;
-    if (end_date !== undefined) updateData.end_date = end_date;
-    // if (progress !== undefined) updateData.progress = progress;
-    // if (status !== undefined) updateData.status = status;
-    if (notes !== undefined) updateData.notes = notes;
-    updateData.updated_at = new Date().toISOString();
+    if (!_current_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'User authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
-    // Update project
+    // ✅ Use wrapper RPC function
+    const { error: rpcError } = await supabaseAdmin.rpc('update_project_with_user', {
+      p_project_id: id,
+      p_project_name: project_name,
+      p_project_description: project_description,
+      p_project_manager_id: project_manager_id,
+      p_project_lead_id: project_lead_id,
+      p_start_date: start_date,
+      p_end_date: end_date,
+      p_notes: notes,
+      p_user_id: _current_user_id
+    });
+
+    if (rpcError) {
+      console.error('RPC error:', rpcError);
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to update project',
+          details: rpcError.message,
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Fetch updated project with relations
     const { data: project, error } = await supabaseAdmin
       .from('projects')
-      .update(updateData)
-      .eq('project_id', id)
       .select(`
         *,
         project_manager:profiles!project_manager_id(id, full_name, email, avatar_url),
@@ -166,13 +197,14 @@ export async function PATCH(request, { params }) {
           profile:profiles(id, full_name, email, avatar_url)
         )
       `)
+      .eq('project_id', id)
       .single();
 
     if (error) {
       console.error('Supabase error:', error);
       return new Response(
         JSON.stringify({
-          error: 'Failed to update project',
+          error: 'Failed to fetch updated project',
           details: error.message,
         }),
         {
@@ -271,30 +303,31 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const _current_user_id = searchParams.get('_current_user_id');
     
-    // Delete related team members first (if cascade is not set)
-    await supabaseAdmin
-      .from('project_core_team')
-      .delete()
-      .eq('project_id', id);
+    if (!_current_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'User authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
-    await supabaseAdmin
-      .from('project_support_team')
-      .delete()
-      .eq('project_id', id);
+    // ✅ Use wrapper RPC function
+    const { error: rpcError } = await supabaseAdmin.rpc('delete_project_with_user', {
+      p_project_id: id,
+      p_user_id: _current_user_id
+    });
 
-    // Delete the project
-    const { error } = await supabaseAdmin
-      .from('projects')
-      .delete()
-      .eq('project_id', id);
-
-    if (error) {
-      console.error('Supabase error:', error);
+    if (rpcError) {
+      console.error('RPC error:', rpcError);
       return new Response(
         JSON.stringify({
           error: 'Failed to delete project',
-          details: error.message,
+          details: rpcError.message,
         }),
         {
           status: 500,

@@ -4,7 +4,7 @@ import WorkshopFilterComponent from "../FilterComponent/FilterComponent";
 import NewWorkshopForm from "../NewVisitModal/NewVisitModal";
 import EditWorkshopForm from "../EditVisitModal/EditVisitModal";
 import WorkshopDetailsModal from "../ViewDetailsModal/ViewDetailsModal";
-import { WorkshopModalsProps } from '@/types/workshop';
+import { WorkshopModalsProps } from '@/types/WorkshopTypes/workshop';
 
 const WorkshopModals: React.FC<WorkshopModalsProps> = ({
   isFilterOpen,

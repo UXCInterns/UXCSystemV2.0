@@ -39,14 +39,21 @@ export default function NotificationDropdown() {
       const response = await fetch(`/api/activity/recent?hours=24`);
       const data = await response.json();
       
-      // Filter out invalid updates
       const validUpdates = (data.all || []).filter((update: Update) => {
-        // Skip if both old and new values are empty/null
-        if (update.old_value === null && update.new_value === null) return false;
-        if (update.old_value === '' && update.new_value === '') return false;
-        if (!update.old_value && !update.new_value) return false;
+        if (update.update_type === 'created') {
+          return update.item_name && update.item_name.trim() !== '';
+        }
         
-        // Skip if item_name is missing
+        const hasOldValue = update.old_value !== null && update.old_value !== undefined && update.old_value !== '';
+        const hasNewValue = update.new_value !== null && update.new_value !== undefined && update.new_value !== '';
+        
+        if (!hasOldValue && !hasNewValue) {
+          if (update.update_type === 'comment_added' || update.update_type === 'notes_updated') {
+            return update.item_name && update.item_name.trim() !== '';
+          }
+          return false;
+        }
+        
         if (!update.item_name || update.item_name.trim() === '') return false;
         
         return true;
@@ -83,52 +90,51 @@ export default function NotificationDropdown() {
   };
 
   const getActivityMessage = (update: Update) => {
-    // For task status changes, always show user action
-    // For project progress/status, it can be system
-    const isTaskStatusChange = update.item_type === 'task' && update.update_type === 'status_change';
-    const isProjectUpdate = update.item_type === 'project' && 
-                           (update.update_type === 'progress_updated' || update.update_type === 'status_change');
-    
     const typeMessages: Record<string, string> = {
       created: 'created',
       deleted: 'deleted',
-      status_change: update.item_type === 'task' ? 'changed status' : 'changed status',
+      status_change: 'changed status',
       priority_change: 'changed priority',
       assignee_added: 'added assignee',
       assignee_removed: 'removed assignee',
-      comment_added: 'commented',
-      notes_updated: 'updated notes',
-      description_updated: 'updated description',
+      comment_added: 'added a comment on',
+      notes_updated: 'updated notes on',
+      description_updated: 'updated description of',
       name_changed: 'renamed',
-      manager_changed: 'changed manager',
-      lead_changed: 'changed lead',
-      team_member_added: 'added team member',
-      team_member_removed: 'removed team member',
-      start_date_changed: 'changed start date',
-      end_date_changed: 'changed end date',
-      due_date_changed: 'changed due date',
-      progress_updated: 'progress updated',
+      manager_changed: 'changed manager of',
+      lead_changed: 'changed lead of',
+      team_member_added: 'added team member to',
+      team_member_removed: 'removed team member from',
+      start_date_changed: 'changed start date of',
+      end_date_changed: 'changed end date of',
+      due_date_changed: 'changed due date of',
+      progress_updated: 'updated progress',
       project_changed: 'moved',
     };
 
     const action = typeMessages[update.update_type] || 'updated';
     
-    // If it has both old and new values, show the transition
+    if (update.update_type === 'created') {
+      return 'created';
+    }
+    
+    if (update.update_type === 'comment_added' || update.update_type === 'notes_updated') {
+      return action;
+    }
+    
     if (update.old_value && update.new_value) {
-      return `${action} from ${update.old_value} to ${update.new_value}`;
+      return `${action} from ${update.old_value} to ${update.new_value} on`;
     }
     
-    // If only new value (something was added)
     if (update.new_value && !update.old_value) {
-      return `${action} to ${update.new_value}`;
+      return `${action} to ${update.new_value} on`;
     }
     
-    // If only old value (something was removed)
     if (update.old_value && !update.new_value) {
-      return `${action} from ${update.old_value}`;
+      return `${action} from ${update.old_value} on`;
     }
     
-    return action;
+    return `${action} on`;
   };
 
   return (
@@ -163,7 +169,7 @@ export default function NotificationDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:right-0"
+        className="absolute left-1/2 -translate-x-1/4 mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:left-auto lg:translate-x-0 lg:right-0"
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700">
           <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -191,7 +197,6 @@ export default function NotificationDropdown() {
         </div>
         <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
           {loading ? (
-            // Loading skeleton
             Array.from({ length: 3 }).map((_, i) => (
               <li key={i}>
                 <div className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 dark:border-gray-800 animate-pulse">
@@ -204,14 +209,12 @@ export default function NotificationDropdown() {
               </li>
             ))
           ) : updates.length === 0 ? (
-            // Empty state
             <li className="py-12 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 No notifications yet
               </p>
             </li>
           ) : (
-            // Actual notifications
             updates.map((update) => (
               <li key={update.id}>
                 <DropdownItem

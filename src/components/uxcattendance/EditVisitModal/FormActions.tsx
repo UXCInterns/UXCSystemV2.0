@@ -13,25 +13,31 @@ const FormActions: React.FC<FormActionsProps> = ({
   cancelLabel = "Cancel"
 }) => {
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-      <div className="flex justify-end space-x-4">
+    <div className="border-0 border-gray-200 dark:border-gray-700 pt-6 sm:border-t">
+      <div className="flex flex-row gap-3 sm:justify-end">
         
         {/* Cancel Button */}
-        <Button 
-          variant="outline"
-          size="md"
-          onClick={onCancel}
-        >
-          {cancelLabel}
-        </Button>
+        <div className="flex-1 sm:flex-none">
+          <Button 
+            variant="outline"
+            size="md"
+            onClick={onCancel}
+            className="w-full sm:w-auto"
+          >
+            {cancelLabel}
+          </Button>
+        </div>
 
         {/* Submit Button */}
-        <Button 
-          variant="primary"
-          size="md"
-        >
-          {submitLabel}
-        </Button>
+        <div className="flex-1 sm:flex-none">
+          <Button 
+            variant="primary"
+            size="md"
+            className="w-full sm:w-auto"
+          >
+            {submitLabel}
+          </Button>
+        </div>
 
       </div>
     </div>

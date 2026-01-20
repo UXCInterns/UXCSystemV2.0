@@ -3,7 +3,7 @@ import WorkshopTableHeader from "./WorkshopTableHeader";
 import WorkshopTableBody from "./WorkshopTableBody";
 import { WorkshopActiveFilters } from "../FilterComponent/ActiveFilters";
 import { WorkshopTableStats } from "./WorkshopTableStats";
-import { WorkshopsTableContentProps } from "@/types/workshop";
+import { WorkshopsTableContentProps } from "@/types/WorkshopTypes/workshop";
 
 export const WorkshopsTableContent: React.FC<WorkshopsTableContentProps> = ({ 
   tableState, 

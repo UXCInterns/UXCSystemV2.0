@@ -1,5 +1,5 @@
 import React from "react";
-import { WorkshopTableStatsProps } from "@/types/workshop";
+import { WorkshopTableStatsProps } from "@/types/WorkshopTypes/workshop";
 
 export const WorkshopTableStats: React.FC<WorkshopTableStatsProps> = ({
   paginatedCount,

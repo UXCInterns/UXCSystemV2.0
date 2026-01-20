@@ -72,8 +72,11 @@ const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
 
+  // ✅ Handle null/undefined name
+  const safeName = name || "Unknown";
+
   // Generate initials from name
-  const initials = name
+  const initials = safeName
     .split(" ")
     .map((word) => word[0])
     .join("")
@@ -86,7 +89,7 @@ const Avatar: React.FC<AvatarProps> = ({
       <div className={`relative rounded-full ${sizeClasses[size]} ${className}`}>
         <div
           className={`flex items-center justify-center rounded-full w-full h-full ${getColorClass(
-            name
+            safeName  // ✅ Use safeName here too
           )}`}
         >
           <span className={`font-medium ${textSizeClasses[size]}`}>
@@ -114,7 +117,7 @@ const Avatar: React.FC<AvatarProps> = ({
         height="0"
         sizes="100vw"
         src={src}
-        alt={alt || name}
+        alt={alt || safeName}  // ✅ Use safeName here too
         className="object-cover w-full h-full rounded-full"
         referrerPolicy="no-referrer"
         onError={() => setImageError(true)}

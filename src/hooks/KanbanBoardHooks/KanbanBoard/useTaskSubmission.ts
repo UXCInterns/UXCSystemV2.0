@@ -44,6 +44,15 @@ export function useTaskSubmission({ projectId, onSuccess, onClose }: UseTaskSubm
     setError(null);
 
     try {
+      // ✅ Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setError('You must be logged in to create tasks');
+        setLoading(false);
+        return;
+      }
+
       console.log('📝 Creating task with data:', {
         project_id: projectId,
         task_name: formData.task_name,
@@ -52,56 +61,49 @@ export function useTaskSubmission({ projectId, onSuccess, onClose }: UseTaskSubm
         due_date: formData.due_date,
       });
 
-      // Insert task into kanban_tasks table
-      const { data: newTask, error: taskError } = await supabase
-        .from('kanban_tasks')
-        .insert({
-          project_id: projectId,
-          task_name: formData.task_name,
-          task_description: formData.task_description || null,
-          status: 'To Do',
-          priority: formData.priority,
-          started_at: formData.started_at,
-          due_date: formData.due_date,
-          comments: formData.comments || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select('task_id')
-        .single();
+      // ✅ Use wrapper RPC function to create task
+      const { data: newTaskId, error: taskError } = await supabase.rpc('create_task_with_user', {
+        p_task_name: formData.task_name,
+        p_task_description: formData.task_description || null,
+        p_project_id: projectId,
+        p_status: 'To Do',
+        p_priority: formData.priority,
+        p_due_date: formData.due_date,
+        p_comments: formData.comments || null,
+        p_user_id: user.id
+      });
 
       if (taskError) {
         console.error('❌ Error creating task:', taskError);
         throw new Error(`Failed to create task: ${taskError.message || taskError.code || JSON.stringify(taskError)}`);
       }
 
-      if (!newTask || !newTask.task_id) {
-        console.error('❌ No task returned from insert');
+      if (!newTaskId) {
+        console.error('❌ No task ID returned from RPC');
         throw new Error('Failed to create task: No task ID returned');
       }
 
-      console.log('✅ Task created with ID:', newTask.task_id);
+      console.log('✅ Task created with ID:', newTaskId);
 
-      // Insert assignees if any
+      // ✅ Insert assignees using wrapper function
       if (selectedAssignees.length > 0) {
         console.log('👥 Assigning to:', selectedAssignees);
         
-        const { error: assignError } = await supabase
-          .from('task_assignees')
-          .insert(
-            selectedAssignees.map(profile_id => ({
-              task_id: newTask.task_id,
-              profile_id: profile_id,
-              assigned_at: new Date().toISOString()
-            }))
-          );
+        for (const profileId of selectedAssignees) {
+          const { error: assignError } = await supabase.rpc('assign_task_with_user', {
+            p_task_id: newTaskId,
+            p_profile_id: profileId,
+            p_assigned_by: user.id,
+            p_user_id: user.id
+          });
 
-        if (assignError) {
-          console.error('❌ Error assigning users:', assignError);
-          console.warn('Task created but failed to assign users:', assignError.message);
-        } else {
-          console.log('✅ Assignees added successfully');
+          if (assignError) {
+            console.error('❌ Error assigning user:', assignError);
+            console.warn('Task created but failed to assign user:', assignError.message);
+          }
         }
+        
+        console.log('✅ Assignees added successfully');
       }
 
       console.log('🎉 Task creation complete');

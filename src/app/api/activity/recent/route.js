@@ -27,19 +27,52 @@ export async function GET(request) {
       );
     }
 
-    const updates = data.map((activity) => ({
-      id: activity.activity_id,
-      item_type: activity.item_type,
-      item_id: activity.item_id,
-      item_name: activity.item_name,
-      update_type: activity.update_type,
-      old_value: activity.old_value,
-      new_value: activity.new_value,
-      comment: activity.comment_text,
-      user_name: activity.user_name || 'System',
-      user_avatar: activity.user_avatar,
-      timestamp: activity.created_at,
-    }));
+    // Filter and map activities
+    const updates = data
+      .filter((activity) => {
+        // Always include created events
+        if (activity.update_type === 'created') {
+          return activity.item_name && activity.item_name.trim() !== '';
+        }
+
+        // Always include comment_added and notes_updated (they don't need old/new values)
+        if (activity.update_type === 'comment_added' || activity.update_type === 'notes_updated') {
+          return activity.item_name && activity.item_name.trim() !== '';
+        }
+
+        // For other events, check if there's meaningful change
+        const hasOldValue = activity.old_value !== null && 
+                           activity.old_value !== undefined && 
+                           activity.old_value !== '';
+        const hasNewValue = activity.new_value !== null && 
+                           activity.new_value !== undefined && 
+                           activity.new_value !== '';
+
+        // Skip if both old and new values are empty
+        if (!hasOldValue && !hasNewValue) {
+          return false;
+        }
+
+        // Skip if item_name is missing
+        if (!activity.item_name || activity.item_name.trim() === '') {
+          return false;
+        }
+
+        return true;
+      })
+      .map((activity) => ({
+        id: activity.activity_id,
+        item_type: activity.item_type,
+        item_id: activity.item_id,
+        item_name: activity.item_name,
+        update_type: activity.update_type,
+        old_value: activity.old_value,
+        new_value: activity.new_value,
+        comment: activity.comment_text,
+        user_name: activity.user_name || 'System',
+        user_avatar: activity.user_avatar,
+        timestamp: activity.created_at,
+      }));
 
     // Group by item type
     const projectUpdates = updates.filter(u => u.item_type === 'project');

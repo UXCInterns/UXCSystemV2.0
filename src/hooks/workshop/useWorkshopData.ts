@@ -1,6 +1,6 @@
 // hooks/useWorkshopData.ts
 import { useState, useEffect } from 'react';
-import { Workshop } from '@/types/workshop';
+import { Workshop } from '@/types/WorkshopTypes/workshop';
 
 export const useWorkshopData = (initialData: Workshop[]) => {
   const [tableData, setTableData] = useState<Workshop[]>([]);

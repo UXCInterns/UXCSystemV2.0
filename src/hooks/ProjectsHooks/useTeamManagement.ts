@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Project, Profile } from "@/types/ProjectsTypes/project";
 import { emitProjectUpdate } from "@/lib/projectEvents";
+import { supabase } from "../../../lib/supabase/supabaseClient"; // ✅ Import supabase
 
 export function useTeamManagement(
   showAddPanel: boolean,
@@ -61,16 +62,30 @@ export function useTeamManagement(
       const toRemove = currentIds.filter(id => !selectedTeamMembers.includes(id));
 
       try {
+        // ✅ Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          alert('You must be logged in to update team members');
+          return;
+        }
+
+        // Add team members
         for (const profileId of toAdd) {
           await fetch(`/api/projects/${editedProject.id}/team`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ profile_id: profileId, team_type: teamType }),
+            body: JSON.stringify({ 
+              profile_id: profileId, 
+              team_type: teamType,
+              _current_user_id: user.id // ✅ Add this
+            }),
           });
         }
 
+        // Remove team members
         for (const profileId of toRemove) {
-          await fetch(`/api/projects/${editedProject.id}/team?profile_id=${profileId}&team_type=${teamType}`, {
+          await fetch(`/api/projects/${editedProject.id}/team?profile_id=${profileId}&team_type=${teamType}&_current_user_id=${user.id}`, { // ✅ Add to query string
             method: 'DELETE',
           });
         }

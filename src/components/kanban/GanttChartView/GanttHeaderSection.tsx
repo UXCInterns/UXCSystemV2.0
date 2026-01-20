@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@/components/ui/button/Button';
 import Toggle from '@/components/ui/toggle/Toggle';
 import type { Range } from '@/components/ui/shadcn-io/gantt';
-import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP } from '@/constants/ganttConstants';
+import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP } from '@/constants/GanttChartConstants/ganttConstants';
 
 interface GanttHeaderSectionProps {
   range: Range;

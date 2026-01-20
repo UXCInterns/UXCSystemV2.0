@@ -1,11 +1,19 @@
 // app/api/projects/[id]/team/route.js
 import { supabaseAdmin } from '../../../supabaseAdmin';
 
-// Add team member to project
+async function getUserFromRequest(request) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader) return null;
+  
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+  return user;
+}
+
 export async function POST(request, { params }) {
   try {
     const body = await request.json();
-    const { profile_id, team_type } = body; // team_type: 'core' or 'support'
+    const { profile_id, team_type, _current_user_id } = body;
 
     if (!profile_id || !team_type) {
       return new Response(
@@ -27,22 +35,27 @@ export async function POST(request, { params }) {
       );
     }
 
-    const tableName =
-      team_type === 'core' ? 'project_core_team' : 'project_support_team';
+    if (!_current_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'User authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
-    // Add team member
-    const { data, error } = await supabaseAdmin
-      .from(tableName)
-      .insert({
-        project_id: params.id,
-        profile_id: profile_id,
-      })
-      .select()
-      .single();
+    // ✅ Use wrapper RPC function
+    const { error: rpcError } = await supabaseAdmin.rpc('add_team_member_with_user', {
+      p_project_id: params.id,
+      p_profile_id: profile_id,
+      p_team_type: team_type,
+      p_user_id: _current_user_id
+    });
 
-    if (error) {
+    if (rpcError) {
       // Check if already exists
-      if (error.code === '23505') {
+      if (rpcError.code === '23505') {
         return new Response(
           JSON.stringify({
             error: 'Team member already assigned to this project',
@@ -54,11 +67,11 @@ export async function POST(request, { params }) {
         );
       }
 
-      console.error('Supabase error:', error);
+      console.error('RPC error:', rpcError);
       return new Response(
         JSON.stringify({
           error: 'Failed to add team member',
-          details: error.message,
+          details: rpcError.message,
         }),
         {
           status: 500,
@@ -71,7 +84,6 @@ export async function POST(request, { params }) {
       JSON.stringify({
         success: true,
         message: 'Team member added successfully',
-        data,
       }),
       {
         status: 201,
@@ -88,12 +100,12 @@ export async function POST(request, { params }) {
   }
 }
 
-// Remove team member from project
 export async function DELETE(request, { params }) {
   try {
     const { searchParams } = new URL(request.url);
     const profile_id = searchParams.get('profile_id');
-    const team_type = searchParams.get('team_type'); // 'core' or 'support'
+    const team_type = searchParams.get('team_type');
+    const _current_user_id = searchParams.get('_current_user_id');
 
     if (!profile_id || !team_type) {
       return new Response(
@@ -115,22 +127,30 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    const tableName =
-      team_type === 'core' ? 'project_core_team' : 'project_support_team';
+    if (!_current_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'User authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
-    // Remove team member
-    const { error } = await supabaseAdmin
-      .from(tableName)
-      .delete()
-      .eq('project_id', params.id)
-      .eq('profile_id', profile_id);
+    // ✅ Use wrapper RPC function
+    const { error: rpcError } = await supabaseAdmin.rpc('remove_team_member_with_user', {
+      p_project_id: params.id,
+      p_profile_id: profile_id,
+      p_team_type: team_type,
+      p_user_id: _current_user_id
+    });
 
-    if (error) {
-      console.error('Supabase error:', error);
+    if (rpcError) {
+      console.error('RPC error:', rpcError);
       return new Response(
         JSON.stringify({
           error: 'Failed to remove team member',
-          details: error.message,
+          details: rpcError.message,
         }),
         {
           status: 500,

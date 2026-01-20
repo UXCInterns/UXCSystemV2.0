@@ -133,7 +133,7 @@ export async function PUT(request) {
   return PATCH(request);
 }
 
-// DELETE - Delete a profile (soft delete by setting is_active to false)
+// DELETE - Delete a profile AND the auth user (complete account deletion)
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -149,20 +149,18 @@ export async function DELETE(request) {
       );
     }
 
-    // Soft delete - set is_active to false instead of actually deleting
-    const { data, error } = await supabaseAdmin
+    // Step 1: Delete the profile from profiles table
+    const { error: profileError } = await supabaseAdmin
       .from('profiles')
-      .update({ is_active: false })
-      .eq('id', id)
-      .select()
-      .single();
+      .delete()
+      .eq('id', id);
 
-    if (error) {
-      console.error('Supabase error:', error);
+    if (profileError) {
+      console.error('Error deleting profile:', profileError);
       return new Response(
         JSON.stringify({
           error: 'Failed to delete profile',
-          details: error.message,
+          details: profileError.message,
         }),
         {
           status: 500,
@@ -171,12 +169,34 @@ export async function DELETE(request) {
       );
     }
 
-    return new Response(JSON.stringify({ 
-      message: 'Profile deactivated successfully',
-      profile: data 
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Step 2: Delete the auth user (this requires service role key)
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
+
+    if (authError) {
+      console.error('Error deleting auth user:', authError);
+      // Profile is already deleted, but auth deletion failed
+      return new Response(
+        JSON.stringify({
+          error: 'Profile deleted but failed to delete authentication',
+          details: authError.message,
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        message: 'Account deleted successfully',
+        deleted: true 
+      }), 
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (err) {
     console.error('DELETE handler error:', err);
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';

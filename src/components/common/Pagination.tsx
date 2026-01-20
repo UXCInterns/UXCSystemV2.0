@@ -29,55 +29,86 @@ const Pagination: React.FC<PaginationProps> = ({
   }
 
   return (
-    <div className="flex justify-between items-center w-full p-4 border-t border-gray-200 dark:border-white/[0.05]">
-      {/* Previous button */}
-      <div>
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="flex items-center h-10 justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] text-sm"
-        >
-          <ArrowRightIcon className="transform rotate-180 mr-2" />
-          Previous
-        </button>
+    <>
+      {/* Desktop Pagination */}
+      <div className="hidden md:flex justify-between items-center w-full p-4 border-t border-gray-200 dark:border-white/[0.05]">
+        {/* Previous button */}
+        <div>
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center h-10 justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] text-sm"
+          >
+            <ArrowRightIcon className="transform rotate-180 mr-2" />
+            Previous
+          </button>
+        </div>
+
+        {/* Page numbers */}
+        <div className="flex items-center gap-2">
+          {visiblePages.map((page, index) => {
+            const prev = visiblePages[index - 1];
+            const showEllipsis = prev && page - prev > 1;
+
+            return (
+              <div key={page} className="flex items-center gap-2">
+                {showEllipsis && <span className="px-2 dark:text-gray-400">...</span>}
+                <button
+                  onClick={() => onPageChange(page)}
+                  className={`px-4 py-2 rounded ${
+                    currentPage === page
+                      ? "bg-brand-500 text-white"
+                      : "text-gray-700 dark:text-gray-400"
+                  } flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500`}
+                >
+                  {page}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Next button */}
+        <div>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
+          >
+            Next
+            <ArrowRightIcon className="ml-2" />
+          </button>
+        </div>
       </div>
 
-      {/* Page numbers */}
-      <div className="flex items-center gap-2">
-        {visiblePages.map((page, index) => {
-          const prev = visiblePages[index - 1];
-          const showEllipsis = prev && page - prev > 1;
+      {/* Mobile Pagination */}
+      <div className="md:hidden flex items-center justify-between w-full p-4 border-t border-gray-200 dark:border-white/[0.05]">
+        {/* Previous button */}
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center h-10 justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] text-sm"
+          >
+            <ArrowRightIcon className="transform rotate-180" />
+          </button>
 
-          return (
-            <div key={page} className="flex items-center gap-2">
-              {showEllipsis && <span className="px-2 dark:text-gray-400">...</span>}
-              <button
-                onClick={() => onPageChange(page)}
-                className={`px-4 py-2 rounded ${
-                  currentPage === page
-                    ? "bg-brand-500 text-white"
-                    : "text-gray-700 dark:text-gray-400"
-                } flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500`}
-              >
-                {page}
-              </button>
-            </div>
-          );
-        })}
-      </div>
+        {/* Page indicator */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700 dark:text-gray-400">
+            Page <span className="font-semibold text-gray-900 dark:text-white">{currentPage}</span> of <span className="font-semibold text-gray-900 dark:text-white">{totalPages}</span>
+          </span>
+        </div>
 
-      {/* Next button */}
-      <div>
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
-        >
-          Next
-          <ArrowRightIcon className="ml-2" />
-        </button>
+        {/* Next button */}
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
+          >
+            <ArrowRightIcon />
+          </button>
       </div>
-    </div>
+    </>
   );
 };
 

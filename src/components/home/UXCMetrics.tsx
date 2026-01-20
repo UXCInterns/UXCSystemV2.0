@@ -178,7 +178,7 @@ export const UXCMetrics = () => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* Active Projects */}
-      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-800 dark:hover:shadow-blue-900/20 md:p-6">
+      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-800 dark:hover:shadow-blue-900/20">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-110">
             <FolderOpenIcon className="text-white size-6" />
@@ -224,7 +224,7 @@ export const UXCMetrics = () => {
       </div>
 
       {/* Pending Tasks */}
-      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-amber-100/50 dark:border-gray-800 dark:hover:shadow-amber-900/20 md:p-6">
+      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-amber-100/50 dark:border-gray-800 dark:hover:shadow-amber-900/20">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg shadow-amber-500/30 transition-transform duration-300 group-hover:scale-110">
             <ClipboardListIcon className="text-white size-6" />
@@ -255,7 +255,7 @@ export const UXCMetrics = () => {
               </Badge>
             )}
           </div>
-          {metrics.pendingTasks > 0 && (
+          {metrics.pendingTasks >= 0 && (
             <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-gray-600 dark:text-gray-400">In Review</span>
@@ -264,7 +264,7 @@ export const UXCMetrics = () => {
                     ? 'text-orange-600 dark:text-orange-400' 
                     : 'text-amber-600 dark:text-amber-400'
                 }`}>
-                  {Math.round((metrics.tasksInReview / metrics.pendingTasks) * 100)}%
+                  {Math.round((metrics.tasksInReview / metrics.pendingTasks) * 100) || 0}%
                 </span>
               </div>
             </div>
@@ -273,7 +273,7 @@ export const UXCMetrics = () => {
       </div>
 
       {/* Completed This Week */}
-      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-emerald-100/50 dark:border-gray-800 dark:hover:shadow-emerald-900/20 md:p-6">
+      <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 dark:bg-white/[0.03] transition-all duration-300 hover:shadow-lg hover:shadow-emerald-100/50 dark:border-gray-800 dark:hover:shadow-emerald-900/20">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/30 transition-transform duration-300 group-hover:scale-110">
             <CheckCircle2Icon className="text-white size-6" />

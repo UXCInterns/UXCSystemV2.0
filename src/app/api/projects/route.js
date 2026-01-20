@@ -98,9 +98,6 @@ export async function GET() {
       updated_at: project.updated_at,
     }));
 
-    console.log('✅ Transformed projects:', transformedData.length);
-    console.log('📊 Sample project manager:', transformedData[0]?.project_manager);
-
     return new Response(JSON.stringify({ projects: transformedData }), {
       headers: { 'Content-Type': 'application/json' },
     });
@@ -130,6 +127,7 @@ export async function POST(request) {
       progress,
       status,
       notes,
+      _current_user_id, // ✅ Get user ID from request
     } = body;
 
     // Validate required fields
@@ -152,24 +150,47 @@ export async function POST(request) {
       );
     }
 
-    // Insert new project
+    if (!_current_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'User authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // ✅ Use wrapper RPC function
+    const { data: newProjectId, error: rpcError } = await supabaseAdmin.rpc('create_project_with_user', {
+      p_project_name: project_name.trim(),
+      p_project_description: project_description || null,
+      p_project_manager_id: project_manager_id,
+      p_project_lead_id: project_lead_id,
+      p_start_date: start_date,
+      p_end_date: end_date,
+      p_progress: progress || 0,
+      p_status: status || 'Not Started',
+      p_notes: notes || null,
+      p_user_id: _current_user_id
+    });
+
+    if (rpcError) {
+      console.error('RPC error:', rpcError);
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to create project',
+          details: rpcError.message,
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Fetch the created project with relations
     const { data: project, error } = await supabaseAdmin
       .from('projects')
-      .insert([
-        {
-          project_name: project_name.trim(),
-          project_description: project_description || null,
-          project_manager_id,
-          project_lead_id,
-          start_date,
-          end_date,
-          progress: progress || 0,
-          status: status || 'Not Started',
-          notes: notes || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
       .select(`
         *,
         project_manager:profiles!project_manager_id(id, full_name, email, avatar_url),
@@ -181,13 +202,14 @@ export async function POST(request) {
           profile:profiles(id, full_name, email, avatar_url)
         )
       `)
+      .eq('project_id', newProjectId)
       .single();
 
     if (error) {
       console.error('Supabase error:', error);
       return new Response(
         JSON.stringify({
-          error: 'Failed to create project',
+          error: 'Failed to fetch created project',
           details: error.message,
         }),
         {

@@ -3,7 +3,7 @@ import Label from "@/components/form/Label";
 import Radio from "@/components/form/input/Radio";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
-import { NewWorkshopFormData } from "@/types/workshop";
+import { NewWorkshopFormData } from "@/types/WorkshopTypes/workshop";
 
 interface ProgramInformationSectionProps {
   formData: NewWorkshopFormData;
@@ -26,10 +26,10 @@ export const ProgramInformationSection: React.FC<ProgramInformationSectionProps>
 }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
+      <h3 className="text-md sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
         Program Information
       </h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Program Type */}
         <div>
           <Label>Program Type *</Label>

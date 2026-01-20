@@ -35,23 +35,36 @@ interface WorkshopDetailsContentProps {
 
 export const WorkshopDetailsContent: React.FC<WorkshopDetailsContentProps> = ({ workshop }) => {
   return (
-    <div className="flex-1 max-h-[60vh] overflow-y-auto custom-scrollbar px-2">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column */}
-        <div className="space-y-6">
-          <ProgramInformationView workshop={workshop} />
-          <ScheduleDetailsView workshop={workshop} />
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          <ParticipantMetricsView workshop={workshop} />
-          <CourseAdministrationView workshop={workshop} />
-        </div>
+    <>
+      {/* Mobile Layout - Single Column */}
+      <div className="md:hidden space-y-6">
+        <ProgramInformationView workshop={workshop} />
+        <ScheduleDetailsView workshop={workshop} />
+        <ParticipantMetricsView workshop={workshop} />
+        <CourseAdministrationView workshop={workshop} />
+        <LearningOutcomesView workshop={workshop} />
+        <MetadataFooter workshop={workshop} />
       </div>
 
-      <LearningOutcomesView workshop={workshop} />
-      <MetadataFooter workshop={workshop} />
-    </div>
+      {/* Desktop Layout - Two Column Grid */}
+      <div className="hidden md:block flex-1 max-h-[55vh] overflow-y-auto custom-scrollbar px-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-6">
+            <ProgramInformationView workshop={workshop} />
+            <ScheduleDetailsView workshop={workshop} />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            <ParticipantMetricsView workshop={workshop} />
+            <CourseAdministrationView workshop={workshop} />
+          </div>
+        </div>
+
+        <LearningOutcomesView workshop={workshop} />
+        <MetadataFooter workshop={workshop} />
+      </div>
+    </>
   );
 };

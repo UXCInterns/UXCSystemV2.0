@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { Table } from "@/components/ui/table";
 import Pagination from "@/components/common/Pagination";
 import { useVisits } from '@/hooks/learningJourney/useVisits';
@@ -16,8 +16,30 @@ import TableStats from './TableStats';
 import TableHeaderRow from './TableHeaderRow';
 import VisitsTableBody from './VisitsTableBody';
 import ModalsContainer from './ModalsContainer';
+import VisitMobileCard from './VisitMobileCard';
 
-const UXCAttendanceTable: React.FC = () => {
+export interface UXCAttendanceTableRef {
+  getFilteredData: () => any[];
+  getAllData: () => any[];
+  getActiveFilters: () => any;
+  getSearchQuery: () => string;
+}
+
+const UXCAttendanceTable = forwardRef<UXCAttendanceTableRef>((props, ref) => {
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  // Detect mobile view
+  useEffect(() => {
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    
+    return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
+
   // Custom hooks for state management
   const {
     expandedVisit,
@@ -80,6 +102,14 @@ const UXCAttendanceTable: React.FC = () => {
     return processTableData(filteredData);
   }, [filteredData, processTableData]);
 
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    getFilteredData: () => sortedData,
+    getAllData: () => visits,
+    getActiveFilters: () => activeFilters,
+    getSearchQuery: () => searchQuery,
+  }));
+
   if (error) {
     return <ErrorState error={error} />;
   }
@@ -115,18 +145,43 @@ const UXCAttendanceTable: React.FC = () => {
           hasActiveFilters={hasActiveFilters}
         />
 
-        <Table className="table-fixed">
-          <TableHeaderRow />
-          <VisitsTableBody
-            visits={paginatedData}
-            isLoading={isLoading}
-            hasActiveFilters={hasActiveFilters}
-            searchQuery={searchQuery}
-            onView={openViewModal}
-            onEdit={openEditModal}
-            onDelete={handleDeleteVisit}
-          />
-        </Table>
+        {isMobileView ? (
+          // Mobile Card View
+          <div className="p-4">
+            {paginatedData.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                {hasActiveFilters || searchQuery
+                  ? "No visits found matching your criteria"
+                  : "No visits yet"}
+              </div>
+            ) : (
+              paginatedData.map((visit) => (
+                <VisitMobileCard
+                  key={visit.id}
+                  visit={visit}
+                  isLoading={isLoading}
+                  onView={openViewModal}
+                  onEdit={openEditModal}
+                  onDelete={handleDeleteVisit}
+                />
+              ))
+            )}
+          </div>
+        ) : (
+          // Desktop Table View
+          <Table className="table-fixed">
+            <TableHeaderRow />
+            <VisitsTableBody
+              visits={paginatedData}
+              isLoading={isLoading}
+              hasActiveFilters={hasActiveFilters}
+              searchQuery={searchQuery}
+              onView={openViewModal}
+              onEdit={openEditModal}
+              onDelete={handleDeleteVisit}
+            />
+          </Table>
+        )}
       </div>
 
       <Pagination
@@ -152,6 +207,8 @@ const UXCAttendanceTable: React.FC = () => {
       />
     </div>
   );
-};
+});
+
+UXCAttendanceTable.displayName = 'UXCAttendanceTable';
 
 export default UXCAttendanceTable;

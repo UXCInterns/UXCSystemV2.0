@@ -55,7 +55,12 @@ export function useComments(taskId?: string) {
 
   const addComment = async (taskId: string, commentText: string): Promise<boolean> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log('🔍 [Comment Add] Current user:', user?.id, user?.email);
+      
+      if (userError) {
+        console.error('❌ [Comment Add] Failed to get user:', userError);
+      }
       
       if (!user) {
         alert('You must be logged in to comment');
@@ -77,22 +82,28 @@ export function useComments(taskId?: string) {
 
       setComments(prev => [...prev, tempComment]);
 
-      const { error } = await supabase
-        .from('task_comments')
-        .insert({
-          task_id: taskId,
-          profile_id: user.id,
-          comment_text: commentText.trim(),
-        });
+      // ✅ Use wrapper function
+      console.log('📝 [Comment Add] Calling wrapper RPC...');
+      const { error } = await supabase.rpc('add_comment_with_user', {
+        p_task_id: taskId,
+        p_profile_id: user.id,
+        p_comment_text: commentText.trim(),
+        p_user_id: user.id
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ [Comment Add] RPC failed:', error);
+        throw error;
+      }
+
+      console.log('✅ [Comment Add] Comment added successfully');
 
       // Refresh to get the real comment with proper ID
       setTimeout(() => fetchComments(true), 300);
       
       return true;
     } catch (err) {
-      console.error('Error adding comment:', err);
+      console.error('❌ [Comment Add] Error adding comment:', err);
       alert('Failed to add comment. Please try again.');
       
       // Remove optimistic comment on error
@@ -112,22 +123,34 @@ export function useComments(taskId?: string) {
     );
 
     try {
-      const { error } = await supabase
-        .from('task_comments')
-        .update({
-          comment_text: commentText.trim(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('comment_id', commentId);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log('🔍 [Comment Edit] Current user:', user?.id);
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
-      if (error) throw error;
+      // ✅ Use wrapper function
+      console.log('🔧 [Comment Edit] Calling wrapper RPC...');
+      const { error } = await supabase.rpc('edit_comment_with_user', {
+        p_comment_id: commentId,
+        p_comment_text: commentText.trim(),
+        p_user_id: user.id
+      });
+
+      if (error) {
+        console.error('❌ [Comment Edit] RPC failed:', error);
+        throw error;
+      }
+
+      console.log('✅ [Comment Edit] Comment edited successfully');
 
       // Silent refresh to sync
       setTimeout(() => fetchComments(true), 300);
       
       return true;
     } catch (err) {
-      console.error('Error editing comment:', err);
+      console.error('❌ [Comment Edit] Error editing comment:', err);
       alert('Failed to edit comment. Please try again.');
       
       // Revert on error
@@ -142,15 +165,29 @@ export function useComments(taskId?: string) {
     setComments((prev) => prev.filter(c => c.comment_id !== commentId));
     
     try {
-      const { error } = await supabase
-        .from('task_comments')
-        .delete()
-        .eq('comment_id', commentId);
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('🔍 [Comment Delete] Current user:', user?.id);
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
-      if (error) throw error;
+      // ✅ Use wrapper function
+      console.log('🔧 [Comment Delete] Calling wrapper RPC...');
+      const { error } = await supabase.rpc('delete_comment_with_user', {
+        p_comment_id: commentId,
+        p_user_id: user.id
+      });
+
+      if (error) {
+        console.error('❌ [Comment Delete] RPC failed:', error);
+        throw error;
+      }
+
+      console.log('✅ [Comment Delete] Comment deleted successfully');
       return true;
     } catch (err) {
-      console.error('Error deleting comment:', err);
+      console.error('❌ [Comment Delete] Error deleting comment:', err);
       alert('Failed to delete comment. Please try again.');
       
       // Revert on error

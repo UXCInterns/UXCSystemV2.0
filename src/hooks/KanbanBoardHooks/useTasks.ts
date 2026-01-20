@@ -115,22 +115,40 @@ export function useTasks(projectId: string) {
     );
 
     try {
-      const { error } = await supabase
-        .from('kanban_tasks')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString() 
-        })
-        .eq('task_id', taskId);
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log('🔍 [Task Update] Current user:', user?.id, user?.email);
+      
+      if (userError) {
+        console.error('❌ [Task Update] Failed to get user:', userError);
+      }
+      
+      if (!user) {
+        console.warn('⚠️ [Task Update] No user found!');
+        throw new Error('User not authenticated');
+      }
 
-      if (error) throw error;
+      // ✅ Use wrapper function that does BOTH in one transaction
+      console.log('📝 [Task Update] Calling wrapper RPC...');
+      const { error } = await supabase.rpc('update_task_status_with_user', {
+        p_task_id: taskId,
+        p_status: newStatus,
+        p_user_id: user.id
+      });
+
+      if (error) {
+        console.error('❌ [Task Update] RPC failed:', error);
+        throw error;
+      }
+
+      console.log('✅ [Task Update] Task status updated successfully');
 
       // Silent background refresh to sync any other changes
       setTimeout(() => fetchTasks(true), 500);
 
       return true;
     } catch (err) {
-      console.error('Error updating task status:', err);
+      console.error('❌ [Task Update] Error updating task status:', err);
       
       // Revert on error
       setTasks(prevTasks =>

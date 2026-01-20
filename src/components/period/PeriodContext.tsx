@@ -501,7 +501,7 @@ const PeriodSelector: React.FC = () => {
         <Button 
           onClick={() => {
             handleReset();
-            window.location.reload();
+            // window.location.reload();
           }} 
           size="md" 
           variant="primary" 

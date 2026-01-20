@@ -1,7 +1,7 @@
 // components/WorkshopTableBody.tsx
 import React from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
-import { WorkshopTableBodyProps } from '@/types/workshop';
+import { WorkshopTableBodyProps } from '@/types/WorkshopTypes/workshop';
 
 const WorkshopTableBody: React.FC<WorkshopTableBodyProps> = ({
   data,

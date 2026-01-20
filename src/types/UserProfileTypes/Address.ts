@@ -24,7 +24,7 @@ export interface AddressEditModalProps {
 
 export interface AddressFieldProps {
   label: string;
-  value: string;
+  value?: string | null;
 }
 
 export interface AddressFormFieldProps {

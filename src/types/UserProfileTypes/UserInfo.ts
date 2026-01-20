@@ -22,8 +22,8 @@ export interface UserInfoEditModalProps {
 
 export interface UserInfoFieldProps {
   label: string;
-  value: string;
-  formatValue?: (value: string) => string;
+  value?: string | null;
+  formatValue?: (value?: string | null) => string;
 }
 
 export interface UserInfoFormFieldProps {

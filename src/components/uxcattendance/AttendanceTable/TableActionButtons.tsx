@@ -17,7 +17,7 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="flex justify-center gap-5 items-center">
+    <div className="flex justify-center gap-8 sm:gap-5 items-center">
       <button
         aria-label="View Details"
         className="hover:text-green-600 dark:hover:text-green-400 disabled:opacity-50"
