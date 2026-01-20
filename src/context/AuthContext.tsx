@@ -47,7 +47,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const INACTIVITY_TIMEOUT = 15 * 60 * 1000;
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = ['/signin'];
+const PUBLIC_ROUTES = ['/signin, /innoPoll/takeSurvey'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

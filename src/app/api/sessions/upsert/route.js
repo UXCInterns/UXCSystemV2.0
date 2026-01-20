@@ -1,4 +1,3 @@
-import { start } from 'repl';
 import { supabaseAdmin } from '../../supabaseAdmin';
 import { NextResponse } from 'next/server';
 
@@ -14,7 +13,7 @@ export async function POST(request) {
       custom_scale = null,
       start_date = startDate,
       end_date = endDate,
-
+      created_by
     } = await request.json();
 
     console.log("this is the start date", start_date)
@@ -53,8 +52,6 @@ export async function POST(request) {
 
 
 
-    console.log(" Upserting quiz data:", { room_code });
-
 
     //  Upsert quiz
     const { data: quiz, error: quizError } = await supabaseAdmin
@@ -70,6 +67,7 @@ export async function POST(request) {
           start_date,
           end_date,
           room_code,
+          created_by
         },
         { onConflict: 'session_id' }
       )
@@ -77,6 +75,7 @@ export async function POST(request) {
       .single();
 
     if (quizError) throw quizError;
+
 
 
 

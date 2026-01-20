@@ -3,9 +3,14 @@
 import DatePicker from "@/components/form/date-picker";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUser } from "@/hooks/useUser";
 
 const CreateSessionSidebar = () => {
   const router = useRouter();
+  const { id, name, loading } = useUser()
+
+
+
 
   // Helper function to format date as YYYY-MM-DD
   const formatDate = (date: Date) => {
@@ -17,7 +22,7 @@ const CreateSessionSidebar = () => {
 
   // Default dates
   const today = new Date();
-  const sevenDaysLater = new Date(today.getTime()); // clone today
+  const sevenDaysLater = new Date(today.getTime());
   sevenDaysLater.setDate(today.getDate() + 7);
 
   const [sessionName, setSessionName] = useState("");
@@ -95,11 +100,12 @@ const CreateSessionSidebar = () => {
       const quizData = {
         session_id: sessionId,
         title: `${sessionName} `,
-        questions, //to fix this
+        questions,
         scale_type: "5-point Likert",
         custom_scale: null,
         start_date: startDate,
         end_date: endDate,
+        created_by: id
       };
 
 
@@ -175,7 +181,7 @@ const CreateSessionSidebar = () => {
             <DatePicker
               id="start-date-picker"
               placeholder="Select a date"
-              defaultDate={today} // ✅ string, not Date
+              defaultDate={new Date(startDate)}
               onChange={(dates: Date[]) => setStartDate(formatDate(dates[0]))}
             />
           </div>
@@ -190,7 +196,7 @@ const CreateSessionSidebar = () => {
             <DatePicker
               id="end-date-picker"
               placeholder="Select a date"
-              defaultDate={sevenDaysLater} // ✅ string, not Date
+              defaultDate={new Date(endDate)} // ✅ string, not Date
               onChange={(dates: Date[]) => setEndDate(formatDate(dates[0]))}
             />
           </div>

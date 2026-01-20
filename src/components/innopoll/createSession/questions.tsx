@@ -56,11 +56,11 @@ const QuestionInput = ({ questions, setQuestions }: Props) => {
   };
 
   return (
-    <div className="flex flex-col p-2 max-w-full mx-auto">
+    <div className="flex flex-col p-2 max-w-full mx-auto dark:border-gray">
       {questions.map((q, qIndex) => (
         <div
           key={qIndex}
-          className="border rounded-lg p-4 bg-white shadow-sm dark:bg-dark-900 dark:border-gray-700 mb-4"
+          className="border rounded-lg p-4 bg-white shadow-sm dark:bg-gray-900 dark:border-gray-700 mb-4"
         >
           {/* Header: Question label + delete */}
           <div className="flex justify-between items-center mb-2">
@@ -98,7 +98,7 @@ const QuestionInput = ({ questions, setQuestions }: Props) => {
                   handleStatementChange(qIndex, sIndex, e.target.value)
                 }
                 placeholder="Enter statement text"
-                className="w-full rounded-lg border px-4 py-2 text-sm min-h-[70px] resize-none overflow-visible dark:bg-dark-900 dark:border-gray-700 dark:text-white/90"
+                className="w-full rounded-lg border px-4 py-2 text-sm min-h-[70px] resize-none custom-scrollbar overflow-visible dark:bg-dark-900 dark:border-gray-700 dark:text-white/90"
               />
             ))}
 

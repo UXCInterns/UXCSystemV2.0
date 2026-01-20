@@ -11,14 +11,14 @@ interface RadialChartProps {
 const RadialChart: React.FC<RadialChartProps> = ({
   score,
   color,
-  radius = 70,
+  radius = 90,
 }) => {
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
 
   return (
     <div className="relative">
-      <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-lg">
+      <svg viewBox="0 0 220 220" className="w-full h-full drop-shadow-lg">
         {/* Outer glow ring */}
         <circle
           cx="100"
@@ -37,7 +37,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
           r={radius}
           fill="white"
           stroke="#f3f4f6"
-          strokeWidth={18}
+          strokeWidth={22}
         />
 
         {/* Progress arc */}
@@ -47,7 +47,7 @@ const RadialChart: React.FC<RadialChartProps> = ({
           r={radius}
           fill="none"
           stroke={color}
-          strokeWidth={18}
+          strokeWidth={22}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
@@ -57,15 +57,15 @@ const RadialChart: React.FC<RadialChartProps> = ({
 
         {/* Center score */}
         <text
-          x="100"
-          y="100"
+          x="98"
+          y="105"
           textAnchor="middle"
           dominantBaseline="middle"
-          className="text-5xl font-black"
+          className="text-6xl font-black"
           fill={color}
         >
           {score}
-          <tspan dx={4} className="text-2xl font-medium" fill="#9ca3af">
+          <tspan dx={4} className="text-3xl font-medium" fill="#9ca3af">
             %
           </tspan>
         </text>

@@ -192,7 +192,7 @@ export default function FeedbackPage() {
           </p>
 
           <button
-            onClick={() => router.push(`/results/${roomCode}`)}
+            onClick={() => router.push(`/participant/results/${roomCode}`)}
             className="w-full px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition"
           >
             View Results

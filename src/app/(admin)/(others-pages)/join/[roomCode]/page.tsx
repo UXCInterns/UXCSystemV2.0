@@ -87,7 +87,7 @@ const JoinPage: React.FC = () => {
     );
   }
 
-  const quizUrl = `${window.location.origin}/takeSurvey/${quiz.room_code}`;
+  const quizUrl = `${window.location.origin}/participant/takeSurvey/${quiz.room_code}`;
 
   const formatTime = (ms: number) => {
     if (ms <= 0) return "0s";
