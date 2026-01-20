@@ -1,5 +1,4 @@
 import React from "react";
-import type { Metadata } from "next";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { PeriodProvider } from "@/context/PeriodContext";
 
@@ -10,12 +9,6 @@ import VisitorsAttended from "@/components/dashboard/VisitorsAttended/VisitorsAt
 import VisitorsByMonth from "@/components/dashboard/VisitorsByMonth/VisitorsByMonth";
 import VisitorsByDate from "@/components/dashboard/VisitorsByDate/VisitorsByDate";
 import VisitsComparison from "@/components/dashboard/VisitsComparison";
-
-export const metadata: Metadata = {
-  title:
-    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
-};
 
 export default function UXCDashboard() {
   return (

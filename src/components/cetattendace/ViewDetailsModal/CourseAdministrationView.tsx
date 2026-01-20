@@ -15,13 +15,13 @@ interface CourseAdministrationViewProps {
 export const CourseAdministrationView: React.FC<CourseAdministrationViewProps> = ({ workshop }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
+      <h3 className="text-md sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
         Course Administration
       </h3>
       <div className="space-y-4">
         <div>
           <Label>BIA Level</Label>
-          <div className="flex space-x-4 mt-2">
+          <div className="grid grid-cols-2 gap-3 mt-2 sm:flex sm:space-x-4 sm:gap-0">
             <Radio
               id="bia-basic-view"
               name="bia-level-view"

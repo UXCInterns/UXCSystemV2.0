@@ -1,16 +1,20 @@
 import { UserInfoProfile } from "@/types/UserProfileTypes/UserInfo";
 
-export const formatDisplayValue = (value: string | undefined | null): string => {
-  return value || "Not set";
-};
+export function formatDisplayValue(value?: string | null): string {
+  if (!value) return "Not Set";
+  return value;
+}
 
-export const formatDate = (dateString: string | number | Date): string => {
+export const formatDate = (dateString?: string | number | Date | null): string => {
   if (!dateString) return "Not set";
+
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  if (isNaN(date.getTime())) return "Not set";
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 };
 

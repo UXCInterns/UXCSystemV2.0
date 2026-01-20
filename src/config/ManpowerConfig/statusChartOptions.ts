@@ -1,5 +1,5 @@
 // ApexCharts configuration for status distribution donut chart
-import { STATUS_COLORS } from "@/constants/manpowerConstants";
+import { STATUS_COLORS } from "@/constants/ManpowerConstants/manpowerConstants";
 
 interface ChartOptionsParams {
   labels: string[];

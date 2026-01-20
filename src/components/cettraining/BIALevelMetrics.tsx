@@ -297,8 +297,8 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center justify-center py-23">
-          <div className="text-gray-400 dark:text-gray-500 text-4xl mb-3">📊</div>
+        <div className="flex flex-col items-center justify-center py-18">
+          <div className="text-gray-400 dark:text-gray-500 text-4xl mb-4">📊</div>
           <p className="text-gray-500 dark:text-gray-400 text-sm text-center">
             No BIA level data available for this period
             {programType && ` - ${programType === "pace" ? "PACE" : "NON-PACE"}`}

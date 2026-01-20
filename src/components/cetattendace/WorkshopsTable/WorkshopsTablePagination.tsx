@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from "@/components/common/Pagination";
-import { WorkshopsTablePaginationProps } from "@/types/workshop";
+import { WorkshopsTablePaginationProps } from "@/types/WorkshopTypes/workshop";
 
 export const WorkshopsTablePagination: React.FC<WorkshopsTablePaginationProps> = ({
   currentPage,

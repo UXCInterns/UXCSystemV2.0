@@ -3,7 +3,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import DetailsSection from "./DetailsSection";
 import { Visit } from "@/types/LearningJourneyAttendanceTypes/visit";
-import { formatDisplayDate, getCalculatedSessionType } from "@/utils/LearningJourneyAttendanceUtils/ViewDetailsModalUtils/formatUtils";
+import { formatDisplayDate, getCalculatedSessionType } from "@/utils/ViewDetailsModalUtils/formatUtils";
 
 interface SessionDetailsDisplayProps {
   visit: Visit;

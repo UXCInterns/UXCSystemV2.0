@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { WorkshopFilterOptions } from "@/types/workshop";
+import { WorkshopFilterOptions } from "@/types/WorkshopTypes/workshop";
 
 export const useWorkshopFilter = (
   currentFilters: WorkshopFilterOptions,

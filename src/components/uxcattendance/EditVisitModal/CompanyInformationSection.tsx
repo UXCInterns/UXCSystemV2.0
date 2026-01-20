@@ -25,7 +25,7 @@ const CompanyInformationSection: React.FC<CompanyInformationSectionProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
+      <h3 className="text-md sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
         Company Information
       </h3>
       <div className="space-y-3">

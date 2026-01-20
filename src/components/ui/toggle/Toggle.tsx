@@ -29,7 +29,7 @@ const Toggle = <T extends string>({
         <button
           key={option.value}
           onClick={() => onChange(option.value as T)}
-          className={`flex-1 px-3 py-3 font-medium w-auto rounded-md text-sm hover:text-gray-900 dark:hover:text-white transition-colors ${getButtonClass(
+          className={`flex-1 px-3 py-3 font-medium w-auto rounded-md text-xs md:text-sm hover:text-gray-900 dark:hover:text-white transition-colors ${getButtonClass(
             option.value
           )}`}
         >

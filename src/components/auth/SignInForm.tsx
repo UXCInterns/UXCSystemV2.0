@@ -1,14 +1,29 @@
+// app/signin/SignInForm.tsx
 "use client";
 
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/button/Button";
-import React, { useState } from "react";
 import { supabase } from "../../../lib/supabase/supabaseClient";
 
-export default function SignInForm() {
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+const SignInForm: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const handleGoogleSignIn = async () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Check for error from OAuth callback
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      setErrorMessage(decodeURIComponent(error));
+      // Clear error from URL
+      router.replace("/signin");
+    }
+  }, [searchParams, router]);
+
+  const handleGoogleSignIn = async (): Promise<void> => {
     setLoading(true);
     setErrorMessage("");
 
@@ -18,8 +33,8 @@ export default function SignInForm() {
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
+            access_type: "offline",
+            prompt: "consent",
           },
         },
       });
@@ -29,10 +44,16 @@ export default function SignInForm() {
         setErrorMessage(error.message);
         setLoading(false);
       }
-      // User will be redirected to Google - don't set loading to false
-    } catch (err: any) {
+      // User is redirected to Google if successful
+    } catch (err: unknown) {
       console.error("❌ Sign in error:", err);
-      setErrorMessage(err.message || "Something went wrong.");
+
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Something went wrong.");
+      }
+
       setLoading(false);
     }
   };
@@ -91,4 +112,6 @@ export default function SignInForm() {
       </div>
     </div>
   );
-}
+};
+
+export default SignInForm;

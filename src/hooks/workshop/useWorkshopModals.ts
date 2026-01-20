@@ -1,6 +1,6 @@
 // hooks/useWorkshopModals.ts
 import { useState } from 'react';
-import { Workshop } from '@/types/workshop';
+import { Workshop } from '@/types/WorkshopTypes/workshop';
 
 export const useWorkshopModals = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);

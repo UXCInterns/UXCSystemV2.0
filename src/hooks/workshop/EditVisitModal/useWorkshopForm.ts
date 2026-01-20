@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Workshop, WorkshopFormData } from "@/types/workshop";
+import { Workshop, WorkshopFormData } from "@/types/WorkshopTypes/workshop";
 
 const INITIAL_FORM_DATA: WorkshopFormData = {
   id: "",

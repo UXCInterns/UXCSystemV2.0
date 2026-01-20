@@ -1,6 +1,6 @@
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
 import type { GanttFeature } from '@/components/ui/shadcn-io/gantt';
-import { priorityColors, statusOrder } from '@/constants/ganttConstants';
+import { priorityColors, statusOrder } from '@/constants/GanttChartConstants/ganttConstants';
 
 // Convert Kanban tasks to Gantt features
 export const convertTasksToFeatures = (tasks: Task[]): GanttFeature[] => {

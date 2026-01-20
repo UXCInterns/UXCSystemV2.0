@@ -14,6 +14,7 @@ export const useUser = () => {
     // Additional profile fields
     createdAt: profile?.created_at || '',
     updatedAt: profile?.updated_at || '',
+    role: profile?.role || 'user',
     // Full profile object if needed
     profile,
   };

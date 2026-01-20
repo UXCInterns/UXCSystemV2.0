@@ -1,3 +1,5 @@
+import Button from "@/components/ui/button/Button";
+import { on } from "events";
 import React from "react";
 
 interface FormActionsProps {
@@ -10,21 +12,29 @@ export const FormActions: React.FC<FormActionsProps> = ({
   submitLabel = "Update Workshop",
 }) => {
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-      <div className="flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-6 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-6 py-2.5 text-sm font-medium text-white bg-brand-500 border border-transparent rounded-lg hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
-        >
-          {submitLabel}
-        </button>
+    <div className="border-0 border-gray-200 dark:border-gray-700 pt-6 sm:border-t">
+      <div className="flex flex-row gap-3 sm:justify-end">
+        <div className="flex-1 sm:flex-none">
+          <Button 
+            variant="outline"
+            size="md"
+            onClick={onCancel}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex-1 sm:flex-none">
+          <Button 
+            variant="primary"
+            size="md"
+            className="w-full sm:w-auto"
+          >
+            {submitLabel}
+          </Button>
+        </div>
       </div>
     </div>
   );

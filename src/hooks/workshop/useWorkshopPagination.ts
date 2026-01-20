@@ -1,6 +1,6 @@
 // hooks/useWorkshopPagination.ts
 import { useMemo } from 'react';
-import { Workshop } from '@/types/workshop';
+import { Workshop } from '@/types/WorkshopTypes/workshop';
 
 export const useWorkshopPagination = (
   tableData: Workshop[],

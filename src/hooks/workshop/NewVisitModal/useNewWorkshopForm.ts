@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NewWorkshopFormData } from "@/types/workshop";
+import { NewWorkshopFormData } from "@/types/WorkshopTypes/workshop";
 
 const INITIAL_FORM_DATA: NewWorkshopFormData = {
   program_type: "",

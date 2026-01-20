@@ -22,6 +22,15 @@ export const useTaskMove = (
     }
 
     try {
+      // ✅ Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('❌ No user found');
+        alert('You must be logged in to update tasks');
+        return;
+      }
+
       const startDateStr = formatDateForStorage(startAt);
       const endDateStr = formatDateForStorage(endAt);
 
@@ -41,24 +50,24 @@ export const useTaskMove = (
         )
       );
 
-      // Update in database
-      console.log('💾 Updating database...');
-      const { data, error: updateError } = await supabase
-        .from('kanban_tasks')
-        .update({
-          started_at: startDateStr,
-          due_date: endDateStr,
-          updated_at: new Date().toISOString()
-        })
-        .eq('task_id', id)
-        .select();
+      // ✅ Update in database using wrapper RPC
+      console.log('💾 Updating database with user context...');
+      const { error: updateError } = await supabase.rpc('update_task_with_user', {
+        p_task_id: id,
+        p_task_name: null, // Don't update name
+        p_task_description: null, // Don't update description
+        p_priority: null, // Don't update priority
+        p_due_date: endDateStr,
+        p_comments: null, // Don't update comments
+        p_user_id: user.id
+      });
 
       if (updateError) {
         console.error('❌ Database error:', updateError);
         throw updateError;
       }
 
-      console.log('✅ Task dates updated successfully:', data);
+      console.log('✅ Task dates updated successfully by:', user.email);
     } catch (err) {
       console.error('❌ Error updating task dates:', err);
       

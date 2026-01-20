@@ -1,7 +1,7 @@
 // Individual legend item showing status with color, percentage, and count
 import React from "react";
 import { StatusDistribution } from "@/types/ManpowerTypes/manpower";
-import { STATUS_COLORS } from "@/constants/manpowerConstants";
+import { STATUS_COLORS } from "@/constants/ManpowerConstants/manpowerConstants";
 
 interface StatusLegendItemProps {
   item: StatusDistribution;

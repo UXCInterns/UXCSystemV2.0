@@ -4,8 +4,8 @@ import { useWorkshopFilters } from "@/hooks/workshop/useWorkshopFilters";
 import { useWorkshopData } from "@/hooks/workshop/useWorkshopData";
 import { useWorkshopModals } from "@/hooks/workshop/useWorkshopModals";
 import { useWorkshopPagination } from "@/hooks/workshop/useWorkshopPagination";
-import { ITEMS_PER_PAGE } from "@/constants/workshopConstants";
-import { WorkshopFilterOptions } from "@/types/workshop";
+import { ITEMS_PER_PAGE } from "@/constants/WorkshopAttendanceConstants/workshopConstants";
+import { WorkshopFilterOptions } from "@/types/WorkshopTypes/workshop";
 
 export const useWorkshopsTableState = (data: any[], programTypeFilter: "pace" | "non_pace") => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -113,8 +113,10 @@ export const useWorkshopsTableState = (data: any[], programTypeFilter: "pace" | 
     
     // Data
     tableData,
+    workshops: tableData, // ✅ Add alias for clarity
     paginatedData,
     sortedData,
+    filteredWorkshops: sortedData, // ✅ Expose filtered (but not paginated) data
     filteredByTypeData,
     isLoading,
     

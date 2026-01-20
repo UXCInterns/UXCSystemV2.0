@@ -7,11 +7,29 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface Profile {
   id: string;
-  email: string;
+  email: string | null;
   full_name: string | null;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  first_name: string | null;
+  last_name: string | null;
+  birthday: string | null;
+  banner_url: string | null;
+  role: string | null;
+  bio: string | null;
+  job_title: string | null;
+  date_joined: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string | null;
+  linkedin_url: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  is_active: boolean | null;
+  twitter_url: string | null;
 }
 
 interface AuthContextType {
@@ -53,14 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error('❌ Error fetching profile:', error);
         return null;
       }
 
-      console.log('✅ Profile fetched:', data);
       return data;
     } catch (err) {
-      console.error('❌ Unexpected error fetching profile:', err);
       return null;
     }
   };
@@ -81,14 +96,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Sign out handler
   const handleSignOut = useCallback(async () => {
     // Prevent multiple simultaneous sign-out attempts
     if (isSigningOutRef.current) {
-      console.log('⚠️ Sign out already in progress');
       return;
     }
 
-    console.log('🚪 Instant sign out...');
     isSigningOutRef.current = true;
     
     // Clear inactivity timer immediately
@@ -99,23 +113,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     setProfile(null);
 
-    // Clear storage immediately
-    localStorage.clear();
-    sessionStorage.clear();
+    // Only clear Supabase-specific keys from localStorage
+    try {
+      const keysToRemove = Object.keys(localStorage).filter(key => 
+        key.startsWith('sb-') || key.includes('supabase')
+      );
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    } catch (error) {
+      // localStorage might not be available
+    }
     
-    console.log('✅ Local state and storage cleared');
-    
-    // Call Supabase signOut in background (don't wait for it)
-    supabase.auth.signOut().then(() => {
-      console.log('✅ Supabase signOut completed (background)');
-    }).catch((error) => {
-      console.warn('⚠️ Supabase signOut failed (background):', error);
+    // Call Supabase signOut in background (don't block on it)
+    supabase.auth.signOut().catch(() => {
+      // Ignore errors, we're signing out anyway
     });
     
-    // Immediate redirect - don't wait for Supabase
-    console.log('🔀 Redirecting immediately to /signin...');
+    // Immediate redirect
     router.replace('/signin');
-
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      isSigningOutRef.current = false;
+    }, 500);
   }, [clearInactivityTimer, router]);
 
   // Reset inactivity timer
@@ -132,7 +151,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Set new timer
     inactivityTimerRef.current = setTimeout(() => {
-      console.log('⏱️ User inactive for 15 minutes, logging out...');
       handleSignOut();
     }, INACTIVITY_TIMEOUT);
   }, [user, handleSignOut, clearInactivityTimer]);
@@ -187,20 +205,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Don't redirect if still loading or if signing out
     if (loading || isSigningOutRef.current) return;
 
-    // Check if current route is public
+    // Check if current route is public or auth callback
     const isPublicRoute = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
-    
-    // Check if this is an OAuth callback (has code parameter)
-    const isOAuthCallback = pathname === '/home' && typeof window !== 'undefined' && 
-      new URLSearchParams(window.location.search).has('code');
+    const isAuthCallback = pathname?.startsWith('/auth/callback');
 
     // If not authenticated and not on a public route and not OAuth callback
-    if (!user && !isPublicRoute && !isOAuthCallback) {
-      console.log('❌ Not authenticated, redirecting to /signin');
+    if (!user && !isPublicRoute && !isAuthCallback) {
       router.replace('/signin');
     }
   }, [user, loading, pathname, router]);
 
+  // Initialize auth and listen for changes
   useEffect(() => {
     // Prevent double initialization in React Strict Mode
     if (initialized.current) return;
@@ -212,20 +227,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('❌ Error getting session:', error);
+          setLoading(false);
+          return;
         }
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          console.log('✅ Session loaded:', session.user.email);
-          // Fetch profile data
           const profileData = await fetchProfile(session.user.id);
           setProfile(profileData);
         }
       } catch (error) {
-        console.error('❌ Unexpected error initializing auth:', error);
+        // Initialization failed
       } finally {
         setLoading(false);
       }
@@ -237,21 +251,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔍 Auth event:', event);
       
       // Handle sign out event
       if (event === 'SIGNED_OUT') {
-        console.log('👋 SIGNED_OUT event received');
-        
-        // Clear inactivity timer
         clearInactivityTimer();
-        
-        // Clear state
         setSession(null);
         setUser(null);
         setProfile(null);
-        
-        // Don't redirect here - handleSignOut already handles it
         return;
       }
       
@@ -265,21 +271,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Handle sign in
       if (event === 'SIGNED_IN' && session?.user) {
-        console.log('✅ User signed in:', session.user.email);
         // Reset signing out flag on new sign in
         isSigningOutRef.current = false;
         // Fetch profile data on sign in
         const profileData = await fetchProfile(session.user.id);
         setProfile(profileData);
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('🔄 Token refreshed');
       }
     });
 
     return () => {
       subscription.unsubscribe();
+      initialized.current = false;
     };
-  }, [clearInactivityTimer, router]);
+  }, [clearInactivityTimer]);
 
   return (
     <AuthContext.Provider
@@ -303,4 +307,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

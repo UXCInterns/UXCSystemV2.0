@@ -18,7 +18,7 @@ export const WorkshopDetailsHeader: React.FC<WorkshopDetailsHeaderProps> = ({ wo
     <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white pr-4">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white pr-4">
             {workshop.course_program_title}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">

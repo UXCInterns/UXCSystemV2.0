@@ -1,7 +1,7 @@
 import React from "react";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { NewWorkshopFormData } from "@/types/workshop";
+import { NewWorkshopFormData } from "@/types/WorkshopTypes/workshop";
 
 interface ParticipantSectionProps {
   formData: NewWorkshopFormData;
@@ -16,7 +16,7 @@ export const ParticipantSection: React.FC<ParticipantSectionProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
+      <h3 className="text-md sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
         Participant Information
       </h3>
       <div className="space-y-3">

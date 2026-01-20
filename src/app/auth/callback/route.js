@@ -1,30 +1,73 @@
 // app/auth/callback/route.js
-// Simple redirect - let the client-side Supabase handle everything
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
   const requestUrl = new URL(request.url);
-  
-  // Just preserve all query params and redirect to home
-  // The Supabase client will detect the code in the URL and handle it automatically
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const error_description = requestUrl.searchParams.get('error_description');
 
-  // If there's an OAuth error
+  // If there's an OAuth error, redirect to signin with error
   if (error) {
     console.error('❌ OAuth error:', error, error_description);
     return NextResponse.redirect(
-      `${requestUrl.origin}/signin?error=${error}`
+      `${requestUrl.origin}/signin?error=${encodeURIComponent(error_description || error)}`
     );
   }
 
+  // If we have a code, exchange it for a session
   if (code) {
-    console.log('✅ Auth code received, redirecting to home (client will process)');
-    // Redirect to home with the code - Supabase client will auto-detect and exchange it
-    return NextResponse.redirect(`${requestUrl.origin}/home?code=${code}`);
+    try {
+      const cookieStore = await cookies();
+      
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+            setAll(cookiesToSet) {
+              try {
+                cookiesToSet.forEach(({ name, value, options }) =>
+                  cookieStore.set(name, value, options)
+                );
+              } catch {
+                // The `setAll` method was called from a Server Component.
+                // This can be ignored if you have middleware refreshing
+                // user sessions.
+              }
+            },
+          },
+        }
+      );
+      
+      console.log('🔄 Exchanging code for session...');
+      const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      
+      if (exchangeError) {
+        console.error('❌ Error exchanging code:', exchangeError);
+        return NextResponse.redirect(
+          `${requestUrl.origin}/signin?error=${encodeURIComponent('Authentication failed')}`
+        );
+      }
+
+      console.log('✅ Session established for:', data.user?.email);
+      
+      // Redirect to home - session is now established
+      return NextResponse.redirect(`${requestUrl.origin}/home`);
+    } catch (err) {
+      console.error('❌ Unexpected error in callback:', err);
+      return NextResponse.redirect(
+        `${requestUrl.origin}/signin?error=${encodeURIComponent('Something went wrong')}`
+      );
+    }
   }
 
-  // No code, just go to signin
+  // No code and no error - shouldn't happen, but redirect to signin
+  console.warn('⚠️ Callback hit without code or error');
   return NextResponse.redirect(`${requestUrl.origin}/signin`);
 }

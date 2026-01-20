@@ -14,32 +14,29 @@ export default function UserMetaDisplay({
   userName,
   userProfileImage,
   onAvatarClick,
-  onBannerClick,      
-  updateProfile
+  onBannerClick,
+  updateProfile,
 }: UserMetaDisplayWithSaveProps) {
   const socialLinks = getSocialLinks(profile);
-  const avatarUrl = profile.avatar_url || userProfileImage || "/images/user/owner.jpg";
+  const avatarUrl =
+    profile.avatar_url || userProfileImage || "/images/user/owner.jpg";
 
   const handleSaveProfile = async (data: ProfileFormData) => {
     const success = await updateProfile(data);
     if (success) {
       console.log("Profile updated!");
-      // Optional: toast here
     }
   };
 
   return (
     <div className="border border-gray-200 rounded-2xl dark:border-gray-800 overflow-hidden">
-      <ProfileBanner
-        bannerUrl={profile.banner_url}
-        onEdit={onBannerClick}
-      />
-      
+      <ProfileBanner bannerUrl={profile.banner_url} onEdit={onBannerClick} />
+
       <div className="relative px-5 pb-6 lg:px-6">
-        <ProfileAvatar
-          avatarUrl={avatarUrl}
-          onClick={onAvatarClick}
-        />
+        {/* Avatar wrapper */}
+        <div className="flex justify-center lg:block">
+          <ProfileAvatar avatarUrl={avatarUrl} onClick={onAvatarClick} />
+        </div>
 
         <ProfileInfo
           fullName={profile.full_name || userName}

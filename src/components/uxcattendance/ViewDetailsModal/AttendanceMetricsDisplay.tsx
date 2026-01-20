@@ -2,26 +2,28 @@ import React from "react";
 import DetailsSection from "./DetailsSection";
 import MetricCard from "@/components/ui/metric/MetricCard";
 import { Visit } from "@/types/LearningJourneyAttendanceTypes/visit";
-import { calculateAttendanceRate } from "@/utils/LearningJourneyAttendanceUtils/ViewDetailsModalUtils/formatUtils";
+import { calculateAttendanceRate } from "@/utils/ViewDetailsModalUtils/formatUtils";
 
 interface AttendanceMetricsDisplayProps {
   visit: Visit;
 }
 
 const AttendanceMetricsDisplay: React.FC<AttendanceMetricsDisplayProps> = ({ visit }) => {
-  const attendanceRate = calculateAttendanceRate(visit.total_attended, visit.total_registered);
+  const totalRegistered = visit.total_registered ?? 0;
+  const totalAttended = visit.total_attended ?? 0;
+  const attendanceRate = calculateAttendanceRate(totalAttended, totalRegistered);
 
   return (
     <DetailsSection title="Attendance Metrics">
       <div className="grid grid-cols-1 gap-4">
         <MetricCard
           label="Total Registered"
-          value={visit.total_registered.toString()}
+          value={totalRegistered.toString()}
           colorClass="blue"
         />
         <MetricCard
           label="Total Attended"
-          value={visit.total_attended.toString()}
+          value={totalAttended.toString()}
           colorClass="green"
         />
         <MetricCard

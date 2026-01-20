@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Project, Profile } from "@/types/ProjectsTypes/project";
 import { emitProjectUpdate } from "@/lib/projectEvents";
+import { supabase } from "../../../lib/supabase/supabaseClient"; // ✅ Import supabase
 
 export function useProjectManagement(
   selectedProject: Project | null,
@@ -27,6 +28,14 @@ export function useProjectManagement(
     if (!editedProject) return;
 
     try {
+      // ✅ Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        alert('You must be logged in to update projects');
+        return;
+      }
+
       const response = await fetch(`/api/projects/${editedProject.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -38,6 +47,7 @@ export function useProjectManagement(
           start_date: editedProject.start_date,
           end_date: editedProject.end_date,
           notes: editedProject.notes,
+          _current_user_id: user.id, // ✅ Add this
         }),
       });
 
@@ -49,7 +59,8 @@ export function useProjectManagement(
         setEditedProject(null);
         emitProjectUpdate();
       } else {
-        alert('Failed to update project');
+        const errorData = await response.json();
+        alert(`Failed to update project: ${errorData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Error updating project:', err);
@@ -65,7 +76,15 @@ export function useProjectManagement(
     }
 
     try {
-      const response = await fetch(`/api/projects/${selectedProject.id}`, {
+      // ✅ Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        alert('You must be logged in to delete projects');
+        return;
+      }
+
+      const response = await fetch(`/api/projects/${selectedProject.id}?_current_user_id=${user.id}`, { // ✅ Add to query string
         method: 'DELETE',
       });
 
@@ -74,7 +93,8 @@ export function useProjectManagement(
         setSelectedProject(null);
         emitProjectUpdate();
       } else {
-        alert('Failed to delete project');
+        const errorData = await response.json();
+        alert(`Failed to delete project: ${errorData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Error deleting project:', err);

@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useProjectData } from "@/hooks/KanbanBoardHooks/KanbanHeader/useProjectData";
 import { useProjectRealtime } from "@/hooks/KanbanBoardHooks/KanbanHeader/useProjectRealtime";
-import { getAllTeamMembers, formatDate } from "@/utils/KanbanBoardUtils/KanbanHeaderViewUtils/kanbanHeaderUtils";
+import { getAllTeamMembers, formatDate } from "@/utils/KanbanHeaderViewUtils/kanbanHeaderUtils";
 import { ProjectTitleSection } from "./KanbanHeaderView/ProjectTitleSection";
 import { DueDateSection } from "./KanbanHeaderView/DueDateSection";
 import { ProgressSection } from "./KanbanHeaderView/ProgressSection";

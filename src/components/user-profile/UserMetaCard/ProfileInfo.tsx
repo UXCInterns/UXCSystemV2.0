@@ -100,7 +100,7 @@ export default function ProfileInfo({
           </div>
         </div>
 
-        <div className="flex flex-row items-center gap-6 lg:items-end">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <SocialLinks links={socialLinks} />
           <button
             onClick={() => setIsEditModalOpen(true)}

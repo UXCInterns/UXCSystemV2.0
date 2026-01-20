@@ -5,7 +5,7 @@ interface InputProps {
   id?: string;
   name?: string;
   placeholder?: string;
-  value?: string | number;
+  value?: string | number | null;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   className?: string;
@@ -35,6 +35,9 @@ const Input: FC<InputProps> = ({
   error = false,
   hint,
 }) => {
+  // Ensure value is never null or undefined for controlled inputs
+  const safeValue = value ?? "";
+
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 
@@ -56,7 +59,7 @@ const Input: FC<InputProps> = ({
         id={id}
         name={name}
         placeholder={placeholder}
-        value={value}
+        value={safeValue}
         onChange={onChange}
         onKeyDown={onKeyDown}
         min={min}
