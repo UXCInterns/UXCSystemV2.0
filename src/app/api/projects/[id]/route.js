@@ -2,7 +2,7 @@
 import { supabaseAdmin } from '../../supabaseAdmin';
 
 // Helper to get user from auth header
-async function getUserFromRequest(request) {
+async function _getUserFromRequest(request) {
   const authHeader = request.headers.get('authorization');
   if (!authHeader) return null;
   

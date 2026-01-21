@@ -4,11 +4,11 @@
 
 import { useParams } from "next/navigation"
 import PageBreadcrumb from "@/components/common/PageBreadCrumb"
-import React, { useState } from "react"
+import React from "react"
 import StatsCards from "@/components/innopoll/viewSession/StatsCards"
 import ParticipantsTable from "@/components/innopoll/viewSession/PartIcipantTable"
 
-export default function viewAdmin() {
+export default function ViewAdmin() {
 
     const params = useParams()
     const { roomCode } = params

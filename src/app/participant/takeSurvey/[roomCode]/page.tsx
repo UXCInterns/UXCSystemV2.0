@@ -13,7 +13,7 @@ export default function JoinPage() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const [participant, setParticipant] = useState(null);
+ 
 
 
   // Function to call API and create participant
@@ -33,7 +33,7 @@ export default function JoinPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to join survey");
 
-      setParticipant(data.participant);
+      
 
       // Save participant info for later use
       localStorage.setItem("participantId", data.participant.id);
@@ -47,7 +47,7 @@ export default function JoinPage() {
   // 🔄 Auto-create participant on page load
   useEffect(() => {
     createParticipant();
-  }, []);
+  }, [createParticipant]);
 
   const handleJoin = () => {
 

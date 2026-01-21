@@ -37,7 +37,6 @@ const MetricCard: React.FC<MetricProps> = ({
   comparisonValue2,
   hasComparison = false,
   percentageChange = null,
-  percentageChange2 = null,
   showPercentageForBadges = false,
 }) => {
   if (loading) {

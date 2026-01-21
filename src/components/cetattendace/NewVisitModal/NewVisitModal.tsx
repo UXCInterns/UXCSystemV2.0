@@ -30,8 +30,8 @@ const NewWorkshopForm: React.FC<NewWorkshopFormProps> = ({
         formHook.resetForm();
         submissionHook.handleSuccess();
         onClose();
-      } catch (error: any) {
-        submissionHook.handleError(error);
+      } catch (error) {
+        submissionHook.handleError(error as Error) ;
       } finally {
         submissionHook.setIsSubmitting(false);
       }

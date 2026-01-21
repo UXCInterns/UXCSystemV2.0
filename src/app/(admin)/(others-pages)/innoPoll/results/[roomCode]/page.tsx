@@ -6,20 +6,6 @@ import { useParams } from 'next/navigation';
 import RadialChart from '@/components/innopoll/RadialChart';
 import { useSidebar } from '@/context/SidebarContext';
 
-interface RadialChartProps {
-  score: number;
-  color: string;
-  radius?: number;
-}
-
-
-interface Score {
-  title: string;
-  desc: string;
-  score: number;
-  color: string;
-  gradient: string;
-}
 
 const questionCategoryMap: Record<string, string> = {
   "INNOVATION CULTURE": "CULTURE",

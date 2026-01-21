@@ -58,7 +58,7 @@ export const CheckboxFilterSection: React.FC<CheckboxFilterSectionProps> = ({
           ))}
           {filteredOptions.length === 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
-              No options found matching "{searchValue}"
+              No options found matching &quot;{searchValue}&quot;
             </p>
           )}
         </div>

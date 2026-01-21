@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     //POSTING IT HERE
     console.log("submitting consolidated answers :", submission.answers)
     
-    const { data, error } = await supabaseAdmin
+    const {  error } = await supabaseAdmin
       .from("responses")
       .insert([submission]);
 
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ message:"Response Submitted" });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
