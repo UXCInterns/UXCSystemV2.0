@@ -12,7 +12,7 @@ import { useModal } from "@/hooks/useModal";
 import Badge from "../ui/badge/Badge";
 import { useRouter } from "next/navigation";
 import { deleteSession } from "@/hooks/innopoll/sessionDelete";
-import { ConfirmDeleteModal } from "./common/ConfirmDeleteModal";
+
 
 
 interface Visit {
@@ -59,10 +59,10 @@ export default function InnoPoll({
     row.sessionName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddVisit = (newVisit: Omit<Visit, "id">) => {
-    setTableData((prev) => [...prev, { ...newVisit, id: prev.length + 1 }]);
-    closeModal();
-  };
+  // const handleAddVisit = (newVisit: Omit<Visit, "id">) => {
+  //   setTableData((prev) => [...prev, { ...newVisit, id: prev.length + 1 }]);
+  //   closeModal();
+  // };
 
 
   useEffect(() => {

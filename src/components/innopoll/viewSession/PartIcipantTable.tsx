@@ -40,11 +40,7 @@ export default function ParticipantsTable({ roomCode, }: { roomCode: string }) {
         fetchParticipants()
     }, [roomCode])
 
-    const getQuestionScores = (responses?: Participant["responses"]) => {
-        if (!responses || !responses[0]?.answers) return null
-
-        return Object.values(responses[0].answers)
-    }
+    
 
     const calculateAverageScore = (scores: number[] | null) => {
         if (!scores) return 0
