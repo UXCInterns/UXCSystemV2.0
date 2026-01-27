@@ -17,6 +17,7 @@ export default function JoinPage() {
 
 
   // Function to call API and create participant
+useEffect(() => {
   const createParticipant = async () => {
     if (!roomCode) {
       alert("Missing room code in the URL!");
@@ -33,9 +34,6 @@ export default function JoinPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to join survey");
 
-      
-
-      // Save participant info for later use
       localStorage.setItem("participantId", data.participant.id);
       localStorage.setItem("participantNumericId", data.participant.numericId);
     } catch (err) {
@@ -44,10 +42,9 @@ export default function JoinPage() {
     }
   };
 
-  // 🔄 Auto-create participant on page load
-  useEffect(() => {
-    createParticipant();
-  }, [createParticipant]);
+  createParticipant();
+}, [roomCode]);
+
 
   const handleJoin = () => {
 

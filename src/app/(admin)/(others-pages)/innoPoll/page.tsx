@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 export default function Innopoll() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
+  const [currentPage, setCurrentPage]=useState(1)
 
   const sortOptions = ["Newest", "Oldest", "Most Participated", "Least Participated"];
   const router = useRouter(); // ✅ Correct hook usage
@@ -61,10 +62,10 @@ export default function Innopoll() {
           />
 
           <Pagination
-            currentPage={1}
+            currentPage={currentPage}
             totalPages={3}
             onPageChange={(page: number): void => {
-              // Implement pagination logic here
+              setCurrentPage(page)
             }}
           />
         </ComponentCard>

@@ -9,8 +9,8 @@ import { useSidebar } from '@/context/SidebarContext';
 
 const questionCategoryMap: Record<string, string> = {
   "INNOVATION CULTURE": "CULTURE",
-  "INNOVATION PRACTICES": "CAPABILITY",
-  "INNOVATION LEADERSHIP": "PROCESS",
+  "INNOVATION PRACTICES": "PRACTICES",
+  "INNOVATION LEADERSHIP": "LEADERSHIP",
 };
 
 
@@ -74,8 +74,6 @@ const InnovationPollPreview: React.FC = () => {
     error,
   } = useRealtimePollResults(roomCode, null);
 
-  console.log('roomCode:', roomCode);
-  console.log('Poll Data:', pollData);
 
 
   const liveScores = BASE_QUESTIONS.map(base => {

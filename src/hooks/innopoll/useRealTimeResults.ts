@@ -11,6 +11,12 @@ export interface PollQuestion {
     unit: string;
 }
 
+interface ResponseRow {
+    participant_id: string;
+    answers: number[];
+    room_code: string;
+}
+
 export interface PollData {
     [key: string]: PollQuestion;
 }
@@ -20,11 +26,11 @@ const CATEGORY_TITLES = ["INNOVATION CULTURE", "INNOVATION PRACTICES", "INNOVATI
 
 export const useRealtimePollResults = (roomCode: string, participantId: string | null) => {
     const [pollData, setPollData] = useState<PollData>({});
-    const [allResponses, setAllResponses] = useState<any[]>([]);
+    const [allResponses, setAllResponses] = useState<ResponseRow[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const buildPollData = useCallback((responses: any[]): PollData => {
+    const buildPollData = useCallback((responses: ResponseRow[]): PollData => {
         const pollDataObj: PollData = {};
 
         // Initialize categories
@@ -72,11 +78,17 @@ export const useRealtimePollResults = (roomCode: string, participantId: string |
 
             setAllResponses(responses || []);
             setPollData(buildPollData(responses || []));
-        } catch (err: any) {
-            setError(err.message || "Failed to fetch poll results");
+
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message); 
+            } else {
+                setError("Failed to fetch poll results");
+            }
         } finally {
             setIsLoading(false);
         }
+
     }, [roomCode, buildPollData]);
 
     useEffect(() => {
@@ -94,13 +106,14 @@ export const useRealtimePollResults = (roomCode: string, participantId: string |
                     table: "responses",
                     filter: `room_code=eq.${roomCode}`,
                 },
-                (payload) => {
+                (payload: { new: ResponseRow }) => {
                     setAllResponses((prev) => {
                         const updated = [...prev, payload.new];
                         setPollData(buildPollData(updated));
                         return updated;
                     });
                 }
+
             )
             .subscribe();
 
@@ -109,5 +122,5 @@ export const useRealtimePollResults = (roomCode: string, participantId: string |
         };
     }, [roomCode, fetchInitialData, buildPollData]);
 
-    return { pollData, isLoading, error, refresh: fetchInitialData };
+    return { pollData, isLoading, error, allResponses, refresh: fetchInitialData };
 };

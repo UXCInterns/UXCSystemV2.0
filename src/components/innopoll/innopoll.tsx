@@ -11,6 +11,7 @@ import {
 import { useModal } from "@/hooks/useModal";
 import Badge from "../ui/badge/Badge";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { deleteSession } from "@/hooks/innopoll/sessionDelete";
 
 
@@ -33,6 +34,17 @@ interface InnoPollProps {
   onSortChange: (value: string) => void;
 }
 
+interface InnoPollApiItem {
+  session_id: number;
+  session_title: string;
+  session_created_at: string;
+  room_code: string;
+  participant_count: number;
+  session_status: string;
+  creator_name: string;
+  creator_avatar: string | null;
+}
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
 
@@ -48,7 +60,7 @@ const formatDate = (dateString: string) => {
 export default function InnoPoll({
   searchQuery,
   selectedSort,
-  onSortChange,
+  // onSortChange,
 }: InnoPollProps) {
   const [tableData, setTableData] = useState<Visit[]>([]);
   const { isOpen, openModal, closeModal } = useModal();
@@ -69,11 +81,10 @@ export default function InnoPoll({
     async function fetchData() {
       try {
         const res = await fetch("/api/innopoll");
-        const data = await res.json();
+        const data: InnoPollApiItem[] = await res.json();
 
 
-
-        const formatted = data.map((item: any) => ({
+        const formatted: Visit[] = data.map((item) => ({
           id: item.session_id,
           sessionName: item.session_title,
           dateCreated: formatDate(item.session_created_at),
@@ -197,13 +208,15 @@ export default function InnoPoll({
                   <div className="flex items-center justify-center gap-3">
                     {/* Avatar */}
                     {row.creator_avatar ? (
-                      <img
+                      <Image
                         src={row.creator_avatar}
                         alt={row.created_by}
-                        className="w-10 h-10 rounded-full transition-transform hover:scale-105"
-
-
+                        width={40}
+                        height={40}
+                        className="rounded-full transition-transform hover:scale-105"
+                        unoptimized
                       />
+
                     ) : (
                       /* Fallback avatar */
                       <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-semibold text-gray-700 dark:text-gray-200">
