@@ -7,7 +7,7 @@ import { useUser } from "@/hooks/useUser";
 
 const CreateSessionSidebar = () => {
   const router = useRouter();
-  const { id, name, loading } = useUser()
+  const { id } = useUser()
 
 
 

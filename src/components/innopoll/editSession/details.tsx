@@ -59,7 +59,7 @@ const EditSessionSidebar: React.FC<EditSessionSidebarProps> = ({ questions, setQ
     };
 
     loadSession();
-  }, [sessionId]);
+  }, [sessionId, setQuestions]);
 
   
   //  Update session
