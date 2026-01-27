@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kanban Board | UXCSystem",
-  description: "Kanban board for project management",
+  title: "Project Board | UXCSystem",
+  description: "Project board for project management",
 };
 
-export default function KanbanBoardLayout({
+export default function ProjectBoardLayout({
   children,
 }: {
   children: React.ReactNode;

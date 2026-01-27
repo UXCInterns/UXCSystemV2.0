@@ -187,7 +187,7 @@ export const WorkloadBalance = () => {
   });
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden h-[700px]">
+    <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden h-[830px]">
       {/* Header */}
       <div className="p-5 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center justify-between mb-4">

@@ -27,6 +27,16 @@ export type ManpowerAllocation = {
   active_projects_count: number;
 };
 
+export type Project = {
+  project_id: string;
+  project_name: string;
+  project_status: string;
+  roles: string[]; // Array of roles the user has on this project
+  tasks_assigned: number;
+  start_date: string;
+  end_date: string | null;
+};
+
 export type StatusType = "Available" | "Busy" | "Overloaded";
 
 export type StatusFilter = "All" | "Available" | "Busy" | "Overloaded";

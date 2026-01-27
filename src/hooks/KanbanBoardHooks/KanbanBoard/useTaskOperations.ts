@@ -37,6 +37,7 @@ export function useTaskOperations({
           p_task_name: otherUpdates.task_name || null,
           p_task_description: otherUpdates.task_description || null,
           p_priority: otherUpdates.priority || null,
+          p_started_at: otherUpdates.started_at || null,
           p_due_date: otherUpdates.due_date || null,
           p_comments: otherUpdates.comments || null,
           p_user_id: user.id

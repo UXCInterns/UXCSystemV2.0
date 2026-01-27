@@ -4,6 +4,117 @@ import { ImageUploadModalProps } from "@/types/UserProfileTypes/UserMeta";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB in bytes
+
+// Compression utility function
+const compressImage = async (file: File, maxSizeBytes: number): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        // Start with original dimensions
+        let width = img.width;
+        let height = img.height;
+        
+        // If image is already small enough, try with original size first
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Function to try compression with a given quality
+        const tryCompress = (quality: number): Promise<Blob | null> => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => resolve(blob),
+              'image/jpeg',
+              quality
+            );
+          });
+        };
+        
+        // Binary search for the right quality/size combination
+        const findOptimalCompression = async (): Promise<File> => {
+          let quality = 0.9;
+          let blob = await tryCompress(quality);
+          
+          // If even at 90% quality it's too large, start reducing dimensions
+          if (blob && blob.size > maxSizeBytes) {
+            let scale = 1.0;
+            
+            while (scale > 0.3) { // Don't go below 30% of original size
+              scale -= 0.1;
+              const newWidth = Math.floor(width * scale);
+              const newHeight = Math.floor(height * scale);
+              
+              canvas.width = newWidth;
+              canvas.height = newHeight;
+              ctx.drawImage(img, 0, 0, newWidth, newHeight);
+              
+              // Try with reducing quality
+              quality = 0.9;
+              while (quality > 0.5) {
+                blob = await tryCompress(quality);
+                
+                if (blob && blob.size <= maxSizeBytes) {
+                  const compressedFile = new File(
+                    [blob],
+                    file.name.replace(/\.[^/.]+$/, '.jpg'),
+                    { type: 'image/jpeg' }
+                  );
+                  return compressedFile;
+                }
+                
+                quality -= 0.1;
+              }
+            }
+          } else if (blob) {
+            // Image is small enough at current size, just optimize quality
+            while (quality > 0.5 && blob.size <= maxSizeBytes) {
+              const testBlob = await tryCompress(quality - 0.05);
+              if (testBlob && testBlob.size <= maxSizeBytes) {
+                blob = testBlob;
+                quality -= 0.05;
+              } else {
+                break;
+              }
+            }
+            
+            const compressedFile = new File(
+              [blob],
+              file.name.replace(/\.[^/.]+$/, '.jpg'),
+              { type: 'image/jpeg' }
+            );
+            return compressedFile;
+          }
+          
+          throw new Error('Unable to compress image to required size');
+        };
+        
+        findOptimalCompression()
+          .then((compressedFile) => resolve(compressedFile))
+          .catch((err) => reject(err));
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = e.target?.result as string;
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function ImageUploadModal({
   isOpen,
   onClose,
@@ -17,6 +128,62 @@ export default function ImageUploadModal({
   description,
   isAvatar = false
 }: ImageUploadModalProps) {
+  const [isCompressing, setIsCompressing] = React.useState(false);
+  const [compressionStatus, setCompressionStatus] = React.useState<string>("");
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    setCompressionStatus("");
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      setIsCompressing(true);
+      setCompressionStatus("Compressing image...");
+      
+      try {
+        const compressedFile = await compressImage(file, MAX_FILE_SIZE);
+        const compressedSizeKB = (compressedFile.size / 1024).toFixed(2);
+        setCompressionStatus(`Compressed to ${compressedSizeKB} KB`);
+        
+        // Create a new event with the compressed file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(compressedFile);
+        const newEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            files: dataTransfer.files
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        // Call the original handler with compressed file
+        onFileSelect(newEvent);
+        
+        // Clear status after 3 seconds
+        setTimeout(() => setCompressionStatus(""), 3000);
+      } catch (error) {
+        console.error('Compression failed:', error);
+        alert('Failed to compress image. Please try a different image or reduce its size manually.');
+      } finally {
+        setIsCompressing(false);
+      }
+    } else {
+      // File is already under 1MB, proceed normally
+      const sizeKB = (file.size / 1024).toFixed(2);
+      setCompressionStatus(`Size: ${sizeKB} KB`);
+      onFileSelect(e);
+      setTimeout(() => setCompressionStatus(""), 3000);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className={`${isAvatar ? 'max-w-[500px]' : 'max-w-[700px]'} m-4`}>
       <div className={`relative w-full ${isAvatar ? 'max-w-[500px]' : 'max-w-[700px]'} rounded-2xl bg-white dark:bg-gray-900 p-8`}>
@@ -27,7 +194,18 @@ export default function ImageUploadModal({
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {description}
           </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Maximum file size: 1MB (automatically compressed if needed)
+          </p>
         </div>
+        
+        {compressionStatus && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
+              {compressionStatus}
+            </p>
+          </div>
+        )}
         
         <div className="flex flex-col items-center gap-8">
           <div className={`relative ${isAvatar ? '' : 'w-full max-w-xl'}`}>
@@ -76,20 +254,37 @@ export default function ImageUploadModal({
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onChange={onFileSelect}
+            onChange={handleFileSelect}
             className="hidden"
           />
         </div>
 
         <div className="flex gap-3 mt-8">
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex-1">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {imagePreview ? "Change Image" : "Upload Image"}
+          <Button 
+            variant="outline" 
+            onClick={() => fileInputRef.current?.click()} 
+            className="flex-1"
+            disabled={isCompressing}
+          >
+            {isCompressing ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Compressing...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {imagePreview ? "Change Image" : "Upload Image"}
+              </>
+            )}
           </Button>
           {imagePreview && (
-            <Button onClick={onSave} disabled={saving} className="flex-1">
+            <Button onClick={onSave} disabled={saving || isCompressing} className="flex-1">
               {saving ? (
                 <>
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

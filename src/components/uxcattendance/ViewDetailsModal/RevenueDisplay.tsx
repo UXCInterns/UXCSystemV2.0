@@ -3,7 +3,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import DetailsSection from "./DetailsSection";
 import { Visit } from "@/types/LearningJourneyAttendanceTypes/visit";
-import { formatCurrency } from "@/utils/ViewDetailsModalUtils/formatUtils";
+import { formatCurrency } from "@/utils/WorkshopAttendanceUtils/ViewDetailsModalUtils/formatUtils";
 import { useUser } from "@/hooks/useUser";
 
 interface RevenueDisplayProps {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { KanbanBoardView } from '@/components/kanban/KanbanBoardView/KanbanBoardView';
 import KanbanTableView from '@/components/kanban/KanbanBoardView/KanbanTableView';
-import { columns } from '@/constants/kanbanConstants';
+import { columns } from '@/constants/KanbanBoardConstants/kanbanConstants';
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
 
 interface KanbanBoardContentProps {
@@ -11,6 +11,7 @@ interface KanbanBoardContentProps {
   onDragEnd: (event: any) => void;
   onTaskClick: (task: Task) => void;
   showCompactView: boolean;
+  canEdit?: boolean; // NEW: Permission prop
 }
 
 export default function KanbanBoardContent({
@@ -19,7 +20,8 @@ export default function KanbanBoardContent({
   onDragStart,
   onDragEnd,
   onTaskClick,
-  showCompactView
+  showCompactView,
+  canEdit = true // Default to true for backward compatibility
 }: KanbanBoardContentProps) {
   return (
     <>
@@ -32,6 +34,7 @@ export default function KanbanBoardContent({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onTaskClick={onTaskClick}
+            canEdit={canEdit} // Pass permission to board view
           />
         </div>
       )}
@@ -43,6 +46,7 @@ export default function KanbanBoardContent({
             tasks={tasks}
             onTaskClick={onTaskClick}
             showCompactView={showCompactView}
+            canEdit={canEdit} // Pass permission to table view
           />
         </div>
       )}

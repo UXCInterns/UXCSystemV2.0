@@ -68,6 +68,7 @@ export function useTaskSubmission({ projectId, onSuccess, onClose }: UseTaskSubm
         p_project_id: projectId,
         p_status: 'To Do',
         p_priority: formData.priority,
+        p_started_at: formData.started_at,
         p_due_date: formData.due_date,
         p_comments: formData.comments || null,
         p_user_id: user.id

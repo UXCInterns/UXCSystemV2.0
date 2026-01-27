@@ -4,14 +4,21 @@ import Badge from '@/components/ui/badge/Badge';
 import Avatar from '@/components/ui/avatar/Avatar';
 import { getStatusBadgeProps, getPriorityBadgeProps } from '@/utils/CommonUtils/badgeUtils';
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table/index';
+import { Eye } from 'lucide-react';
 
 interface KanbanTableViewProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   showCompactView?: boolean;
+  canEdit?: boolean; // NEW: Permission prop
 }
 
-const KanbanTableView: React.FC<KanbanTableViewProps> = ({ tasks, onTaskClick, showCompactView = false }) => {
+const KanbanTableView: React.FC<KanbanTableViewProps> = ({ 
+  tasks, 
+  onTaskClick, 
+  showCompactView = false,
+  canEdit = true // Default to true for backward compatibility
+}) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -29,6 +36,14 @@ const KanbanTableView: React.FC<KanbanTableViewProps> = ({ tasks, onTaskClick, s
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+      {/* Read-only banner for non-members */}
+      {!canEdit && (
+        <div className="flex items-center gap-2 px-5 py-3 bg-blue-50 dark:bg-blue-950/30 border-b border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 text-sm">
+          <Eye size={16} />
+          <span>View-only mode: You can view tasks but cannot edit them</span>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <Table className="w-full">
           <TableHeader className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
@@ -73,7 +88,6 @@ const KanbanTableView: React.FC<KanbanTableViewProps> = ({ tasks, onTaskClick, s
               <TableRow>
                 <TableCell 
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
-                  // Use colSpan as a regular prop
                 >
                   <div style={{ gridColumn: `span ${showCompactView ? 4 : 5}` }}>
                     No tasks found
@@ -89,18 +103,27 @@ const KanbanTableView: React.FC<KanbanTableViewProps> = ({ tasks, onTaskClick, s
                   <TableRow
                     key={task.id}
                     onClick={() => onTaskClick(task)}
-                    className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                    className={`hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer ${
+                      !canEdit ? 'opacity-75' : ''
+                    }`}
                   >
                     {/* Task Name */}
                     <TableCell className="px-5 py-2 text-sm text-gray-500 dark:text-gray-400 text-left">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {task.task_name}
-                      </div>
-                      {!showCompactView && task.task_description && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-md">
-                          {task.task_description}
+                      <div className="flex items-center gap-2">
+                        {!canEdit && (
+                          <Eye size={14} className="text-gray-400 flex-shrink-0" />
+                        )}
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {task.task_name}
+                          </div>
+                          {!showCompactView && task.task_description && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-md">
+                              {task.task_description}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </TableCell>
 
                     {/* Assignees */}

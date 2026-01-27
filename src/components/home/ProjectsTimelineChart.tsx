@@ -261,7 +261,7 @@ export const ProjectsTimelineChart = () => {
             </h4>
           </div>
 
-          <div className="overflow-x-auto overflow-y-auto h-[240px] border border-gray-200 dark:border-gray-800 rounded-lg custom-scrollbar">
+          <div className="overflow-x-auto overflow-y-auto h-[370px] border border-gray-200 dark:border-gray-800 rounded-lg custom-scrollbar">
             <table className="w-full min-w-[500px]">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr className="border-b border-gray-200 dark:border-gray-700">

@@ -1,4 +1,4 @@
-import type { KanbanColumn } from '../types/KanbanBoardTypes/kanban';
+import type { KanbanColumn } from '@/types/KanbanBoardTypes/kanban';
 
 export const columns: KanbanColumn[] = [
   { id: 'To Do', name: 'To Do', color: '#E53E3E' },

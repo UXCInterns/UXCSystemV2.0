@@ -1,6 +1,32 @@
 // Utilities for extracting and formatting role information
 import { ManpowerRecord, RoleBadge } from "@/types/ManpowerTypes/manpower";
 
+export const normalizeRole = (role: string) => {
+  const r = role.toLowerCase();
+
+  if (r.includes("manager")) return "Manager";
+  if (r.includes("lead")) return "Lead";
+  if (r.includes("core")) return "Core";
+  if (r.includes("support")) return "Support";
+
+  return role;
+};
+
+export const getRoleBadgeColor = (role: string) => {
+  switch (normalizeRole(role)) {
+    case "Manager":
+      return "error";
+    case "Lead":
+      return "warning";
+    case "Core":
+      return "primary";
+    case "Support":
+      return "success";
+    default:
+      return "gray";
+  }
+};
+
 export const getRoles = (person: ManpowerRecord): RoleBadge[] => {
   const roles: RoleBadge[] = [];
   

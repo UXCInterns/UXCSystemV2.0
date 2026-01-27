@@ -20,8 +20,6 @@ interface Visit {
   notes: string;
   pace: boolean;
   informal: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 const initialFormState = {
@@ -152,9 +150,6 @@ export const useVisitForm = (isOpen: boolean, visit?: Visit | null) => {
     if (!formData.end_time) newErrors.end_time = "End time is required";
     if (formData.total_registered < 0) newErrors.total_registered = "Must be 0 or greater";
     if (formData.total_attended < 0) newErrors.total_attended = "Must be 0 or greater";
-    if (formData.total_attended > formData.total_registered) {
-      newErrors.total_attended = "Cannot exceed total registered";
-    }
 
     if (formData.start_time && formData.end_time) {
       const startTime = new Date(`2000-01-01T${formData.start_time}`);

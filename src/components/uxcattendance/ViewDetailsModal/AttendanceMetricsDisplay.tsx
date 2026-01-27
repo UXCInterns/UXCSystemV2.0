@@ -2,7 +2,7 @@ import React from "react";
 import DetailsSection from "./DetailsSection";
 import MetricCard from "@/components/ui/metric/MetricCard";
 import { Visit } from "@/types/LearningJourneyAttendanceTypes/visit";
-import { calculateAttendanceRate } from "@/utils/ViewDetailsModalUtils/formatUtils";
+import { calculateAttendanceRate } from "@/utils/WorkshopAttendanceUtils/ViewDetailsModalUtils/formatUtils";
 
 interface AttendanceMetricsDisplayProps {
   visit: Visit;
