@@ -6,7 +6,7 @@ interface PeriodConfig {
 
 export const getMonthlyChartTitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig | null,
   currentPeriod: PeriodConfig,
   getPeriodLabel: () => string
 ): string => {
@@ -28,8 +28,8 @@ export const getMonthlyChartTitle = (
 
 export const getMonthlyChartSubtitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: any,
-  getPeriodLabel: (period?: any) => string
+  comparisonPeriod: PeriodConfig | null,
+  getPeriodLabel: (period?: PeriodConfig) => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
     return `${getPeriodLabel()} vs ${getPeriodLabel(comparisonPeriod)}`;

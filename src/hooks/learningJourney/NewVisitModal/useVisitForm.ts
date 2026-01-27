@@ -1,7 +1,31 @@
 import { useState, useEffect } from "react";
-import { VisitFormData, FormErrors } from "@/types/LearningJourneyAttendanceTypes/visit";
 
-const initialFormData: VisitFormData = {
+interface Visit {
+  id: string;
+  company_name: string;
+  date_of_visit: string;
+  total_attended: number;
+  total_registered: number;
+  uen_number: string;
+  start_time: string;
+  end_time: string;
+  duration: string;
+  session_type: string;
+  consultancy: boolean;
+  training: boolean;
+  revenue: number;
+  sector: string;
+  size: string;
+  industry: string;
+  notes: string;
+  pace: boolean;
+  informal: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+const initialFormState = {
+  id: "",
   company_name: "",
   uen_number: "",
   industry: "",
@@ -22,30 +46,52 @@ const initialFormData: VisitFormData = {
   notes: "",
 };
 
-export const useVisitForm = () => {
-  const [formData, setFormData] = useState<VisitFormData>(initialFormData);
-  const [errors, setErrors] = useState<FormErrors>({});
+export const useVisitForm = (isOpen: boolean, visit?: Visit | null) => {
+  const [formData, setFormData] = useState(initialFormState);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Auto-calculate session type based on start time
+  // Reset or populate form data
   useEffect(() => {
-    if (formData.start_time) {
-      const [hours] = formData.start_time.split(':').map(Number);
-      const sessionType = hours < 12 ? 'AM' : 'PM';
-      setFormData(prev => ({ ...prev, session_type: sessionType }));
+    if (isOpen && visit) {
+      setFormData({
+        id: visit.id,
+        company_name: visit.company_name,
+        uen_number: visit.uen_number === "-" ? "" : visit.uen_number,
+        industry: visit.industry === "-" ? "" : visit.industry,
+        sector: visit.sector === "-" ? "" : visit.sector,
+        size: visit.size === "-" ? "" : visit.size,
+        date_of_visit: visit.date_of_visit,
+        start_time: visit.start_time,
+        end_time: visit.end_time,
+        duration: visit.duration === "-" ? "" : visit.duration,
+        session_type: visit.session_type === "-" ? "" : visit.session_type,
+        total_registered: visit.total_registered,
+        total_attended: visit.total_attended,
+        consultancy: visit.consultancy,
+        training: visit.training,
+        revenue: visit.revenue,
+        pace: visit.pace,
+        informal: visit.informal,
+        notes: visit.notes,
+      });
+      setErrors({});
+    } else if (!isOpen) {
+      setFormData(initialFormState);
+      setErrors({});
     }
-  }, [formData.start_time]);
+  }, [isOpen, visit]);
 
-  // Auto-calculate duration when start_time or end_time changes
+  // Auto-calculate duration
   useEffect(() => {
     if (formData.start_time && formData.end_time) {
       const startTime = new Date(`2000-01-01T${formData.start_time}`);
       const endTime = new Date(`2000-01-01T${formData.end_time}`);
-      
+
       if (endTime > startTime) {
         const diffMs = endTime.getTime() - startTime.getTime();
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         let durationStr = "";
         if (diffHours > 0) {
           durationStr += `${diffHours} hour${diffHours > 1 ? 's' : ''}`;
@@ -54,7 +100,7 @@ export const useVisitForm = () => {
           if (durationStr) durationStr += " ";
           durationStr += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
         }
-        
+
         setFormData(prev => ({ ...prev, duration: durationStr || "0 minutes" }));
       }
     }
@@ -83,8 +129,22 @@ export const useVisitForm = () => {
     setFormData(prev => ({ ...prev, [field]: value === "yes" }));
   };
 
+  const handleSessionTypeChange = (type: 'pace' | 'informal' | 'neither') => {
+    switch (type) {
+      case 'pace':
+        setFormData(prev => ({ ...prev, pace: true, informal: false }));
+        break;
+      case 'informal':
+        setFormData(prev => ({ ...prev, informal: true, pace: false }));
+        break;
+      case 'neither':
+        setFormData(prev => ({ ...prev, pace: false, informal: false }));
+        break;
+    }
+  };
+
   const validateForm = () => {
-    const newErrors: FormErrors = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.company_name.trim()) newErrors.company_name = "Company name is required";
     if (!formData.date_of_visit) newErrors.date_of_visit = "Visit date is required";
@@ -108,34 +168,14 @@ export const useVisitForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const processFormDataForSubmission = (data: VisitFormData) => {
-    const processedData = { ...data };
-    
-    Object.keys(processedData).forEach(key => {
-      const value = processedData[key as keyof VisitFormData];
-      if (typeof value === 'string' && value.trim() === '') {
-        (processedData as any)[key] = null;
-      }
-    });
-    
-    return processedData;
-  };
-
-  const resetForm = () => {
-    setFormData(initialFormData);
-    setErrors({});
-  };
-
   return {
     formData,
     errors,
-    setFormData,
     handleInputChange,
     handleSelectChange,
     handleTextAreaChange,
     handleRadioChange,
+    handleSessionTypeChange,
     validateForm,
-    processFormDataForSubmission,
-    resetForm,
   };
 };

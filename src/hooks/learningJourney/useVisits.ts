@@ -15,7 +15,7 @@ const fetcher = async (url: string) => {
 
 export const useVisits = () => {
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { data: rawData, error, isLoading: swrLoading } = useSWR('/api/learning-journeys', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
@@ -30,35 +30,36 @@ export const useVisits = () => {
     return "No Conversion";
   };
 
-  const mapVisitData = (row: any): Visit => ({
-    id: row.id,
-    company_name: row.company_name,
-    date_of_visit: row.date_of_visit,
-    total_attended: row.total_attended,
-    total_registered: row.total_registered,
+  const mapVisitData = (row: Partial<Visit>): Visit => ({
+    id: row.id || "",
+    company_name: row.company_name || "",
+    date_of_visit: row.date_of_visit || "",
+    total_attended: row.total_attended ?? 0,
+    total_registered: row.total_registered ?? 0,
     uen_number: row.uen_number || "-",
-    start_time: row.start_time,
-    end_time: row.end_time,
+    start_time: row.start_time || "",
+    end_time: row.end_time || "",
     duration: row.duration || "-",
     session_type: row.session_type || "-",
-    consultancy: row.consultancy,
-    training: row.training,
-    revenue: row.revenue || 0,
+    consultancy: row.consultancy ?? false,
+    training: row.training ?? false,
+    revenue: row.revenue ?? 0,
     sector: row.sector || "-",
     size: row.size || "-",
     industry: row.industry || "-",
     notes: row.notes || "",
-    pace: row.pace,
-    informal: row.informal,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    conversion_status: computeConversionStatus(row.consultancy, row.training),
+    pace: row.pace ?? false,
+    informal: row.informal ?? false,
+    created_at: row.created_at || "",
+    updated_at: row.updated_at || "",
+    conversion_status: computeConversionStatus(row.consultancy ?? false, row.training ?? false),
   });
+
 
   const visits = rawData ? rawData.map(mapVisitData) : [];
 
   // CRUD operations
-  const addVisit = async (visitData: any) => {
+  const addVisit = async (visitData: Visit) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/learning-journeys", {
@@ -74,7 +75,7 @@ export const useVisits = () => {
 
       mutate('/api/learning-journeys');
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error adding visit:", error);
       return { success: false, error };
     } finally {
@@ -82,7 +83,7 @@ export const useVisits = () => {
     }
   };
 
-  const updateVisit = async (visitData: any) => {
+  const updateVisit = async (visitData: Visit) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/learning-journeys", {

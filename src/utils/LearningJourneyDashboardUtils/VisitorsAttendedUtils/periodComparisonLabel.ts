@@ -1,12 +1,12 @@
 interface PeriodConfig {
-  type: string;
+  type: "calendar" | "financial" | "quarterly" | "custom";
 }
 
 export const getPeriodComparisonLabel = (
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig,
   currentPeriod: PeriodConfig,
-  getPeriodLabel: (period?: any) => string
+  getPeriodLabel: (period?: PeriodConfig) => string
 ): string => {
   if (!isComparisonMode || !comparisonPeriod) {
     switch (currentPeriod.type) {

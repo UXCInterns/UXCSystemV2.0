@@ -49,16 +49,16 @@ export interface FilterComponentProps {
 }
 
 export interface VisitFormData {
-  company_name: string;
-  uen_number: string;
-  industry: string;
-  sector: string;
-  size: string;
-  date_of_visit: string;
-  start_time: string;
-  end_time: string;
-  duration: string;
-  session_type: string;
+  company_name: string | null;
+  uen_number: string | null;
+  industry: string | null;
+  sector: string | null;
+  size: string | null;
+  date_of_visit: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  duration: string | null;
+  session_type: string | null;
   total_registered: number;
   total_attended: number;
   consultancy: boolean;
@@ -66,13 +66,13 @@ export interface VisitFormData {
   revenue: number;
   pace: boolean;
   informal: boolean;
-  notes: string;
+  notes: string | null;
 }
 
 export interface NewVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (visitData: any) => void;
+  onSubmit: (visitData: VisitFormData) => void;
 }
 
 export type FormErrors = Record<string, string>;
@@ -108,6 +108,6 @@ export interface FilterState {
 export interface EditVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (visitData: any) => void;
+  onSubmit: (visitData: VisitFormData) => void;
   visit?: Visit | null;
 }

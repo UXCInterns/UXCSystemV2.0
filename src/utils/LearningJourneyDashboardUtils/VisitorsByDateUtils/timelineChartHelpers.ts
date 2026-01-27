@@ -1,10 +1,10 @@
 interface PeriodConfig {
-  type: string;
+  type: "calendar" | "financial" | "quarterly" | "custom";
 }
 
 export const getChartTitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig,
   getPeriodLabel: () => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
@@ -18,9 +18,9 @@ export const getChartSubtitle = (
   primarySeries: number[],
   comparisonSeries: number[],
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig,
   currentPeriod: PeriodConfig,
-  getPeriodLabel: (period?: any) => string
+  getPeriodLabel: (period?: PeriodConfig) => string
 ): string => {
   if (categories.length === 0) return "No visits recorded for this period";
 
@@ -29,7 +29,7 @@ export const getChartSubtitle = (
   }
 
   const visitCount = primarySeries.filter(v => v > 0).length;
-  
+
   switch (currentPeriod.type) {
     case 'quarterly':
       return `${visitCount} visits recorded in ${getPeriodLabel()}`;

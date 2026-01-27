@@ -1,7 +1,7 @@
 // src/hooks/useVisitTable.ts
 // This is for the UXC LJ Attendance Table
 
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Visit } from '../../types/LearningJourneyAttendanceTypes/visit';
 
 export const useVisitTable = (visits: Visit[]) => {
@@ -33,8 +33,10 @@ export const useVisitTable = (visits: Visit[]) => {
   };
 
   const processTableData = (filteredVisits: Visit[]) => {
+
+    const dataToProcess = filteredVisits || visits
     // Apply search
-    const searchedData = filteredVisits.filter((row: Visit) =>
+    const searchedData = dataToProcess.filter((row: Visit) =>
       row.company_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
