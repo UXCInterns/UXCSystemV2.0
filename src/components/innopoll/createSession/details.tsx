@@ -2,10 +2,17 @@
 
 import DatePicker from "@/components/form/date-picker";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { useUser } from "@/hooks/useUser";
+import { Question } from "@/types/question";
 
-const CreateSessionSidebar = () => {
+interface Props {
+  questions: Question[];
+  setQuestions: Dispatch<SetStateAction<Question[]>>;
+}
+
+
+const CreateSessionSidebar = ({ questions }: Props) => {
   const router = useRouter();
   const { id } = useUser()
 
@@ -28,41 +35,6 @@ const CreateSessionSidebar = () => {
   const [sessionName, setSessionName] = useState("");
   const [startDate, setStartDate] = useState(formatDate(today));
   const [endDate, setEndDate] = useState(formatDate(sevenDaysLater));
-  const [questions, setQuestions] = useState([
-    {
-      question:
-        "Does your company embrace discussions on experimentations to generate and test new ideas, concepts, business models, etc. to innovate?",
-      statements: [
-        {
-          text: `An Innovation Culture fosters an atmosphere where employees feel empowered to take risks, collaborate, and continuously seek out opportunities for improvement and innovation in products, processes, or services. This is essential to staying competitive in today's rapidly changing landscape.`,
-          title: `INNOVATION CULTURE`,
-          desc: `Embrace Innovation`,
-        },
-      ],
-    },
-    {
-      question:
-        "How often does your company use business models, startup methodologies, design thinking or any other innovation tools and methods?",
-      statements: [
-        {
-          text: `Innovation Practices often involve fostering a culture of innovation, conducting research and development, leveraging on technology and tools and processes for collaboration to thrive in an ever changing environmental and economic uncertainty to achieve sustainable advancements for all users.`,
-          title: `INNOVATION PRACTICES`,
-          desc: `Practice Innovation Tools & Methods`,
-        },
-      ],
-    },
-    {
-      question:
-        "How often do leaders in your organisation encourage the need for innovation and provide the resources to support innovation efforts?",
-      statements: [
-        {
-          text: `Innovation leadership inspires organisations to foster a creative culture. They not only champion and support creative thinking but also provide strategic direction, allocate resources, and create an environment where experimentation and calculated risk-taking are encouraged.`,
-          title: `INNOVATION LEADERSHIP`,
-          desc: `Leaders who Champion Innovation`,
-        },
-      ],
-    },
-  ]);
 
 
 
@@ -73,7 +45,7 @@ const CreateSessionSidebar = () => {
   };
 
   const handleCreateSession = async () => {
-    console.log({ sessionName, startDate, endDate });
+     
 
     if (!sessionName) {
       alert("please enter a session title")
@@ -93,6 +65,7 @@ const CreateSessionSidebar = () => {
       }
 
       const sessionResult = await sessionResponse.json();
+      console.log("Session creation result:", sessionResult);
 
       const sessionId = sessionResult?.session?.id;
 

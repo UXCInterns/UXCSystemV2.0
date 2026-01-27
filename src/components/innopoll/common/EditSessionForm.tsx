@@ -3,47 +3,12 @@
 import DatePicker from "@/components/form/date-picker";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import QuestionInput from "../createSession/questions";
 
 const UpdateSessionSidebar = () => {
   const [sessionName, setSessionName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
- const [questions, setQuestions] = useState([
-    {
-      question:
-        "Does your company embrace discussions on experimentations to generate and test new ideas, concepts, business models, etc. to innovate?",
-      statements: [
-        {
-          text: `An Innovation Culture fosters an atmosphere where employees feel empowered to take risks, collaborate, and continuously seek out opportunities for improvement and innovation in products, processes, or services. This is essential to staying competitive in today's rapidly changing landscape.`,
-          title: `INNOVATION CULTURE`,
-          desc: `Embrace Innovation`,
-        },
-      ],
-    },
-    {
-      question:
-        "How often does your company use business models, startup methodologies, design thinking or any other innovation tools and methods?",
-      statements: [
-        {
-          text: `Innovation Practices often involve fostering a culture of innovation, conducting research and development, leveraging on technology and tools and processes for collaboration to thrive in an ever changing environmental and economic uncertainty to achieve sustainable advancements for all users.`,
-          title: `INNOVATION PRACTICES`,
-          desc: `Practice Innovation Tools & Methods`,
-        },
-      ],
-    },
-    {
-      question:
-        "How often do leaders in your organisation encourage the need for innovation and provide the resources to support innovation efforts?",
-      statements: [
-        {
-          text: `Innovation leadership inspires organisations to foster a creative culture. They not only champion and support creative thinking but also provide strategic direction, allocate resources, and create an environment where experimentation and calculated risk-taking are encouraged.`,
-          title: `INNOVATION LEADERSHIP`,
-          desc: `Leaders who Champion Innovation`,
-        },
-      ],
-    },
-  ]); // defaultQuestions = your 3 initial questions
+ const [questions] = useState([]); // defaultQuestions = your 3 initial questions
 
 
   const router = useRouter(); // ✅ Correct hook usage
@@ -82,7 +47,7 @@ try {
       const quizData = {
         session_id: sessionId,
         title: `${sessionName} Survey`,
-        questions, //to fix this
+        questions, 
         scale_type: "5-point Likert",
         custom_scale: null,
         start_date: startDate,
