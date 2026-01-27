@@ -136,7 +136,7 @@ export async function GET(request) {
     };
 
     // Generate monthly breakdown for chart - TRACKING VISITORS
-    const generateMonthlyVisitorsBreakdown = (workshops, startDate, endDate) => {
+    const generateMonthlyVisitorsBreakdown = (workshops) => {
       const monthlyData = {};
       
       workshops.forEach(workshop => {

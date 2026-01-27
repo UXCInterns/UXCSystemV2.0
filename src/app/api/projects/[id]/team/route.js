@@ -1,7 +1,7 @@
 // app/api/projects/[id]/team/route.js
 import { supabaseAdmin } from '../../../supabaseAdmin';
 
-async function getUserFromRequest(request) {
+async function _getUserFromRequest(request) {
   const authHeader = request.headers.get('authorization');
   if (!authHeader) return null;
   
