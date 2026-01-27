@@ -49,22 +49,22 @@ export default function ManpowerTable() {
                 
                 <TableHeader className="sticky top-0 border-b border-gray-100 dark:border-white/[0.05] bg-gray-200 dark:bg-gray-900">
                   <TableRow>
-                    <TableCell isHeader className="w-[12%] px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[15%] px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Person
                     </TableCell>
-                    <TableCell isHeader className="w-[13%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[15%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Total Projects
                     </TableCell>
-                    <TableCell isHeader className="w-[13%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[15%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Active Projects
                     </TableCell>
-                    <TableCell isHeader className="w-[30%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[25%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Roles
                     </TableCell>
-                    <TableCell isHeader className="w-[13%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[15%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Tasks Assigned
                     </TableCell>
-                    <TableCell isHeader className="w-[11%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <TableCell isHeader className="w-[15%] px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Status
                     </TableCell>
                   </TableRow>

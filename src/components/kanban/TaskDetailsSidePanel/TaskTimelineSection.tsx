@@ -68,7 +68,9 @@ export function TaskTimelineSection({ task, isEditing, onUpdateTask }: Props) {
             <DatePicker
               id={`due-date-${task.id}`}
               mode="single"
-              defaultDate={task.due_date || undefined}
+              defaultDate={
+                task.due_date ? new Date(task.due_date.split('T')[0]) : undefined
+              }
               onChange={(selectedDates) => {
                 if (selectedDates.length > 0) {
                   const localDateString = dateToLocalString(selectedDates[0]);

@@ -17,6 +17,8 @@ interface KanbanBoardHeaderProps {
   filters: TaskFilters;
   onFilterChange: (filters: TaskFilters) => void;
   onCreateTask: () => void;
+  canEdit?: boolean; // NEW: Permission prop
+  isRealtimeConnected?: boolean;
 }
 
 export default function KanbanBoardHeader({
@@ -30,22 +32,27 @@ export default function KanbanBoardHeader({
   profiles,
   filters,
   onFilterChange,
-  onCreateTask
+  onCreateTask,
+  canEdit = true // Default to true for backward compatibility
 }: KanbanBoardHeaderProps) {
   return (
     <>
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <KanbanViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-        <Button
-          size="sm"
-          variant="primary"
-          startIcon={<Plus size={16} />}
-          onClick={onCreateTask}
-          className="px-4 py-3"
-        >
-          Create Task
-        </Button>
+        
+        {/* Only show Create Task button if user has edit permissions */}
+        {canEdit && (
+          <Button
+            size="sm"
+            variant="primary"
+            startIcon={<Plus size={16} />}
+            onClick={onCreateTask}
+            className="px-4 py-3"
+          >
+            Create Task
+          </Button>
+        )}
       </div>
 
       <div className="border-t border-gray-200 dark:border-gray-700" />

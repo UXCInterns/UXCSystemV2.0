@@ -41,6 +41,8 @@ interface MousePosition {
   y: number;
 }
 
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB in bytes
+
 export const ImageCropper: React.FC<ImageCropperProps> = ({ 
   image, 
   onCrop, 
@@ -58,6 +60,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   const [imageData, setImageData] = useState<ImageDataState | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [imageOffset, setImageOffset] = useState<MousePosition>({ x: 0, y: 0 });
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   useEffect(() => {
     const img = new Image();
@@ -293,52 +296,116 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     setIsResizing(false);
   };
 
-  const handleCrop = () => {
+  const compressToBlob = async (canvas: HTMLCanvasElement, targetSize: number): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const tryCompression = async (quality: number, scale: number = 1): Promise<Blob | null> => {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width * scale;
+        tempCanvas.height = canvas.height * scale;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        if (!tempCtx) return null;
+        
+        tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+        
+        return new Promise((resolve) => {
+          tempCanvas.toBlob(
+            (blob) => resolve(blob),
+            'image/jpeg',
+            quality
+          );
+        });
+      };
+
+      const findOptimalCompression = async () => {
+        // Start with high quality
+        let quality = 0.95;
+        let currentScale = 1.0;
+        
+        while (quality >= 0.5 || currentScale >= 0.5) {
+          const blob = await tryCompression(quality, currentScale);
+          
+          if (blob && blob.size <= targetSize) {
+            return blob;
+          }
+          
+          // Reduce quality first
+          if (quality > 0.5) {
+            quality -= 0.05;
+          } else if (currentScale > 0.5) {
+            // If quality is at minimum, start reducing scale
+            currentScale -= 0.1;
+            quality = 0.95; // Reset quality when changing scale
+          } else {
+            break;
+          }
+        }
+        
+        // Last resort: use minimum settings
+        const blob = await tryCompression(0.5, 0.5);
+        if (blob) return blob;
+        
+        throw new Error('Unable to compress image to target size');
+      };
+
+      findOptimalCompression().then(resolve).catch(reject);
+    });
+  };
+
+  const handleCrop = async () => {
     if (!imageData) return;
     
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return;
+    setIsProcessing(true);
     
-    const scaledWidth = imageData.width * scale;
-    const scaledHeight = imageData.height * scale;
-    const offsetX = (imageData.width - scaledWidth) / 2 + imageOffset.x;
-    const offsetY = (imageData.height - scaledHeight) / 2 + imageOffset.y;
-    
-    // Calculate source coordinates in original image space
-    const sourceScaleX = imageData.originalWidth / scaledWidth;
-    const sourceScaleY = imageData.originalHeight / scaledHeight;
-    
-    const sourceX = (crop.x - offsetX) * sourceScaleX;
-    const sourceY = (crop.y - offsetY) * sourceScaleY;
-    const sourceWidth = crop.width * sourceScaleX;
-    const sourceHeight = crop.height * sourceScaleY;
-    
-    // Set output size (maintain crop box dimensions for better quality)
-    tempCanvas.width = crop.width * 2;
-    tempCanvas.height = crop.height * 2;
+    try {
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
+      
+      const scaledWidth = imageData.width * scale;
+      const scaledHeight = imageData.height * scale;
+      const offsetX = (imageData.width - scaledWidth) / 2 + imageOffset.x;
+      const offsetY = (imageData.height - scaledHeight) / 2 + imageOffset.y;
+      
+      // Calculate source coordinates in original image space
+      const sourceScaleX = imageData.originalWidth / scaledWidth;
+      const sourceScaleY = imageData.originalHeight / scaledHeight;
+      
+      const sourceX = (crop.x - offsetX) * sourceScaleX;
+      const sourceY = (crop.y - offsetY) * sourceScaleY;
+      const sourceWidth = crop.width * sourceScaleX;
+      const sourceHeight = crop.height * sourceScaleY;
+      
+      // Set output size (maintain crop box dimensions for better quality)
+      tempCanvas.width = crop.width * 2;
+      tempCanvas.height = crop.height * 2;
 
-    tempCtx.drawImage(
-      imageData.img,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      0,
-      0,
-      tempCanvas.width,
-      tempCanvas.height
-    );
+      tempCtx.drawImage(
+        imageData.img,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        tempCanvas.width,
+        tempCanvas.height
+      );
 
-    tempCanvas.toBlob((blob) => {
-      if (!blob) return;
+      // Compress to ensure it's under 1MB
+      const blob = await compressToBlob(tempCanvas, MAX_FILE_SIZE);
       
       const reader = new FileReader();
       reader.onloadend = () => {
         onCrop(reader.result as string);
+        setIsProcessing(false);
       };
       reader.readAsDataURL(blob);
-    }, 'image/jpeg', 0.95);
+    } catch (error) {
+      console.error('Crop and compression failed:', error);
+      alert('Failed to process image. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   const handleZoomChange = (newScale: number) => {
@@ -394,17 +461,29 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         </div>
 
         <div className="flex gap-3">
-          <Button variant="outline" onClick={onCancel} className="flex-1">
+          <Button variant="outline" onClick={onCancel} className="flex-1" disabled={isProcessing}>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
             Cancel
           </Button>
-          <Button onClick={handleCrop} className="flex-1">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Apply Crop
+          <Button onClick={handleCrop} className="flex-1" disabled={isProcessing}>
+            {isProcessing ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Apply Crop
+              </>
+            )}
           </Button>
         </div>
 

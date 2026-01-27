@@ -15,6 +15,7 @@ type Props = {
   onDragStart: (event: any) => void;
   onDragEnd: (event: any) => void;
   onTaskClick: (task: Task) => void;
+  canEdit?: boolean; // Permission prop
 };
 
 export function KanbanBoardView({
@@ -23,6 +24,7 @@ export function KanbanBoardView({
   onDragStart,
   onDragEnd,
   onTaskClick,
+  canEdit = true
 }: Props) {
   const [localTasks, setLocalTasks] = useState(tasks);
 
@@ -31,7 +33,19 @@ export function KanbanBoardView({
   }, [tasks]);
 
   const handleDataChange = (updatedTasks: Task[]) => {
+    // Only allow data changes if user has edit permissions
+    if (!canEdit) return;
     setLocalTasks(updatedTasks);
+  };
+
+  const handleDragStartWrapper = (event: any) => {
+    if (!canEdit) return;
+    onDragStart(event);
+  };
+
+  const handleDragEndWrapper = (event: any) => {
+    if (!canEdit) return;
+    onDragEnd(event);
   };
 
   return (
@@ -41,8 +55,9 @@ export function KanbanBoardView({
           columns={columns}
           data={localTasks}
           onDataChange={handleDataChange}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
+          onDragStart={handleDragStartWrapper}
+          onDragEnd={handleDragEndWrapper}
+          disabled={!canEdit} // Pass disabled prop to completely disable dragging
         >
           {(column) => (
             <KanbanBoard id={column.id} key={column.id}>
@@ -66,7 +81,11 @@ export function KanbanBoardView({
                     key={task.id}
                     name={task.name}
                   >
-                    <TaskCard task={task} onExpand={onTaskClick} />
+                    <TaskCard 
+                      task={task} 
+                      onExpand={onTaskClick}
+                      canEdit={canEdit}
+                    />
                   </KanbanCard>
                 )}
               </KanbanCards>

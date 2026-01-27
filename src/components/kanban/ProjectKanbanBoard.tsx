@@ -14,6 +14,8 @@ import { useProjectData } from '@/hooks/KanbanBoardHooks/KanbanBoard/useProjectD
 import { useTaskOperations } from '@/hooks/KanbanBoardHooks/KanbanBoard/useTaskOperations';
 import { useCommentOperations } from '@/hooks/KanbanBoardHooks/KanbanBoard/useCommentOperations';
 import { useTaskFilters } from '@/hooks/KanbanBoardHooks/KanbanBoard/useTaskFilters';
+import { useProjectPermissions } from '@/hooks/KanbanBoardHooks/KanbanBoard/useProjectPermissions';
+import { AlertCircle } from 'lucide-react';
 
 export default function ProjectKanbanBoard({ projectId }: { projectId: string }) {
   // State management
@@ -38,6 +40,12 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
 
   // Project data
   const { profiles, projectMembers, projectName } = useProjectData(projectId);
+
+  // Permission check - NEW
+  const { isProjectMember, loading: permissionsLoading } = useProjectPermissions(
+    projectId,
+    currentUserId || undefined
+  );
 
   // Task operations
   const { tasks, loading, error, fetchTasks, updateTaskStatus, setTasks } = useTasks(projectId);
@@ -77,8 +85,13 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
     filters
   });
 
-  // Event handlers
+  // Event handlers - with permission checks
   const handleCreateTask = () => {
+    if (!isProjectMember) {
+      // Optionally show a toast notification
+      console.warn('Only project members can create tasks');
+      return;
+    }
     setSelectedTask(null);
     setShowCreatePanel(true);
   };
@@ -89,19 +102,42 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
   };
 
   const handleDragStart = (event: any) => {
+    if (!isProjectMember) {
+      event.preventDefault();
+      return;
+    }
     taskOperations.handleDragStart(event, dragStartColumnRef, tasks);
   };
 
   const handleDragEnd = (event: any) => {
+    if (!isProjectMember) {
+      return;
+    }
     taskOperations.handleDragEnd(event, dragStartColumnRef, tasks);
   };
 
+  const handleTaskClick = (task: any) => {
+    setSelectedTask(task);
+  };
+
+  // Combined loading state
+  const isLoading = loading || permissionsLoading;
+
   return (
-    <KanbanLoadingError loading={loading} error={error} onRetry={fetchTasks}>
+    <KanbanLoadingError loading={isLoading} error={error} onRetry={fetchTasks}>
       <div className="flex gap-6 h-[calc(100vh-200px)]">
         {/* Main Kanban Area */}
         <div className={`transition-all duration-300 ${(selectedTask || showCreatePanel) ? 'w-[calc(100%-410px)]' : 'w-full'}`}>
           <div className="p-6 space-y-4 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] h-full flex flex-col">
+            
+            {/* View-Only Banner for non-members */}
+            {!permissionsLoading && !isProjectMember && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-800 dark:text-blue-200 text-sm">
+                <AlertCircle size={16} />
+                <span>You are viewing this project in read-only mode. Only project members can edit tasks.</span>
+              </div>
+            )}
+
             <KanbanBoardHeader
               viewMode={viewMode}
               setViewMode={setViewMode}
@@ -114,6 +150,7 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
               filters={filters}
               onFilterChange={setFilters}
               onCreateTask={handleCreateTask}
+              canEdit={isProjectMember} // Pass permission to header
             />
 
             <KanbanBoardContent
@@ -121,14 +158,15 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
               tasks={filteredTasks}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
-              onTaskClick={setSelectedTask}
+              onTaskClick={handleTaskClick}
               showCompactView={!!(selectedTask || showCreatePanel)}
+              canEdit={isProjectMember} // Pass permission to content
             />
           </div>
         </div>
 
         {/* Side Panels */}
-        {showCreatePanel && (
+        {showCreatePanel && isProjectMember && (
           <AddTaskPanel
             projectId={projectId}
             projectName={projectName}
@@ -155,6 +193,7 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
             currentUserId={currentUserId || undefined}
             currentUserName={currentUserName || undefined}
             currentUserAvatar={currentUserAvatar || undefined}
+            canEdit={isProjectMember} // Pass permission to side panel
           />
         )}
       </div>

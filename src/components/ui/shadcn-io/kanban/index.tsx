@@ -56,12 +56,14 @@ type KanbanContextProps<
   columns: C[];
   data: T[];
   activeCardId: string | null;
+  disabled?: boolean; // NEW: Add disabled to context
 };
 
 const KanbanContext = createContext<KanbanContextProps>({
   columns: [],
   data: [],
   activeCardId: null,
+  disabled: false,
 });
 
 export type KanbanBoardProps = {
@@ -71,14 +73,17 @@ export type KanbanBoardProps = {
 };
 
 export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
+  const { disabled } = useContext(KanbanContext);
   const { isOver, setNodeRef } = useDroppable({
     id,
+    disabled, // NEW: Disable droppable when disabled
   });
 
   return (
     <div
       className={cn(
         'flex size-full flex-col divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden bg-white dark:bg-gray-900 transition-all border border-gray-200 dark:border-gray-700 rounded-2xl',
+        disabled && 'cursor-not-allowed', // NEW: Show not-allowed cursor
         className,
       )}
       ref={setNodeRef}
@@ -99,6 +104,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   children,
   className,
 }: KanbanCardProps<T>) => {
+  const { disabled } = useContext(KanbanContext); // NEW: Get disabled from context
   const {
     attributes,
     listeners,
@@ -108,6 +114,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     isDragging,
   } = useSortable({
     id,
+    disabled, // NEW: Disable sorting when disabled
   });
   const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
 
@@ -118,11 +125,18 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 
   return (
     <>
-      <div style={style} {...listeners} {...attributes} ref={setNodeRef}>
+      <div 
+        style={style} 
+        // NEW: Only spread listeners if not disabled
+        {...(disabled ? {} : listeners)} 
+        {...attributes} 
+        ref={setNodeRef}
+      >
         <Card
           className={cn(
             'cursor-grab rounded-lg p-3 bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all',
             isDragging && 'pointer-events-none cursor-grabbing opacity-30',
+            disabled && 'cursor-default opacity-75', // NEW: Change cursor when disabled
             className
           )}
         >
@@ -133,7 +147,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
           )}
         </Card>
       </div>
-      {activeCardId === id && (
+      {activeCardId === id && !disabled && ( // NEW: Don't show overlay if disabled
         <t.In>
           <Card
             className={cn(
@@ -202,6 +216,7 @@ export type KanbanProviderProps<
   onDragStart?: (event: DragStartEvent) => void;
   onDragEnd?: (event: DragEndEvent) => void;
   onDragOver?: (event: DragOverEvent) => void;
+  disabled?: boolean; // NEW: Add disabled prop
 };
 
 export const KanbanProvider = <
@@ -216,17 +231,32 @@ export const KanbanProvider = <
   columns,
   data,
   onDataChange,
+  disabled = false, // NEW: Default to false
   ...props
 }: KanbanProviderProps<T, C>) => {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
+  // NEW: Conditionally create sensors based on disabled prop
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
-    useSensor(KeyboardSensor)
+    ...(disabled ? [] : [
+      useSensor(MouseSensor, {
+        activationConstraint: {
+          distance: 8, // Require 8px of movement before drag starts
+        },
+      }),
+      useSensor(TouchSensor, {
+        activationConstraint: {
+          delay: 200,
+          tolerance: 8,
+        },
+      }),
+      useSensor(KeyboardSensor)
+    ])
   );
 
   const handleDragStart = (event: DragStartEvent) => {
+    if (disabled) return; // NEW: Don't handle if disabled
+    
     const card = data.find((item) => item.id === event.active.id);
     if (card) {
       setActiveCardId(event.active.id as string);
@@ -235,6 +265,8 @@ export const KanbanProvider = <
   };
 
   const handleDragOver = (event: DragOverEvent) => {
+    if (disabled) return; // NEW: Don't handle if disabled
+    
     const { active, over } = event;
 
     if (!over) {
@@ -269,6 +301,8 @@ export const KanbanProvider = <
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    if (disabled) return; // NEW: Don't handle if disabled
+    
     setActiveCardId(null);
 
     onDragEnd?.(event);
@@ -315,7 +349,7 @@ export const KanbanProvider = <
   };
 
   return (
-    <KanbanContext.Provider value={{ columns, data, activeCardId }}>
+    <KanbanContext.Provider value={{ columns, data, activeCardId, disabled }}> {/* NEW: Pass disabled to context */}
       <DndContext
         accessibility={{ announcements }}
         collisionDetection={rectIntersection}

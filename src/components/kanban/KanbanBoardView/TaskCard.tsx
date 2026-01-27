@@ -4,13 +4,15 @@ import { getPriorityBadgeProps } from '@/utils/CommonUtils/badgeUtils';
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
 import Avatar from '../../ui/avatar/Avatar';
 import { ChatIcon } from '@/icons';
+import { Eye } from 'lucide-react';
 
 type Props = {
   task: Task;
   onExpand: (task: Task) => void;
+  canEdit?: boolean; // NEW: Permission prop
 };
 
-export function TaskCard({ task, onExpand }: Props) {
+export function TaskCard({ task, onExpand, canEdit = true }: Props) {
   // ✅ Format due date to "28 August 2025"
   const formattedDueDate = task.due_date
     ? new Date(task.due_date).toLocaleDateString('en-GB', {
@@ -21,7 +23,15 @@ export function TaskCard({ task, onExpand }: Props) {
     : null;
 
   return (
-    <div className="-m-3 p-3 rounded-lg">
+    <div className={`-m-3 p-3 rounded-lg ${!canEdit ? 'opacity-75' : ''}`}>
+      {/* Read-only indicator */}
+      {!canEdit && (
+        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <Eye size={12} />
+          <span>View only</span>
+        </div>
+      )}
+
       {/* Header with expand button */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex-1">

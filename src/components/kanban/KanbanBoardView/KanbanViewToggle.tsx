@@ -17,7 +17,7 @@ export function KanbanViewToggle({ viewMode, setViewMode }: Props) {
         onClick={() => setViewMode('kanban')}
         className="px-4 py-3"
       >
-        Kanban
+        Card
       </Button>
       <Button
         size="sm"

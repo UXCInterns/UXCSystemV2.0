@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit2, Trash2, Check } from 'lucide-react';
+import { X, Edit2, Trash2, Check, AlertCircle } from 'lucide-react';
 import TextArea from "@/components/form/input/TextArea";
 import type { Task, TaskComment } from '@/types/KanbanBoardTypes/kanban';
 import type { Profile } from "@/types/ProjectsTypes/project";
@@ -24,6 +24,7 @@ type Props = {
   currentUserId?: string;
   currentUserName?: string;
   currentUserAvatar?: string;
+  canEdit?: boolean; // NEW: Permission prop
 };
 
 export function TaskSidePanel({
@@ -41,6 +42,7 @@ export function TaskSidePanel({
   currentUserId,
   currentUserName,
   currentUserAvatar,
+  canEdit = true, // Default to true for backward compatibility
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
@@ -59,6 +61,7 @@ export function TaskSidePanel({
   }, [task.id]);
 
   const handleEdit = () => {
+    if (!canEdit) return;
     setIsEditing(true);
     setEditedTask(task);
     setSelectedAssignees(task.assignees?.map(a => a.id) || []);
@@ -72,7 +75,7 @@ export function TaskSidePanel({
   };
 
   const handleSave = async () => {
-    if (!onUpdate) return;
+    if (!onUpdate || !canEdit) return;
     
     const updates: Partial<Task> & { assignee_ids?: string[] } = {
       task_name: editedTask.task_name,
@@ -80,7 +83,7 @@ export function TaskSidePanel({
       status: editedTask.status,
       priority: editedTask.priority,
       due_date: editedTask.due_date,
-      started_at: editedTask.started_at,  // Add this line
+      started_at: editedTask.started_at,
       comments: editedTask.comments,
       assignee_ids: selectedAssignees,
     };
@@ -92,10 +95,12 @@ export function TaskSidePanel({
   };
 
   const handleUpdateTask = (updates: Partial<Task>) => {
+    if (!canEdit) return;
     setEditedTask(prev => ({ ...prev, ...updates }));
   };
 
   const handleToggleAssignee = (profileId: string) => {
+    if (!canEdit) return;
     setSelectedAssignees(prev => 
       prev.includes(profileId)
         ? prev.filter(id => id !== profileId)
@@ -104,7 +109,7 @@ export function TaskSidePanel({
   };
 
   const handleSaveAssignees = async () => {
-    if (!onUpdate) return;
+    if (!onUpdate || !canEdit) return;
     
     const success = await onUpdate(task.id, {
       assignee_ids: selectedAssignees
@@ -118,7 +123,7 @@ export function TaskSidePanel({
   };
 
   const handleDelete = async () => {
-    if (!onDelete) return;
+    if (!onDelete || !canEdit) return;
     
     if (confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
       const success = await onDelete(task.id);
@@ -158,7 +163,8 @@ export function TaskSidePanel({
               </>
             ) : (
               <>
-                {onUpdate && (
+                {/* Only show edit/delete buttons if user has permission */}
+                {canEdit && onUpdate && (
                   <button
                     onClick={handleEdit}
                     className="p-1.5 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
@@ -167,13 +173,15 @@ export function TaskSidePanel({
                     <Edit2 className="w-4 h-4" />
                   </button>
                 )}
-                <button
-                  onClick={handleDelete}
-                  className="p-1.5 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {canEdit && onDelete && (
+                  <button
+                    onClick={handleDelete}
+                    className="p-1.5 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={onClose}
                   className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
@@ -186,13 +194,21 @@ export function TaskSidePanel({
           </div>
         </div>
 
+        {/* Read-only mode notice */}
+        {!canEdit && (
+          <div className="mx-6 mt-4 flex items-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-800 dark:text-blue-200 text-sm">
+            <AlertCircle size={16} />
+            <span>You can only view this task. Only project members can edit.</span>
+          </div>
+        )}
+
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <div className="space-y-4">
             {/* Details Section */}
             <TaskDetailsSection
               task={displayTask}
-              isEditing={isEditing}
+              isEditing={isEditing && canEdit}
               showDropdown={showDropdown}
               onUpdateTask={handleUpdateTask}
               onToggleDropdown={setShowDropdown}
@@ -201,7 +217,7 @@ export function TaskSidePanel({
             {/* Timeline Section */}
             <TaskTimelineSection
               task={displayTask}
-              isEditing={isEditing}
+              isEditing={isEditing && canEdit}
               onUpdateTask={handleUpdateTask}
             />
 
@@ -209,9 +225,9 @@ export function TaskSidePanel({
             <TaskAssigneesSection
               task={displayTask}
               profiles={profiles}
-              isEditing={isEditing}
+              isEditing={isEditing && canEdit}
               selectedAssignees={selectedAssignees}
-              onOpenModal={() => setShowAssigneesModal(true)}
+              onOpenModal={() => canEdit && setShowAssigneesModal(true)}
             />
 
             {/* Description */}
@@ -219,7 +235,7 @@ export function TaskSidePanel({
               <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase mb-4">
                 Description
               </h4>
-              {isEditing ? (
+              {isEditing && canEdit ? (
                 <TextArea
                   value={displayTask.task_description}
                   onChange={(value) => handleUpdateTask({ task_description: value })}
@@ -238,7 +254,7 @@ export function TaskSidePanel({
               <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase mb-4">
                 Internal Notes
               </h4>
-              {isEditing ? (
+              {isEditing && canEdit ? (
                 <TextArea
                   value={displayTask.comments || ''}
                   onChange={(value) => handleUpdateTask({ comments: value })}
@@ -263,13 +279,14 @@ export function TaskSidePanel({
               onAddComment={onAddComment}
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
+              // canEdit={canEdit} // Pass permission to comments section
             />
           </div>
         </div>
       </div>
 
-      {/* Assignees Modal */}
-      {showAssigneesModal && (
+      {/* Assignees Modal - only show if user has edit permission */}
+      {showAssigneesModal && canEdit && (
         <AssigneesModal
           profiles={profiles}
           selectedAssignees={selectedAssignees}
