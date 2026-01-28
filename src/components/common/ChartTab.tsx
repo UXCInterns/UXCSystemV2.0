@@ -1,14 +1,11 @@
-/* ───────────────────────────────────────────────────────────────
-   ChartTabDropdowns.tsx
-   – period & year/custom-range selector used in the chart header
-──────────────────────────────────────────────────────────────── */
-
 import { useState, useRef, useEffect, useMemo } from "react";
 import flatpickr from "flatpickr";
+import { Instance as FlatpickrInstance } from "flatpickr/dist/types/instance";
 import "flatpickr/dist/flatpickr.css";
+import { Dropdown } from "@/components/ui/dropdown/Dropdown";
+import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 
 const ChartTabDropdowns: React.FC = () => {
-  /* ── state ─────────────────────────────────────────── */
   const [selectedPeriod, setSelectedPeriod] = useState("Calendar Year");
   const [selectedYear, setSelectedYear]     = useState("2025");
   const [dateRange,   setDateRange]         = useState<string>("");
@@ -16,12 +13,8 @@ const ChartTabDropdowns: React.FC = () => {
   const [openPeriod, setOpenPeriod] = useState(false);
   const [openYear,   setOpenYear]   = useState(false);
 
-  /* ── refs ──────────────────────────────────────────── */
-  const periodRef = useRef<HTMLDivElement>(null);
-  const yearRef   = useRef<HTMLDivElement>(null);
-  const dpRef     = useRef<HTMLInputElement | null>(null);
+  const dpRef = useRef<HTMLInputElement>(null);
 
-  /* ── constants ─────────────────────────────────────── */
   const periodOptions = [
     "Calendar Year",
     "Financial Year",
@@ -30,7 +23,6 @@ const ChartTabDropdowns: React.FC = () => {
   ];
   const isCustom = selectedPeriod === "Custom";
 
-  /* ── dynamic year list ─────────────────────────────── */
   const yearOptions = useMemo(() => {
     const baseYears = [2025, 2024, 2023, 2022];
 
@@ -48,24 +40,10 @@ const ChartTabDropdowns: React.FC = () => {
     return [];
   }, [selectedPeriod]);
 
-  /* ── sync year when period changes ─────────────────── */
   useEffect(() => {
     if (!isCustom) setSelectedYear(yearOptions[0]);
   }, [selectedPeriod, yearOptions, isCustom]);
 
-  /* ── click-outside to close dropdowns ──────────────── */
-  useEffect(() => {
-    const handle = (e: MouseEvent) => {
-      if (periodRef.current && !periodRef.current.contains(e.target as Node))
-        setOpenPeriod(false);
-      if (yearRef.current && !yearRef.current.contains(e.target as Node))
-        setOpenYear(false);
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, []);
-
-  /* ── init / destroy flatpickr for custom range ─────── */
   useEffect(() => {
     if (isCustom && dpRef.current) {
       const fp = flatpickr(dpRef.current, {
@@ -90,26 +68,23 @@ const ChartTabDropdowns: React.FC = () => {
     }
   }, [isCustom]);
 
-  /* ── generic dropdown component ────────────────────── */
-  const Dropdown = ({
+  const CustomDropdown = ({
     options,
     selected,
     open,
     setOpen,
     setSelected,
-    dropdownRef,
   }: {
     options: string[];
     selected: string;
     open: boolean;
     setOpen: (v: boolean) => void;
     setSelected: (v: string) => void;
-    dropdownRef: React.RefObject<HTMLDivElement>;
   }) => (
-    <div className="relative inline-block" ref={dropdownRef}>
+    <div className="relative inline-block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 text-theme-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-white shadow-theme-xs whitespace-nowrap"
+        className="dropdown-toggle flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 text-theme-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-white shadow-theme-xs whitespace-nowrap"
       >
         {selected}
         <svg
@@ -125,41 +100,36 @@ const ChartTabDropdowns: React.FC = () => {
         </svg>
       </button>
 
-      {open && (
-        <ul className="absolute right-0 z-10 mt-2 w-40 rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black/10 dark:ring-white/10 max-h-60 overflow-auto">
-          {options.map(opt => (
-            <li
-              key={opt}
-              onClick={() => {
-                setSelected(opt);
-                setOpen(false);
-              }}
-              className={`px-4 py-2 cursor-pointer text-sm font-medium rounded-md whitespace-nowrap
-              ${
-                selected === opt
-                  ? "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-white"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-              }`}
-            >
-              {opt}
-            </li>
-          ))}
-        </ul>
-      )}
+      <Dropdown isOpen={open} onClose={() => setOpen(false)} className="w-40 max-h-60 overflow-auto">
+        {options.map(opt => (
+          <DropdownItem
+            key={opt}
+            onClick={() => {
+              setSelected(opt);
+              setOpen(false);
+            }}
+            baseClassName={`px-4 py-2 cursor-pointer text-sm font-medium rounded-md whitespace-nowrap ${
+              selected === opt
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-white"
+                : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+            }`}
+          >
+            {opt}
+          </DropdownItem>
+        ))}
+      </Dropdown>
     </div>
   );
 
-  /* ── render ─────────────────────────────────────────── */
   return (
     <div className="flex items-center gap-2">
       {/* Period selector */}
-      <Dropdown
+      <CustomDropdown
         options={periodOptions}
         selected={selectedPeriod}
         open={openPeriod}
         setOpen={setOpenPeriod}
         setSelected={setSelectedPeriod}
-        dropdownRef={periodRef}
       />
 
       {/* Year OR Custom range selector */}
@@ -198,7 +168,11 @@ const ChartTabDropdowns: React.FC = () => {
             <button
               onClick={() => {
                 setDateRange("");
-                if (dpRef.current) (dpRef.current as any)._flatpickr?.clear();
+                const inputElement = dpRef.current;
+                if (inputElement) {
+                  const flatpickrInstance = (inputElement as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+                  flatpickrInstance?.clear();
+                }
               }}
               className="px-3 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-theme-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
             >
@@ -207,13 +181,12 @@ const ChartTabDropdowns: React.FC = () => {
           )}
         </div>
       ) : (
-        <Dropdown
+        <CustomDropdown
           options={yearOptions}
           selected={selectedYear}
           open={openYear}
           setOpen={setOpenYear}
           setSelected={setSelectedYear}
-          dropdownRef={yearRef}
         />
       )}
     </div>

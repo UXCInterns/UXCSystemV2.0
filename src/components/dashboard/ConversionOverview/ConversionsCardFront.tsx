@@ -5,11 +5,20 @@ import { StackedProgressBar } from './StackedProgressBar';
 import { TotalConversionsBar } from './TotalConversionsBar';
 import { ConversionMetrics, DataBar } from '@/types/LearningJourneyDashboardTypes/conversionsOverview';
 
+type Period = {
+  year?: number;
+  month?: number;
+  quarter?: number;
+  startDate?: string;
+  endDate?: string;
+  [key: string]: unknown;
+};
+
 interface ConversionsCardFrontProps {
   metrics: ConversionMetrics;
   isComparisonMode: boolean;
-  getPeriodLabel: (period?: any) => string;
-  comparisonPeriod?: any;
+  getPeriodLabel: (period?: Period) => string;
+  comparisonPeriod?: Period;
 }
 
 export const ConversionsCardFront: React.FC<ConversionsCardFrontProps> = ({

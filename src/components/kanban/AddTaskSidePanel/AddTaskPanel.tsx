@@ -52,7 +52,7 @@ export default function AddTaskPanel({
     submitTask(formData, selectedAssignees);
   };
 
-  const handleUpdate = (field: string, value: any) => {
+  const handleUpdate = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

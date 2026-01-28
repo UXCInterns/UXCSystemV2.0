@@ -100,7 +100,7 @@ export const ManpowerTableRow = ({
                 <Badge
                   key={idx}
                   size="sm"
-                  color={role.color as any}
+                  color={role.color as 'error' | 'warning' | 'primary' | 'success' | 'gray'}
                   variant="light"
                 >
                   {role.label} ({role.count})

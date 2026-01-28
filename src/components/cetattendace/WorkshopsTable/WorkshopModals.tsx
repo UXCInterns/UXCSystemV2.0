@@ -4,7 +4,7 @@ import WorkshopFilterComponent from "../FilterComponent/FilterComponent";
 import NewWorkshopForm from "../NewVisitModal/NewVisitModal";
 import EditWorkshopForm from "../EditVisitModal/EditVisitModal";
 import WorkshopDetailsModal from "../ViewDetailsModal/ViewDetailsModal";
-import { WorkshopModalsProps } from '@/types/WorkshopTypes/workshop';
+import { WorkshopModalsProps, NewWorkshopFormData, WorkshopFormData } from '@/types/WorkshopTypes/workshop';
 
 const WorkshopModals: React.FC<WorkshopModalsProps> = ({
   isFilterOpen,
@@ -25,7 +25,7 @@ const WorkshopModals: React.FC<WorkshopModalsProps> = ({
   onDetailsClose,
   selectedWorkshop
 }) => {
-  const handleCreateWorkshop = async (workshopData: any) => {
+  const handleCreateWorkshop = async (workshopData: NewWorkshopFormData) => {
     const result = await onCreateWorkshop(workshopData);
     if (result.success) {
       onNewClose();
@@ -34,7 +34,7 @@ const WorkshopModals: React.FC<WorkshopModalsProps> = ({
     }
   };
 
-  const handleUpdateWorkshop = async (workshopData: any) => {
+  const handleUpdateWorkshop = async (workshopData: WorkshopFormData) => {
     const result = await onUpdateWorkshop(workshopData);
     if (result.success) {
       onEditClose();

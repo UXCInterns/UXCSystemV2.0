@@ -1,12 +1,21 @@
 import React from 'react';
 import { ConversionData, ConversionMetrics } from '@/types/LearningJourneyDashboardTypes/conversionsOverview';
 
+type Period = {
+  year?: number;
+  month?: number;
+  quarter?: number;
+  startDate?: string;
+  endDate?: string;
+  [key: string]: unknown;
+};
+
 interface ConversionsCardBackProps {
   data: ConversionData;
   metrics: ConversionMetrics;
   isComparisonMode: boolean;
-  getPeriodLabel: (period?: any) => string;
-  comparisonPeriod?: any;
+  getPeriodLabel: (period?: Period) => string;
+  comparisonPeriod?: Period;
 }
 
 export const ConversionsCardBack: React.FC<ConversionsCardBackProps> = ({

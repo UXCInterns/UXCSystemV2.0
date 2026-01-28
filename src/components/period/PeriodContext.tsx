@@ -17,6 +17,7 @@ import Radio from "../form/input/Radio";
 import Select from "../form/Select";
 import Label from "../form/Label";
 import flatpickr from "flatpickr";
+import type { Instance as FlatpickrInstance } from 'flatpickr/dist/types/instance';
 import "flatpickr/dist/flatpickr.css";
 
 const PeriodSelector: React.FC = () => {
@@ -207,7 +208,7 @@ const PeriodSelector: React.FC = () => {
     }
   };
 
-  const updateState = (tab: 'primary' | 'comparison', field: string, value: any) => {
+  const updateState = (tab: 'primary' | 'comparison', field: string, value: PeriodType | number | string) => {
     if (tab === 'primary') {
       switch (field) {
         case 'type': 
@@ -215,19 +216,19 @@ const PeriodSelector: React.FC = () => {
           if (selectedType === 'custom' && value !== 'custom') {
             clearDateRange('primary');
           }
-          setSelectedType(value); 
+          setSelectedType(value as PeriodType); 
           // Auto-sync comparison type when primary type changes
           if (isComparisonMode) {
             // Also clear comparison date range if switching away from custom
             if (comparisonType === 'custom' && value !== 'custom') {
               clearDateRange('comparison');
             }
-            setComparisonType(value);
+            setComparisonType(value as PeriodType);
           }
           break;
-        case 'year': setSelectedYear(value); break;
-        case 'quarter': setSelectedQuarter(value); break;
-        case 'dateRange': setCustomDateRange(value); break;
+        case 'year': setSelectedYear(value as number); break;
+        case 'quarter': setSelectedQuarter(value as number); break;
+        case 'dateRange': setCustomDateRange(value as string); break;
       }
     } else {
       switch (field) {
@@ -236,11 +237,11 @@ const PeriodSelector: React.FC = () => {
           if (comparisonType === 'custom' && value !== 'custom') {
             clearDateRange('comparison');
           }
-          setComparisonType(value); 
+          setComparisonType(value as PeriodType); 
           break;
-        case 'year': setComparisonYear(value); break;
-        case 'quarter': setComparisonQuarter(value); break;
-        case 'dateRange': setComparisonDateRange(value); break;
+        case 'year': setComparisonYear(value as number); break;
+        case 'quarter': setComparisonQuarter(value as number); break;
+        case 'dateRange': setComparisonDateRange(value as string); break;
       }
     }
   };
@@ -316,10 +317,12 @@ const PeriodSelector: React.FC = () => {
       setCustomDateRange('');
       setComparisonDateRange('');
       if (primaryDateRef.current) {
-        (primaryDateRef.current as any)._flatpickr?.clear();
+        const fpInstance = (primaryDateRef.current as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+        fpInstance?.clear();
       }
       if (comparisonDateRef.current) {
-        (comparisonDateRef.current as any)._flatpickr?.clear();
+        const fpInstance = (comparisonDateRef.current as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+        fpInstance?.clear();
       }
     }, 100);
   };
@@ -351,12 +354,14 @@ const PeriodSelector: React.FC = () => {
     if (tab === 'primary') {
       setCustomDateRange("");
       if (primaryDateRef.current) {
-        (primaryDateRef.current as any)._flatpickr?.clear();
+        const fpInstance = (primaryDateRef.current as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+        fpInstance?.clear();
       }
     } else {
       setComparisonDateRange("");
       if (comparisonDateRef.current) {
-        (comparisonDateRef.current as any)._flatpickr?.clear();
+        const fpInstance = (comparisonDateRef.current as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+        fpInstance?.clear();
       }
     }
   };

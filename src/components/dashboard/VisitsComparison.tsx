@@ -16,6 +16,14 @@ const MONTHS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
+// Type definitions
+type SessionData = {
+  pace: number;
+  informal: number;
+};
+
+type SessionBreakdown = Record<string, SessionData>;
+
 export default function VisitsComparison() {
   const { 
     getPeriodRange, 
@@ -61,7 +69,7 @@ export default function VisitsComparison() {
     }
 
     // Helper function to process session data
-    const processSessionData = (sessionBreakdown: any, periodType: string) => {
+    const processSessionData = (sessionBreakdown: SessionBreakdown, periodType: string) => {
       let labels: string[] = [];
       let paceData: number[] = [];
       let informalData: number[] = [];
@@ -70,7 +78,7 @@ export default function VisitsComparison() {
         // For custom date ranges, use chronological order
         const customData: { date: Date; month: string; pace: number; informal: number }[] = [];
         
-        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, any]) => {
+        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, SessionData]) => {
           const [monthName, year] = monthKey.split(" ");
           const monthIndex = MONTHS.indexOf(monthName);
           if (monthIndex !== -1) {
@@ -94,7 +102,7 @@ export default function VisitsComparison() {
         // For quarterly, use the actual month names from the data
         const quarterData: { month: string; pace: number; informal: number }[] = [];
         
-        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, any]) => {
+        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, SessionData]) => {
           const monthName = monthKey.split(" ")[0];
           quarterData.push({
             month: monthName,
@@ -120,7 +128,7 @@ export default function VisitsComparison() {
         const yearlyPaceData = Array(12).fill(0);
         const yearlyInformalData = Array(12).fill(0);
 
-        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, any]) => {
+        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, SessionData]) => {
           const monthName = monthKey.split(" ")[0];
           const monthIndex = MONTHS.indexOf(monthName);
           if (monthIndex !== -1) {
@@ -139,7 +147,7 @@ export default function VisitsComparison() {
         const yearlyPaceData = Array(12).fill(0);
         const yearlyInformalData = Array(12).fill(0);
 
-        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, any]) => {
+        Object.entries(sessionBreakdown).forEach(([monthKey, data]: [string, SessionData]) => {
           const monthName = monthKey.split(" ")[0];
           const monthIndex = MONTHS.indexOf(monthName);
           if (monthIndex !== -1) {

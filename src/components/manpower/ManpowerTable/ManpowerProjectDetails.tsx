@@ -7,7 +7,7 @@ interface Project {
   project_id: string;
   project_name: string;
   project_status: string;
-  roles: string[]; // Changed from 'role: string' to 'roles: string[]'
+  roles: string[];
   tasks_assigned: number;
   start_date: string;
   end_date: string | null;
@@ -93,12 +93,13 @@ export const ManpowerProjectDetails: React.FC<ManpowerProjectDetailsProps> = ({
                         {project.roles?.length ? (
                             project.roles.map((role, index) => {
                             const normalized = normalizeRole(role);
+                            const badgeColor = getRoleBadgeColor(normalized) as 'error' | 'warning' | 'primary' | 'success' | 'gray';
 
                             return (
                                 <Badge
                                 key={`${project.project_id}-${normalized}-${index}`}
                                 size="sm"
-                                color={getRoleBadgeColor(normalized) as any}
+                                color={badgeColor}
                                 variant="light"
                                 >
                                 {normalized}

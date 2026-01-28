@@ -8,6 +8,7 @@ import Avatar from "@/components/ui/avatar/Avatar";
 import { getPriorityBadgeProps } from '@/utils/CommonUtils/badgeUtils';
 import { Dropdown } from '@/components/ui/dropdown/Dropdown';
 import flatpickr from 'flatpickr';
+import type { Instance as FlatpickrInstance } from 'flatpickr/dist/types/instance';
 import 'flatpickr/dist/flatpickr.css';
 import type { Profile } from "@/types/ProjectsTypes/project";
 
@@ -44,7 +45,7 @@ export function KanbanToolbar({
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [localFilters, setLocalFilters] = useState<TaskFilters>(activeFilters);
   const dateRef = useRef<HTMLInputElement>(null);
-  const flatpickrInstance = useRef<any>(null);
+  const flatpickrInstance = useRef<FlatpickrInstance | null>(null);
 
   // Initialize flatpickr when due date section expands
   useEffect(() => {
@@ -103,6 +104,7 @@ export function KanbanToolbar({
         flatpickrInstance.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expandedSection]);
 
   // Sync local filters with active filters

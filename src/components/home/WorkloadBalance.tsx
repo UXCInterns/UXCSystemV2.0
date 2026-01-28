@@ -14,6 +14,14 @@ import {
   AlertTriangleIcon,
 } from "lucide-react";
 
+interface Task {
+  id: string;
+  status: string;
+  priority: string;
+  due_date: string;
+  [key: string]: unknown;
+}
+
 interface WorkloadData {
   byStatus: Record<string, number>;
   byPriority: Record<string, number>;
@@ -43,18 +51,18 @@ export const WorkloadBalance = () => {
         const data = await response.json();
 
         const activeTasks = (data.tasks || []).filter(
-          (task: any) => task.status !== 'Done' && task.status !== 'Cancelled'
+          (task: Task) => task.status !== 'Done' && task.status !== 'Cancelled'
         );
 
         // Group by status
         const byStatus: Record<string, number> = {};
-        activeTasks.forEach((task: any) => {
+        activeTasks.forEach((task: Task) => {
           byStatus[task.status] = (byStatus[task.status] || 0) + 1;
         });
 
         // Group by priority
         const byPriority: Record<string, number> = {};
-        activeTasks.forEach((task: any) => {
+        activeTasks.forEach((task: Task) => {
           byPriority[task.priority] = (byPriority[task.priority] || 0) + 1;
         });
 
@@ -69,7 +77,7 @@ export const WorkloadBalance = () => {
         let dueThisWeek = 0;
         let overdue = 0;
 
-        activeTasks.forEach((task: any) => {
+        activeTasks.forEach((task: Task) => {
           const dueDate = new Date(task.due_date);
           dueDate.setHours(0, 0, 0, 0); // Normalize to start of day
           

@@ -8,14 +8,15 @@ import {
 } from '@/components/ui/shadcn-io/kanban';
 import { TaskCard } from './TaskCard';
 import type { Task, KanbanColumn } from '@/types/KanbanBoardTypes/kanban';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 
 type Props = {
   columns: KanbanColumn[];
   tasks: Task[];
-  onDragStart: (event: any) => void;
-  onDragEnd: (event: any) => void;
+  onDragStart: (event: DragStartEvent) => void;
+  onDragEnd: (event: DragEndEvent) => void;
   onTaskClick: (task: Task) => void;
-  canEdit?: boolean; // Permission prop
+  canEdit?: boolean;
 };
 
 export function KanbanBoardView({
@@ -33,17 +34,16 @@ export function KanbanBoardView({
   }, [tasks]);
 
   const handleDataChange = (updatedTasks: Task[]) => {
-    // Only allow data changes if user has edit permissions
     if (!canEdit) return;
     setLocalTasks(updatedTasks);
   };
 
-  const handleDragStartWrapper = (event: any) => {
+  const handleDragStartWrapper = (event: DragStartEvent) => {
     if (!canEdit) return;
     onDragStart(event);
   };
 
-  const handleDragEndWrapper = (event: any) => {
+  const handleDragEndWrapper = (event: DragEndEvent) => {
     if (!canEdit) return;
     onDragEnd(event);
   };
@@ -57,7 +57,7 @@ export function KanbanBoardView({
           onDataChange={handleDataChange}
           onDragStart={handleDragStartWrapper}
           onDragEnd={handleDragEndWrapper}
-          disabled={!canEdit} // Pass disabled prop to completely disable dragging
+          disabled={!canEdit}
         >
           {(column) => (
             <KanbanBoard id={column.id} key={column.id}>

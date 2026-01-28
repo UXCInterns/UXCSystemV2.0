@@ -5,9 +5,19 @@ import { ProgramTypeDetailsSection } from "./ProgramTypeDetailsSection";
 import { ParticipantSection } from "./ParticipantSection";
 import { AdditionalInfoSection } from "./AdditionalInfoSection";
 import { PROGRAM_TYPE_OPTIONS, BIA_LEVEL_OPTIONS, COURSE_TYPE_OPTIONS, PACE_CATEGORY_OPTIONS } from "@/utils/WorkshopAttendanceUtils/EditVisitModalUtils/workshopFormOptions";
+import { NewWorkshopFormData } from "@/types/WorkshopTypes/workshop";
+
+interface FormHook {
+  formData: NewWorkshopFormData;
+  errors: Record<string, string>;
+  handleInputChange: (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (field: string) => (value: string) => void;
+  handleRadioChange: (field: string) => (value: string) => void;
+  handleTextAreaChange: (field: string) => (value: string) => void;
+}
 
 interface WorkshopFormContentProps {
-  formHook: any;
+  formHook: FormHook;
   isMobile?: boolean;
 }
 

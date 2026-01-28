@@ -16,6 +16,8 @@ import { useCommentOperations } from '@/hooks/KanbanBoardHooks/KanbanBoard/useCo
 import { useTaskFilters } from '@/hooks/KanbanBoardHooks/KanbanBoard/useTaskFilters';
 import { useProjectPermissions } from '@/hooks/KanbanBoardHooks/KanbanBoard/useProjectPermissions';
 import { AlertCircle } from 'lucide-react';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import type { Task } from '@/types/KanbanBoardTypes/kanban';
 
 export default function ProjectKanbanBoard({ projectId }: { projectId: string }) {
   // State management
@@ -101,22 +103,23 @@ export default function ProjectKanbanBoard({ projectId }: { projectId: string })
     setShowCreatePanel(false);
   };
 
-  const handleDragStart = (event: any) => {
+  const handleDragStart = (event: DragStartEvent) => {
+    // Don't call preventDefault - just return early if not a member
+    // The KanbanProvider's disabled prop will handle preventing drag
     if (!isProjectMember) {
-      event.preventDefault();
       return;
     }
     taskOperations.handleDragStart(event, dragStartColumnRef, tasks);
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     if (!isProjectMember) {
       return;
     }
     taskOperations.handleDragEnd(event, dragStartColumnRef, tasks);
   };
 
-  const handleTaskClick = (task: any) => {
+  const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
   };
 
