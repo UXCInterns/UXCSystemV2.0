@@ -19,7 +19,7 @@ interface KanbanHeaderProps {
 export default function KanbanHeader({ projectId }: KanbanHeaderProps) {
   const router = useRouter();
   const { project, loading, error } = useProjectData(projectId);
-  const { realtimeChannel, liveProgress, liveStatus } = useProjectRealtime(projectId);
+  const { realtimeChannel, liveProgress } = useProjectRealtime(projectId);
 
   if (loading) {
     return <KanbanHeaderLoading />;

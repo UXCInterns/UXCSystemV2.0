@@ -15,7 +15,6 @@ export const MetricCardFront = ({
   icon,
   title,
   value,
-  badge,
   comparisonValue,
 }: MetricCardFrontProps) => {
   const renderTitle = () => {

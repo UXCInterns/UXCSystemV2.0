@@ -8,7 +8,6 @@ import type {
   DragStartEvent,
 } from '@dnd-kit/core';
 import {
-  closestCenter,
   rectIntersection,
   DndContext,
   DragOverlay,
@@ -74,7 +73,7 @@ export type KanbanBoardProps = {
 
 export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
   const { disabled } = useContext(KanbanContext);
-  const { isOver, setNodeRef } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id,
     disabled, // NEW: Disable droppable when disabled
   });
@@ -237,21 +236,23 @@ export const KanbanProvider = <
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   // NEW: Conditionally create sensors based on disabled prop
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 8,
+    },
+  });
+
+  const keyboardSensor = useSensor(KeyboardSensor);
+
   const sensors = useSensors(
-    ...(disabled ? [] : [
-      useSensor(MouseSensor, {
-        activationConstraint: {
-          distance: 8, // Require 8px of movement before drag starts
-        },
-      }),
-      useSensor(TouchSensor, {
-        activationConstraint: {
-          delay: 200,
-          tolerance: 8,
-        },
-      }),
-      useSensor(KeyboardSensor)
-    ])
+    ...(disabled ? [] : [mouseSensor, touchSensor, keyboardSensor])
   );
 
   const handleDragStart = (event: DragStartEvent) => {

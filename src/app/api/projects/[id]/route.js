@@ -1,17 +1,7 @@
 // app/api/projects/[id]/route.js
 import { supabaseAdmin } from '../../supabaseAdmin';
 
-// Helper to get user from auth header
-async function _getUserFromRequest(request) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return null;
-  
-  const token = authHeader.replace('Bearer ', '');
-  const { data: { user } } = await supabaseAdmin.auth.getUser(token);
-  return user;
-}
-
-export async function GET(request, { params }) {
+export async function GET({ params }) {
   try {
     const { id } = await params;
     console.log('🔍 GET: Fetching project with ID:', id);

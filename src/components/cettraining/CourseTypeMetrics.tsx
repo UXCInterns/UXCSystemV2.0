@@ -9,6 +9,16 @@ interface CourseTypeMetricsProps {
   programType?: "pace" | "non_pace";
 }
 
+interface CourseTypeData {
+  courseType: string;
+  count: number;
+}
+
+interface DashboardData {
+  courseTypes: CourseTypeData[];
+  comparisonCourseTypes: CourseTypeData[];
+}
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 // Define all possible course types
@@ -27,7 +37,6 @@ const CourseTypeMetrics: React.FC<CourseTypeMetricsProps> = ({ programType }) =>
     currentPeriod, 
     comparisonPeriod,
     isComparisonMode,
-    getPeriodLabel 
   } = usePeriod();
 
   const { startDate, endDate } = getPeriodRange();
@@ -53,7 +62,7 @@ const CourseTypeMetrics: React.FC<CourseTypeMetricsProps> = ({ programType }) =>
     return p.toString();
   }, [startDate, endDate, currentPeriod.type, programType, isComparisonMode, comparisonPeriod, comparisonRange]);
 
-  const { data, error, isLoading } = useSWR(`/api/workshops-dashboard?${params}`, fetcher, {
+  const { data, error, isLoading } = useSWR<DashboardData>(`/api/workshops-dashboard?${params}`, fetcher, {
     refreshInterval: 30000,
   });
 
@@ -62,19 +71,19 @@ const CourseTypeMetrics: React.FC<CourseTypeMetricsProps> = ({ programType }) =>
     const apiCourseTypes = data?.courseTypes || [];
     const comparisonCourseTypes = data?.comparisonCourseTypes || [];
     
-    const totalWorkshops = apiCourseTypes.reduce((sum: number, ct: any) => sum + ct.count, 0);
-    const totalComparisonWorkshops = comparisonCourseTypes.reduce((sum: number, ct: any) => sum + ct.count, 0);
+    const totalWorkshops = apiCourseTypes.reduce((sum: number, ct: CourseTypeData) => sum + ct.count, 0);
+    const totalComparisonWorkshops = comparisonCourseTypes.reduce((sum: number, ct: CourseTypeData) => sum + ct.count, 0);
     
     return ALL_COURSE_TYPES.map((type) => {
       // Primary period data
-      const apiData = apiCourseTypes.find((ct: any) => 
+      const apiData = apiCourseTypes.find((ct: CourseTypeData) => 
         ct.courseType.toLowerCase() === type.name.toLowerCase()
       );
       const count = apiData?.count || 0;
       const percentage = totalWorkshops > 0 ? Math.round((count / totalWorkshops) * 100) : 0;
       
       // Comparison period data
-      const comparisonData = comparisonCourseTypes.find((ct: any) => 
+      const comparisonData = comparisonCourseTypes.find((ct: CourseTypeData) => 
         ct.courseType.toLowerCase() === type.name.toLowerCase()
       );
       const comparisonCount = comparisonData?.count || 0;
@@ -191,4 +200,4 @@ const CourseTypeMetrics: React.FC<CourseTypeMetricsProps> = ({ programType }) =>
   );
 };
 
-export default CourseTypeMetrics; 
+export default CourseTypeMetrics;

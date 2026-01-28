@@ -2,8 +2,8 @@
 import React, { useState, useMemo } from "react";
 import useSWR from "swr";
 import Badge from "../ui/badge/Badge";
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon, UserIcon } from "@/icons";
-import { Presentation, Clock, Building2, Group, User } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, GroupIcon } from "@/icons";
+import { Presentation, Building2, User } from "lucide-react";
 import ChartTab from "../common/PaceToggle";
 import { usePeriod } from "@/context/PeriodContext";
 import PeriodSelector from "../period/PeriodContext";
@@ -14,10 +14,29 @@ interface StatsMetricsProps {
   setSelectedProgram: (program: "pace" | "non_pace") => void;
 }
 
+interface Workshop {
+  id?: string;
+  program_type: string;
+  program_start_date: string;
+  program_end_date: string;
+  course_program_title: string;
+  category?: string;
+  csc?: boolean | null;
+  no_of_participants?: number;
+  company_sponsored_participants?: number;
+  individual_group_participants?: number;
+}
+
+interface WorkshopData {
+  workshops: Workshop[];
+  comparisonWorkshops: Workshop[];
+  isComparison: boolean;
+}
+
 // Flip Card Component for Total Workshops
 const WorkshopCard: React.FC<{
-  workshopData: any[];
-  comparisonWorkshopData?: any[];
+  workshopData: Workshop[];
+  comparisonWorkshopData?: Workshop[];
   programType: "pace" | "non_pace";
   loading: boolean;
   periodRange: { startDate: string; endDate: string };
@@ -255,7 +274,7 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
   selectedProgram, 
   setSelectedProgram 
 }) => {
-  const { getPeriodRange, getPeriodLabel, currentPeriod, comparisonPeriod, isComparisonMode } = usePeriod();
+  const { getPeriodRange, currentPeriod, comparisonPeriod, isComparisonMode } = usePeriod();
 
   // Build API URL with date range parameters
   const apiUrl = useMemo(() => {
@@ -278,14 +297,15 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
   }, [currentPeriod, comparisonPeriod, isComparisonMode, selectedProgram, getPeriodRange]);
 
   // Fetch workshop data
-  const { data: workshopData, error, isLoading } = useSWR(apiUrl, fetcher, {
+  const { data: workshopData, error, isLoading } = useSWR<WorkshopData>(apiUrl, fetcher, {
     refreshInterval: 60_000,
     revalidateOnFocus: true,
   });
 
-  const workshops = workshopData?.workshops || [];
-  const comparisonWorkshops = workshopData?.comparisonWorkshops || [];
-  const hasComparison = workshopData?.isComparison && comparisonWorkshops.length > 0;
+  // Memoize workshops array to prevent dependency issues
+  const workshops = useMemo(() => workshopData?.workshops || [], [workshopData?.workshops]);
+  const comparisonWorkshops = useMemo(() => workshopData?.comparisonWorkshops || [], [workshopData?.comparisonWorkshops]);
+  const hasComparison = Boolean(workshopData?.isComparison && comparisonWorkshops.length > 0);
 
   // Get current period range for filtering
   const currentRange = getPeriodRange(currentPeriod);
@@ -293,7 +313,7 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
 
   // Calculate metrics based on selected program type and current period
   const metrics = useMemo(() => {
-    const filteredWorkshops = workshops.filter((w: any) => {
+    const filteredWorkshops = workshops.filter((w: Workshop) => {
       if (w.program_type !== selectedProgram) return false;
       
       const startDate = new Date(w.program_start_date);
@@ -304,15 +324,15 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
       return startDate <= rangeEnd && endDate >= rangeStart;
     });
     
-    const totalParticipants = filteredWorkshops.reduce((sum: number, w: any) => 
+    const totalParticipants = filteredWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.no_of_participants || 0), 0
     );
 
-    const companySponsoredParticipants = filteredWorkshops.reduce((sum: number, w: any) => 
+    const companySponsoredParticipants = filteredWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.company_sponsored_participants || 0), 0
     );
 
-    const individualGroupParticipants = filteredWorkshops.reduce((sum: number, w: any) => 
+    const individualGroupParticipants = filteredWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.individual_group_participants || 0), 0
     );
 
@@ -327,7 +347,7 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
   const comparisonMetrics = useMemo(() => {
     if (!hasComparison || !comparisonRange) return {};
 
-    const filteredComparisonWorkshops = comparisonWorkshops.filter((w: any) => {
+    const filteredComparisonWorkshops = comparisonWorkshops.filter((w: Workshop) => {
       if (w.program_type !== selectedProgram) return false;
       
       const startDate = new Date(w.program_start_date);
@@ -338,15 +358,15 @@ export const StatMetrics: React.FC<StatsMetricsProps> = ({
       return startDate <= rangeEnd && endDate >= rangeStart;
     });
 
-    const totalParticipants = filteredComparisonWorkshops.reduce((sum: number, w: any) => 
+    const totalParticipants = filteredComparisonWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.no_of_participants || 0), 0
     );
 
-    const companySponsoredParticipants = filteredComparisonWorkshops.reduce((sum: number, w: any) => 
+    const companySponsoredParticipants = filteredComparisonWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.company_sponsored_participants || 0), 0
     );
 
-    const individualGroupParticipants = filteredComparisonWorkshops.reduce((sum: number, w: any) => 
+    const individualGroupParticipants = filteredComparisonWorkshops.reduce((sum: number, w: Workshop) => 
       sum + (w.individual_group_participants || 0), 0
     );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Badge from "../ui/badge/Badge";
 import { useUser } from "@/hooks/useUser";
 import {
@@ -14,18 +14,12 @@ import {
 } from "lucide-react";
 import { TaskIcon } from "@/icons";
 import Toggle from "../ui/toggle/Toggle";
+import Image from "next/image";
 
 // Toggle Component
 interface ToggleOption {
   value: string;
   label: string;
-}
-
-interface ToggleProps<T extends string> {
-  options: ToggleOption[];
-  selectedValue: T;
-  onChange: (value: T) => void;
-  className?: string;
 }
 
 interface Assignee {
@@ -57,11 +51,11 @@ export const TasksGrid = () => {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<FilterType>("all");
   
-  const STATUS_ORDER: Record<string, number> = {
+  const STATUS_ORDER: Record<string, number> = useMemo(() => ({
     'To Do': 1,
     'In Progress': 2,
     'Review': 3,
-  };
+  }), []);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -93,7 +87,7 @@ export const TasksGrid = () => {
     if (userId) {
       fetchTasks();
     }
-  }, [userId]);
+  }, [userId, STATUS_ORDER]);
 
   const getStatusConfig = (status: string) => {
     type BadgeColor = "success" | "error" | "warning" | "purple";
@@ -254,7 +248,7 @@ export const TasksGrid = () => {
               No Tasks Found
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              You don't have any tasks assigned yet.
+              You don&apos;t have any tasks assigned yet.
             </p>
           </div>
         </div>
@@ -373,9 +367,11 @@ export const TasksGrid = () => {
                             className="relative"
                             style={{ zIndex: 10 - idx }}
                           >
-                            <img
+                            <Image
                               src={assignee.avatar_url || '/images/user/default-avatar.jpg'}
                               alt={assignee.name}
+                              width={24}
+                              height={24}
                               className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 object-cover hover:z-20 transition-all duration-200 hover:scale-125 hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer shadow-sm"
                               title={assignee.name}
                             />

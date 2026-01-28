@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface Props {
   selectedType: "area" | "bar";
   onChange: (type: "area" | "bar") => void;

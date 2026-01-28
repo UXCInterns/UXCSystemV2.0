@@ -1,7 +1,7 @@
 // Hook for managing status distribution chart state and data
 import { useState, useEffect, useMemo } from "react";
 import { onProjectUpdate } from "@/lib/projectEvents";
-import { ManpowerAllocation, StatusDistribution } from "@/types/ManpowerTypes/manpower";
+import { ManpowerAllocation } from "@/types/ManpowerTypes/manpower";
 import { calculateStatusDistribution } from "@/utils/ManpowerUtils/StatusDistributionChartUtils/statusDistribution";
 
 export const useStatusDistribution = () => {

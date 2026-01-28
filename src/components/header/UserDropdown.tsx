@@ -1,17 +1,14 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useUser } from "@/hooks/useUser";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
 export default function UserDropdown() {
   const { name, email, profileImage } = useUser();
   const { signOut } = useAuth();
-  const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 

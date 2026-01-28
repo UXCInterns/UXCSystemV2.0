@@ -1,12 +1,9 @@
 import React from "react";
 import { ChevronDown } from "lucide-react";
-import { Profile } from "@/types/ProjectsTypes/project";
 import Label from "@/components/form/Label";
 import Badge from "@/components/ui/badge/Badge";
 import DatePicker from "@/components/form/date-picker";
-import Avatar from "@/components/ui/avatar/Avatar";
 import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { getStatusBadgeProps, getPriorityBadgeProps } from '@/utils/CommonUtils/badgeUtils';
@@ -21,7 +18,7 @@ interface TaskFormFieldsProps {
     comments: string;
   };
   projectName: string;
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string) => void;
   showDropdown: string | null;
   onDropdownChange: (value: string | null) => void;
 }

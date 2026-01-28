@@ -1,15 +1,6 @@
 // app/api/projects/[id]/team/route.js
 import { supabaseAdmin } from '../../../supabaseAdmin';
 
-async function _getUserFromRequest(request) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return null;
-  
-  const token = authHeader.replace('Bearer ', '');
-  const { data: { user } } = await supabaseAdmin.auth.getUser(token);
-  return user;
-}
-
 export async function POST(request, { params }) {
   try {
     const body = await request.json();

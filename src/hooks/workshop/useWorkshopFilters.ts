@@ -3,29 +3,7 @@
 
 import { useMemo, useState } from 'react';
 import { PROGRAM_TYPES, COURSE_TYPES, BIA_LEVELS, PACE_CATEGORIES } from "@/hooks/workshop/useWorkshopOptions";
-
-interface Workshop {
-  id: string;
-  course_program_title: string;
-  program_start_date: string;
-  program_end_date: string;
-  no_of_participants: number;
-  trainee_hours: number;
-  program_type: string;
-  school_dept: string;
-  course_hours: number;
-  company_sponsored_participants: number;
-  run_number?: string;
-  individual_group_participants?: number;
-  course_type?: string;
-  subsidy_description?: string;
-  bia_level?: string;
-  learning_outcome?: string;
-  category?: string; // for PACE workshops
-  csc?: boolean; // for non-PACE workshops
-  created_at: string;
-  updated_at: string;
-}
+import { Workshop } from "@/types/WorkshopTypes/workshop";
 
 export interface WorkshopFilterOptions {
   programTypes: string[];
@@ -52,7 +30,7 @@ export interface WorkshopFilterOptions {
   cscOnly: boolean; // for non-PACE workshops
 }
 
-export const useWorkshopFilters = (workshops: Workshop[]) => {
+export const useWorkshopFilters = (_workshops: Workshop[]) => {
   const [activeFilters, setActiveFilters] = useState<WorkshopFilterOptions>({
     programTypes: [],
     schoolDepts: [],
@@ -67,8 +45,9 @@ export const useWorkshopFilters = (workshops: Workshop[]) => {
   });
 
   // Transform constants to match database values
-  const PROGRAM_TYPE_VALUES = PROGRAM_TYPES.map(type => 
-    type.toLowerCase().replace("-", "_")
+  const PROGRAM_TYPE_VALUES = useMemo(() => 
+    PROGRAM_TYPES.map(type => type.toLowerCase().replace("-", "_")),
+    []
   );
 
   // Use predefined constants for available options instead of deriving from data
@@ -80,7 +59,7 @@ export const useWorkshopFilters = (workshops: Workshop[]) => {
       categories: PACE_CATEGORIES, // Use all predefined PACE categories
       biaLevels: BIA_LEVELS // Use all predefined BIA levels
     };
-  }, []); // No dependency on workshops data
+  }, [PROGRAM_TYPE_VALUES]);
 
   const applyFilters = (data: Workshop[], filters: WorkshopFilterOptions): Workshop[] => {
     return data.filter((item: Workshop) => {

@@ -123,7 +123,7 @@ export function useComments(taskId?: string) {
     );
 
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       console.log('🔍 [Comment Edit] Current user:', user?.id);
       
       if (!user) {

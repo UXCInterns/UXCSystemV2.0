@@ -13,7 +13,6 @@ interface ChartOptionsParams {
 
 export const getStatusChartOptions = ({
   labels,
-  series,
   hoveredLabel,
   hoveredValue,
   totalPeople,
@@ -27,7 +26,8 @@ export const getStatusChartOptions = ({
       type: "donut",
       background: "transparent",
       events: {
-        dataPointMouseEnter: function (event, chartContext, config) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        dataPointMouseEnter: function (_event, _chartContext, config) {
           onDataPointMouseEnter(config.dataPointIndex);
         },
         dataPointMouseLeave: function () {
@@ -63,7 +63,7 @@ export const getStatusChartOptions = ({
               fontWeight: 700,
               color: "#111827",
               offsetY: 5,
-              formatter: function (val) {
+              formatter: function () {
                 return hoveredValue !== null ? String(hoveredValue) : String(totalPeople);
               }
             },

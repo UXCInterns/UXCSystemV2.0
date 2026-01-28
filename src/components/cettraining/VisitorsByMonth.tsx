@@ -24,6 +24,16 @@ interface VisitorsByMonthProps {
   programType?: "pace" | "non_pace";
 }
 
+interface MonthlyBreakdownItem {
+  month: string;
+  visitorCount: number;
+}
+
+interface DashboardData {
+  monthlyBreakdown: MonthlyBreakdownItem[];
+  comparisonMonthlyBreakdown?: MonthlyBreakdownItem[];
+}
+
 export default function VisitorsByMonth({ 
   programType 
 }: VisitorsByMonthProps) {
@@ -60,21 +70,21 @@ export default function VisitorsByMonth({
     return p.toString();
   }, [startDate, endDate, currentPeriod.type, programType, isComparisonMode, comparisonPeriod, getPeriodRange]);
 
-  const { data, error, isLoading } = useSWR(`/api/workshops-dashboard?${params}`, fetcher, {
+  const { data, error, isLoading } = useSWR<DashboardData>(`/api/workshops-dashboard?${params}`, fetcher, {
     refreshInterval: 30000, // auto-refresh every 30s
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
   });
 
   const { primaryData, comparisonData, labels } = useMemo(() => {
-    const processBreakdown = (breakdown: any[], type: string): { processedData: number[], labels: string[] } => {
+    const processBreakdown = (breakdown: MonthlyBreakdownItem[], type: string): { processedData: number[], labels: string[] } => {
       if (!breakdown) return { processedData: [], labels: MONTHS };
 
       if (type === "quarterly") {
         const quarterData: number[] = [];
         const quarterLabels: string[] = [];
 
-        breakdown.forEach((item: any) => {
+        breakdown.forEach((item: MonthlyBreakdownItem) => {
           if (item.month && typeof item.visitorCount === "number") {
             quarterLabels.push(item.month);
             quarterData.push(item.visitorCount);
@@ -96,7 +106,7 @@ export default function VisitorsByMonth({
           "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"
         ];
 
-        breakdown.forEach((item: any) => {
+        breakdown.forEach((item: MonthlyBreakdownItem) => {
           if (item.month && typeof item.visitorCount === "number") {
             const monthIndex = MONTHS.indexOf(item.month);
             if (monthIndex !== -1) {
@@ -114,7 +124,7 @@ export default function VisitorsByMonth({
         const customData: number[] = [];
         const customLabels: string[] = [];
 
-        breakdown.forEach((item: any) => {
+        breakdown.forEach((item: MonthlyBreakdownItem) => {
           if (item.month && typeof item.visitorCount === "number") {
             customLabels.push(item.month);
             customData.push(item.visitorCount);
@@ -126,7 +136,7 @@ export default function VisitorsByMonth({
 
       // Default calendar year
       const yearlyData = Array(12).fill(0) as number[];
-      breakdown.forEach((item: any) => {
+      breakdown.forEach((item: MonthlyBreakdownItem) => {
         if (item.month && typeof item.visitorCount === "number") {
           const monthIndex = MONTHS.indexOf(item.month);
           if (monthIndex !== -1) yearlyData[monthIndex] = item.visitorCount;
@@ -136,7 +146,7 @@ export default function VisitorsByMonth({
       return { processedData: yearlyData, labels: MONTHS };
     };
 
-    const primaryResult = processBreakdown(data?.monthlyBreakdown, currentPeriod.type);
+    const primaryResult = processBreakdown(data?.monthlyBreakdown || [], currentPeriod.type);
     let comparisonResult: { processedData: number[], labels: string[] } = { processedData: [], labels: [] };
 
     if (isComparisonMode && data?.comparisonMonthlyBreakdown) {
@@ -247,7 +257,6 @@ export default function VisitorsByMonth({
 
   // Calculate totals and peak months
   const primaryTotal = primaryData.reduce((sum, val) => sum + val, 0);
-  const comparisonTotal = comparisonData.reduce((sum, val) => sum + val, 0);
   const primaryPeakIndex = primaryData.indexOf(Math.max(...primaryData));
   const comparisonPeakIndex = comparisonData.length > 0 ? comparisonData.indexOf(Math.max(...comparisonData)) : -1;
 

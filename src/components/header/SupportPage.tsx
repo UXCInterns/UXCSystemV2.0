@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { 
   BookOpen, 
-  Bell, 
   BarChart3, 
   Users, 
   HelpCircle,
@@ -91,7 +90,7 @@ function GettingStartedContent() {
           Getting Started
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Welcome to the UXC System! Here's everything you need to get started.
+          Welcome to the UXC System! Here&apos;s everything you need to get started.
         </p>
       </div>
 
@@ -111,7 +110,7 @@ function GettingStartedContent() {
 
         <Section title="2. Complete Your Profile">
           <p>
-            If this is your first time logging in or you're using a new Gmail account, you should complete 
+            If this is your first time logging in or you&apos;re using a new Gmail account, you should complete 
             the details in the Profile page. Navigate to the Profile page in the user dropdown menu to add your information.
           </p>
           
@@ -157,7 +156,7 @@ function ProfileContent() {
         <Section title="Accessing Your Profile">
           <p>
             Access your profile by clicking on your profile picture or name in the user dropdown menu at the top right 
-            of the screen, then select "Profile" from the menu.
+            of the screen, then select &quot;Profile&quot; from the menu.
           </p>
         </Section>
 
@@ -191,13 +190,13 @@ function ProfileContent() {
         <Section title="Editing Your Profile">
           <p>
             You can edit your profile information at any time. Simply navigate to the Profile page, make your changes, 
-            and click "Save Changes". Your updates will be reflected immediately across the entire system.
+            and click &quot;Save Changes&quot;. Your updates will be reflected immediately across the entire system.
           </p>
         </Section>
 
         <Section title="Deleting Your Account">
           <p>
-            If you need to delete your account, you can do so from the Profile page by clicking the "Delete Account" 
+            If you need to delete your account, you can do so from the Profile page by clicking the &quot;Delete Account&quot; 
             button. This action is permanent and will remove all your data from the system. You will be signed out and 
             redirected to the sign-in page.
           </p>
@@ -251,7 +250,7 @@ function DashboardContent() {
             Compare attendance data across different time periods to identify trends and changes:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
-            <li>Click the "Compare" toggle to enable comparison mode</li>
+            <li>Click the &quot;Compare&quot; toggle to enable comparison mode</li>
             <li>Select your primary time period using the main date filters</li>
             <li>Choose a comparison period from the dropdown menu</li>
             <li>View side-by-side comparisons of key metrics and visualizations</li>
@@ -260,7 +259,7 @@ function DashboardContent() {
 
         <Section title="Resetting Filters">
           <p>
-            Clear all applied filters and return to the default view by clicking the "Reset" button. This removes all 
+            Clear all applied filters and return to the default view by clicking the &quot;Reset&quot; button. This removes all 
             active filters and comparison settings.
           </p>
         </Section>
@@ -288,7 +287,7 @@ function AttendanceContent() {
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
             <li>Navigate to the Attendance page from the sidebar</li>
-            <li>Click "Log new visit" (for LJ) or "Add new workshop" (for CET)</li>
+            <li>Click &quot;Log new visit&quot; (for LJ) or &quot;Add new workshop&quot; (for CET)</li>
             <li>Fill in the required details:
               <ul className="list-disc list-inside ml-6 mt-1">
                 <li>Company name or course title</li>
@@ -298,7 +297,7 @@ function AttendanceContent() {
                 <li>Session details and notes</li>
               </ul>
             </li>
-            <li>Click "Log visit" or "Create workshop" to save</li>
+            <li>Click &quot;Log visit&quot; or &quot;Create workshop&quot; to save</li>
           </ol>
         </Section>
 
@@ -330,7 +329,7 @@ function AttendanceContent() {
             <li>Locate the record you want to edit</li>
             <li>Click the edit icon</li>
             <li>Modify the necessary fields</li>
-            <li>Click "Save changes" to update the record</li>
+            <li>Click &quot;Save changes&quot; to update the record</li>
           </ol>
         </Section>
 
@@ -346,7 +345,7 @@ function AttendanceContent() {
             Export your attendance data for external analysis or reporting:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
-            <li>Click the "Export" button</li>
+            <li>Click the &quot;Export&quot; button</li>
             <li>Apply any desired filters to select specific records</li>
             <li>Click the export button</li>
             <li>The file will be downloaded to your device</li>
@@ -375,7 +374,7 @@ function ProjectBoardContent() {
             To create a new project:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
-            <li>Click the "New Project" button on the Project Board page</li>
+            <li>Click the &quot;New Project&quot; button on the Project Board page</li>
             <li>Fill in the project details:
               <ul className="list-disc list-inside ml-6 mt-1">
                 <li>Project name</li>
@@ -398,12 +397,12 @@ function ProjectBoardContent() {
 
         <Section title="Accessing the Kanban Board">
           <p>
-            To access a project's Kanban board:
+            To access a project&apos;s Kanban board:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
             <li>Click on a project to open its side panel</li>
             <li>Look for the yellow Kanban icon in the side panel</li>
-            <li>Click the Kanban icon to navigate to the project's task board</li>
+            <li>Click the Kanban icon to navigate to the project&apos;s task board</li>
           </ol>
         </Section>
 
@@ -479,7 +478,7 @@ function KanbanContent() {
             To create a new task:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
-            <li>Click the "Create Task" button at the top of the Kanban board</li>
+            <li>Click the &quot;Create Task&quot; button at the top of the Kanban board</li>
             <li>Enter task details:
               <ul className="list-disc list-inside ml-6 mt-1">
                 <li>Task title</li>
@@ -503,7 +502,7 @@ function KanbanContent() {
             <li>Release to drop the task in its new position</li>
           </ol>
           <p className="mt-2">
-            The task status will automatically update based on the column it's placed in.
+            The task status will automatically update based on the column it&apos;s placed in.
           </p>
         </Section>
 
@@ -552,7 +551,7 @@ function KanbanContent() {
             Switch to table view for a different perspective:
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
-            <li>Click the "Table View" button at the top of the Kanban board</li>
+            <li>Click the &quot;Table View&quot; button at the top of the Kanban board</li>
             <li>View all tasks in a sortable, filterable table format</li>
             <li>Click on any row to view or edit task details</li>
           </ol>
@@ -606,7 +605,7 @@ function ManpowerContent() {
       <div className="space-y-4">
         <Section title="Overview">
           <p>
-            The Manpower Board provides a comprehensive view of your team's workload distribution, helping you identify 
+            The Manpower Board provides a comprehensive view of your team&apos;s workload distribution, helping you identify 
             who is available for new assignments and who might be overloaded.
           </p>
         </Section>
@@ -674,7 +673,7 @@ function InnoPollContent() {
           </p>
           <ol className="list-decimal list-inside ml-4 space-y-1">
             <li>Navigate to the InnoPoll page</li>
-            <li>Click "Create Quiz" or "New Quiz"</li>
+            <li>Click &quot;Create Quiz&quot; or &quot;New Quiz&quot;</li>
             <li>Enter quiz details:
               <ul className="list-disc list-inside ml-6 mt-1">
                 <li>Quiz title</li>
@@ -691,7 +690,7 @@ function InnoPollContent() {
                 <li>Points value</li>
               </ul>
             </li>
-            <li>Click "Create Quiz" to save</li>
+            <li>Click &quot;Create Quiz&quot; to save</li>
           </ol>
         </Section>
 
@@ -709,7 +708,7 @@ function InnoPollContent() {
             <li>Find your quiz in the list</li>
             <li>Click the edit icon or button</li>
             <li>Modify quiz settings, questions, or answers</li>
-            <li>Click "Save Changes"</li>
+            <li>Click &quot;Save Changes&quot;</li>
           </ol>
           <p className="mt-2">
             Note: If participants have already completed the quiz, editing questions may affect the accuracy of existing results.
@@ -806,7 +805,7 @@ function FriendsContent() {
         <Section title="Accessing the Friends Page">
           <p>
             The Friends page is located in the user dropdown menu at the top right of the screen. Click on your profile 
-            picture or name, then select "Friends" from the menu.
+            picture or name, then select &quot;Friends&quot; from the menu.
           </p>
         </Section>
 
@@ -839,9 +838,9 @@ function FriendsContent() {
           </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li>Finding contact information for colleagues</li>
-            <li>Checking team members' birthdays</li>
+            <li>Checking team members&apos; birthdays</li>
             <li>Learning more about new team members</li>
-            <li>Finding colleagues' social media profiles for professional networking</li>
+            <li>Finding colleagues&apos; social media profiles for professional networking</li>
             <li>Understanding team structure and roles</li>
           </ul>
         </Section>
@@ -870,12 +869,7 @@ function FAQContent() {
         </p>
       </div>
 
-      <div className="space-y-4">
-        <FAQ 
-          question="How do I reset my password?"
-          answer="Navigate to Settings → Security and click 'Change Password'. You'll receive an email with instructions to reset your password."
-        />
-        
+      <div className="space-y-4">        
         <FAQ 
           question="Can I use multiple Gmail accounts?"
           answer="It is preferred to use only one Gmail account to sign in to the UXC System. This ensures consistency and simplifies your experience across all features."

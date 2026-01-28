@@ -65,7 +65,6 @@ export default function ExportModal({ isOpen, onClose, onExport, allData }: Expo
   const uniqueStatuses = Array.from(new Set(allData.map(v => v.conversion_status).filter(Boolean)));
   const uniqueSessionTypes = Array.from(new Set(allData.map(v => v.session_type).filter(Boolean)));
   const uniqueSectors = Array.from(new Set(allData.map(v => v.sector).filter(Boolean)));
-  const uniqueIndustries = Array.from(new Set(allData.map(v => v.industry).filter(Boolean)));
   const uniqueSizes = Array.from(new Set(allData.map(v => v.size).filter(Boolean)));
 
   const handleYearToggle = (year: number) => {

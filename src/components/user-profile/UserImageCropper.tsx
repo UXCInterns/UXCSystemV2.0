@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from '../ui/button/Button';
 import { Modal } from '../ui/modal';
 
@@ -59,7 +59,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   const [dragStart, setDragStart] = useState<DragStartState>({ x: 0, y: 0, cropX: 0, cropY: 0, cropWidth: 0, cropHeight: 0 });
   const [imageData, setImageData] = useState<ImageDataState | null>(null);
   const [scale, setScale] = useState<number>(1);
-  const [imageOffset, setImageOffset] = useState<MousePosition>({ x: 0, y: 0 });
+  const [imageOffset] = useState<MousePosition>({ x: 0, y: 0 });
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   useEffect(() => {
@@ -70,8 +70,8 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       
       const maxWidth = 600;
       const maxHeight = 450;
-      let width = img.width;
-      let height = img.height;
+      const width = img.width;
+      const height = img.height;
       
       const scaleToFit = Math.min(maxWidth / width, maxHeight / height, 1);
       const displayWidth = width * scaleToFit;
@@ -101,13 +101,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     img.src = image;
   }, [image, aspectRatio, isCircular]);
 
-  useEffect(() => {
-    if (imageData) {
-      drawCanvas();
-    }
-  }, [imageData, crop, scale, imageOffset]);
-
-  const drawCanvas = () => {
+  const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || !imageData) return;
     
@@ -188,7 +182,13 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       ctx.fill();
       ctx.stroke();
     });
-  };
+  }, [imageData, crop, scale, imageOffset, isCircular]);
+
+  useEffect(() => {
+    if (imageData) {
+      drawCanvas();
+    }
+  }, [imageData, drawCanvas]);
 
   const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>): MousePosition => {
     const canvas = canvasRef.current;
@@ -252,14 +252,13 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       const newY = Math.max(0, Math.min(dragStart.cropY + dy, imageData.height - crop.height));
       setCrop(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
-      let newCrop = { ...crop };
+      const newCrop = { ...crop };
       const minSize = 50;
 
       if (isResizing === 'se') {
         newCrop.width = Math.max(minSize, Math.min(dragStart.cropWidth + dx, imageData.width - crop.x));
         newCrop.height = isCircular ? newCrop.width : newCrop.width / aspectRatio;
       } else if (isResizing === 'sw') {
-        const newWidth = Math.max(minSize, dragStart.cropWidth - dx);
         newCrop.x = Math.max(0, dragStart.cropX + dx);
         newCrop.width = dragStart.cropX + dragStart.cropWidth - newCrop.x;
         newCrop.height = isCircular ? newCrop.width : newCrop.width / aspectRatio;
@@ -269,7 +268,6 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         newCrop.y = Math.max(0, dragStart.cropY + dragStart.cropHeight - newHeight);
         newCrop.height = newHeight;
       } else if (isResizing === 'nw') {
-        const newWidth = Math.max(minSize, dragStart.cropWidth - dx);
         newCrop.x = Math.max(0, dragStart.cropX + dx);
         newCrop.width = dragStart.cropX + dragStart.cropWidth - newCrop.x;
         const newHeight = isCircular ? newCrop.width : newCrop.width / aspectRatio;

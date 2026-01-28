@@ -3,12 +3,10 @@
 import UserAddressCard from "@/components/user-profile/UserAddressCard/UserAddressCard";
 import UserInfoCard from "@/components/user-profile/UserInfoCard/UserInfoCard";
 import UserMetaCard from "@/components/user-profile/UserMetaCard/UserMetaCard";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import React, { useState } from "react";
 
 export default function Profile() {
-  const router = useRouter();
   const { user, signOut } = useAuth(); // Call hook at top level
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);

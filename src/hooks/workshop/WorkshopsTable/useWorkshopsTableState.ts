@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useModal } from "@/hooks/useModal";
 import { useWorkshopFilters } from "@/hooks/workshop/useWorkshopFilters";
 import { useWorkshopData } from "@/hooks/workshop/useWorkshopData";
 import { useWorkshopModals } from "@/hooks/workshop/useWorkshopModals";
 import { useWorkshopPagination } from "@/hooks/workshop/useWorkshopPagination";
 import { ITEMS_PER_PAGE } from "@/constants/WorkshopAttendanceConstants/workshopConstants";
-import { WorkshopFilterOptions } from "@/types/WorkshopTypes/workshop";
+import { Workshop, WorkshopFilterOptions } from "@/types/WorkshopTypes/workshop";
 
-export const useWorkshopsTableState = (data: any[], programTypeFilter: "pace" | "non_pace") => {
+export const useWorkshopsTableState = (data: Workshop[], programTypeFilter: "pace" | "non_pace") => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +16,6 @@ export const useWorkshopsTableState = (data: any[], programTypeFilter: "pace" | 
   const {
     tableData,
     isLoading,
-    fetchWorkshops,
     handleCreateWorkshop,
     handleUpdateWorkshop,
     handleDeleteWorkshop
@@ -81,26 +80,26 @@ export const useWorkshopsTableState = (data: any[], programTypeFilter: "pace" | 
       return newFilters;
     });
     setCurrentPage(1);
-  }, [programTypeFilter]);
+  }, [programTypeFilter, setActiveFilters]);
 
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, sortBy, programTypeFilter, activeFilters]);
 
-  const handleApplyFilters = (filters: WorkshopFilterOptions) => {
+  const handleApplyFilters = useCallback((filters: WorkshopFilterOptions) => {
     setActiveFilters(filters);
     setCurrentPage(1);
-  };
+  }, [setActiveFilters]);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     clearFilters();
     setCurrentPage(1);
-  };
+  }, [clearFilters]);
 
-  const handleRemoveFilter = (filterType: string, value?: string) => {
+  const handleRemoveFilter = useCallback((filterType: string, value?: string) => {
     removeFilter(filterType, value);
-  };
+  }, [removeFilter]);
 
   return {
     // State

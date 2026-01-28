@@ -13,6 +13,18 @@ interface TraineeHoursByMonthProps {
   programType?: "pace" | "non_pace";
 }
 
+interface Workshop {
+  program_start_date: string;
+  program_end_date: string;
+  no_of_participants?: number;
+  course_hours?: number;
+}
+
+interface WorkshopData {
+  workshops: Workshop[];
+  comparisonWorkshops: Workshop[];
+}
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonthProps) {
@@ -50,7 +62,7 @@ export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonth
     return p.toString();
   }, [startDate, endDate, currentPeriod.type, programType, isComparisonMode, comparisonPeriod, comparisonRange]);
 
-  const { data, error, isLoading } = useSWR(`/api/workshops-dashboard?${params}`, fetcher, {
+  const { data, error, isLoading } = useSWR<WorkshopData>(`/api/workshops-dashboard?${params}`, fetcher, {
     refreshInterval: 30000,
   });
 
@@ -62,8 +74,6 @@ export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonth
     comparisonTotalTraineeHours,
     averageMonthlyHours,
     comparisonAverageMonthlyHours,
-    peakMonth,
-    comparisonPeakMonth
   } = useMemo(() => {
     const workshops = data?.workshops || [];
     const comparisonWorkshops = data?.comparisonWorkshops || [];
@@ -77,13 +87,11 @@ export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonth
         comparisonTotalTraineeHours: 0,
         averageMonthlyHours: 0,
         comparisonAverageMonthlyHours: 0,
-        peakMonth: '',
-        comparisonPeakMonth: ''
       };
     }
 
     // Helper function to process workshops into monthly trainee hours
-    const processMonthlyData = (workshopList: any[]) => {
+    const processMonthlyData = (workshopList: Workshop[]) => {
       const monthlyData: { [key: string]: number } = {};
       
       workshopList.forEach(workshop => {
@@ -176,9 +184,6 @@ export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonth
     const primaryNonZeroValues = primaryValues.filter(v => v > 0);
     const comparisonNonZeroValues = comparisonValues.filter(v => v > 0);
 
-    const primaryPeakIndex = primaryValues.indexOf(Math.max(...primaryValues));
-    const comparisonPeakIndex = comparisonValues.indexOf(Math.max(...comparisonValues));
-
     return {
       primarySeries: primaryValues,
       comparisonSeries: comparisonValues,
@@ -191,8 +196,6 @@ export default function TraineeHoursByMonth({ programType }: TraineeHoursByMonth
       comparisonAverageMonthlyHours: comparisonNonZeroValues.length > 0 
         ? Math.round(comparison.total / comparisonNonZeroValues.length) 
         : 0,
-      peakMonth: finalCategories[primaryPeakIndex] || '',
-      comparisonPeakMonth: finalCategories[comparisonPeakIndex] || ''
     };
   }, [data, isComparisonMode]);
 

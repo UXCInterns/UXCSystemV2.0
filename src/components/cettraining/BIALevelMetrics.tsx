@@ -10,10 +10,20 @@ interface BIALevelMetricsProps {
   programType?: "pace" | "non_pace";
 }
 
+interface BIALevel {
+  level: string;
+  count: number;
+}
+
+interface DashboardData {
+  biaLevels: BIALevel[];
+  comparisonBIALevels: BIALevel[];
+}
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType }) => {
-  const [hoveredValue, setHoveredValue] = useState<number | null>(null);
+  const [, setHoveredValue] = useState<number | null>(null);
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
   
   const { 
@@ -21,7 +31,6 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
     currentPeriod, 
     comparisonPeriod,
     isComparisonMode,
-    getPeriodLabel 
   } = usePeriod();
 
   const { startDate, endDate } = getPeriodRange();
@@ -47,7 +56,7 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
     return p.toString();
   }, [startDate, endDate, currentPeriod.type, programType, isComparisonMode, comparisonPeriod, comparisonRange]);
 
-  const { data, error, isLoading } = useSWR(`/api/workshops-dashboard?${params}`, fetcher, {
+  const { data, error, isLoading } = useSWR<DashboardData>(`/api/workshops-dashboard?${params}`, fetcher, {
     refreshInterval: 30000,
   });
 
@@ -55,59 +64,59 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
   const comparisonBiaLevels = data?.comparisonBIALevels || [];
   
   const totalWorkshops = useMemo(() => 
-    biaLevels.reduce((sum: number, level: any) => sum + level.count, 0),
+    biaLevels.reduce((sum: number, level: BIALevel) => sum + level.count, 0),
     [biaLevels]
   );
 
   const totalComparisonWorkshops = useMemo(() => 
-    comparisonBiaLevels.reduce((sum: number, level: any) => sum + level.count, 0),
+    comparisonBiaLevels.reduce((sum: number, level: BIALevel) => sum + level.count, 0),
     [comparisonBiaLevels]
   );
 
   // Color mapping for BIA levels
-  const colorMap: { [key: string]: string } = {
+  const colorMap: { [key: string]: string } = useMemo(() => ({
     'Basic': '#3b82f6',
     'Intermediate': '#2563eb',
     'Advanced': '#1e40af',
     'Uncategorized': '#93c5fd'
-  };
+  }), []);
 
-  const comparisonColorMap: { [key: string]: string } = {
+  const comparisonColorMap: { [key: string]: string } = useMemo(() => ({
     'Basic': '#fca5a5',
     'Intermediate': '#f87171',
     'Advanced': '#ef4444',
     'Uncategorized': '#fecaca'
-  };
+  }), []);
 
   // Prepare chart data for comparison mode
   const chartLabels = useMemo(() => {
     if (isComparisonMode) {
-      return biaLevels.flatMap((level: any) => [
+      return biaLevels.flatMap((level: BIALevel) => [
         `${level.level}`,
         `${level.level}`
       ]);
     }
-    return biaLevels.map((level: any) => level.level);
+    return biaLevels.map((level: BIALevel) => level.level);
   }, [biaLevels, isComparisonMode]);
 
   const chartColors = useMemo(() => {
     if (isComparisonMode) {
-      return biaLevels.flatMap((level: any) => [
+      return biaLevels.flatMap((level: BIALevel) => [
         colorMap[level.level] || '#93c5fd',
         comparisonColorMap[level.level] || '#fecaca'
       ]);
     }
-    return biaLevels.map((level: any) => colorMap[level.level] || '#93c5fd');
-  }, [biaLevels, isComparisonMode]);
+    return biaLevels.map((level: BIALevel) => colorMap[level.level] || '#93c5fd');
+  }, [biaLevels, isComparisonMode, colorMap, comparisonColorMap]);
 
   const chartSeries = useMemo(() => {
     if (isComparisonMode) {
-      return biaLevels.flatMap((level: any) => {
-        const compLevel = comparisonBiaLevels.find((cl: any) => cl.level === level.level);
+      return biaLevels.flatMap((level: BIALevel) => {
+        const compLevel = comparisonBiaLevels.find((cl: BIALevel) => cl.level === level.level);
         return [level.count, compLevel?.count || 0];
       });
     }
-    return biaLevels.map((level: any) => level.count);
+    return biaLevels.map((level: BIALevel) => level.count);
   }, [biaLevels, comparisonBiaLevels, isComparisonMode]);
 
   const chartOptions: ApexCharts.ApexOptions = {
@@ -115,7 +124,7 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
       type: "donut",
       background: "transparent",
       events: {
-        dataPointMouseEnter: function (event, chartContext, config) {
+        dataPointMouseEnter: function (config) {
           setHoveredValue(chartSeries[config.dataPointIndex]);
           setHoveredLabel(chartLabels[config.dataPointIndex]);
         },
@@ -236,13 +245,13 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 xl:flex xl:flex-col gap-4 w-full xl:w-auto max-h-[220px] xl:overflow-y-auto custom-scrollbar">
-              {biaLevels.map((level: any, index: number) => {
+              {biaLevels.map((level: BIALevel, index: number) => {
                 const percentage = totalWorkshops > 0 
                   ? Math.round((level.count / totalWorkshops) * 100) 
                   : 0;
                 
                 const comparisonLevel = comparisonBiaLevels.find(
-                  (cl: any) => cl.level === level.level
+                  (cl: BIALevel) => cl.level === level.level
                 );
                 const comparisonCount = comparisonLevel?.count || 0;
                 const comparisonPercentage = totalComparisonWorkshops > 0

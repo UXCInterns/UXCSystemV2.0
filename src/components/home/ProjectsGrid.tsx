@@ -1,32 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Badge from "../ui/badge/Badge";
 import { useUser } from "@/hooks/useUser";
 import {
   AlertCircleIcon,
-  CalendarIcon,
   CheckCircle2Icon,
   ClockIcon,
   FolderKanbanIcon,
   PauseCircleIcon,
   TrendingUpIcon,
-  UsersIcon,
   XCircleIcon,
 } from "lucide-react";
 import Toggle from "../ui/toggle/Toggle";
+import Image from "next/image";
 
 // Toggle Component
 interface ToggleOption {
   value: string;
   label: string;
-}
-
-interface ToggleProps<T extends string> {
-  options: ToggleOption[];
-  selectedValue: T;
-  onChange: (value: T) => void;
-  className?: string;
 }
 
 interface TeamMember {
@@ -58,11 +50,11 @@ export const ProjectsGrid = () => {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<FilterType>("all");
   
-  const PROJECT_STATUS_ORDER: Record<string, number> = {
+  const PROJECT_STATUS_ORDER: Record<string, number> = useMemo(() => ({
     'Not Started': 1,
     'In Progress': 2,
     'On Hold': 3,
-  };
+  }), []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -100,7 +92,7 @@ export const ProjectsGrid = () => {
     if (userId) {
       fetchProjects();
     }
-  }, [userId]);
+  }, [userId, PROJECT_STATUS_ORDER]);
 
   const getUserRole = (project: Project): string[] => {
     const roles: string[] = [];
@@ -465,10 +457,12 @@ export const ProjectsGrid = () => {
                       <div className="flex items-center gap-1 sm:gap-1.5">
                         <div className="flex -space-x-1.5 sm:-space-x-2">
                           {uniqueTeamMembers.slice(0, 3).map((member) => (
-                            <img
+                            <Image
                               key={member.id}
                               src={member.avatar_url || '/images/user/default-avatar.jpg'}
                               alt={member.name}
+                              width={28}
+                              height={28}
                               className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-white dark:border-gray-900 object-cover hover:z-10 transition-transform hover:scale-110 cursor-pointer"
                               title={member.name}
                             />
