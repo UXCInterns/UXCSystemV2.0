@@ -72,7 +72,7 @@ export interface VisitFormData {
 export interface NewVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (visitData: any) => void;
+  onSubmit: (visitData: VisitFormData) => void;
 }
 
 export type FormErrors = Record<string, string>;
@@ -108,6 +108,6 @@ export interface FilterState {
 export interface EditVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (visitData: any) => void;
+  onSubmit: (visitData: Partial<Visit>) => void;
   visit?: Visit | null;
 }

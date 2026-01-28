@@ -7,7 +7,7 @@ interface Props {
     project_name: string;
     progress: number;
   };
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string | number) => void;
 }
 
 export default function AddProjectBasicInfo({ formData, onUpdate }: Props) {

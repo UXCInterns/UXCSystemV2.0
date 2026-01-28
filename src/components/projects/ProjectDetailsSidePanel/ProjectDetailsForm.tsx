@@ -4,6 +4,7 @@ import ProjectDates from "./ProjectDates";
 import ProjectTeam from "./ProjectTeam";
 import ProjectDescription from "./ProjectDescription";
 import ProjectNotes from "./ProjectNotes";
+import { BadgeColor, BadgeVariant } from "@/components/ui/badge/Badge";
 
 interface Props {
   project: Project;
@@ -14,7 +15,10 @@ interface Props {
   onDropdownToggle: (key: string | null) => void;
   onUpdateManager: (id: string, role: 'manager' | 'lead') => void;
   onOpenTeamModal: (type: 'core' | 'support') => void;
-  getStatusBadgeProps: (status: string) => any;
+  getStatusBadgeProps: (status: string) => {
+    color?: BadgeColor;
+    variant?: BadgeVariant;
+  };
 }
 
 export default function ProjectDetailsForm({ 

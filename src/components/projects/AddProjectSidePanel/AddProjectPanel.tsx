@@ -117,7 +117,7 @@ export default function AddProjectPanel({
     }
   };
 
-  const handleUpdate = (field: string, value: any) => {
+  const handleUpdate = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

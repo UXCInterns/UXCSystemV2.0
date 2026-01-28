@@ -100,11 +100,10 @@ export interface NewWorkshopFormData {
   csc: boolean;
 }
 
-
 export interface EditWorkshopFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (workshopData: any) => void;
+  onSubmit: (workshopData: Partial<Workshop>) => void;
   workshop?: Workshop | null;
 }
 
@@ -118,11 +117,10 @@ export interface WorkshopFilterComponentProps {
   programTypeFilter: "pace" | "non_pace";
 }
 
-
 export interface NewWorkshopFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (workshopData: any) => Promise<void> | void;
+  onSubmit: (workshopData: NewWorkshopFormData) => Promise<void> | void;
 }
 
 export interface WorkshopDetailsModalProps {
@@ -162,15 +160,24 @@ export interface WorkshopTableBodyProps {
   onDeleteClick: (workshop: Workshop) => void;
 }
 
-
 export interface WorkshopsTablePaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
+export interface WorkshopTableState {
+  searchQuery: string;
+  sortBy: string;
+  currentPage: number;
+  totalPages: number;
+  isLoading: boolean;
+  hasActiveFilters: boolean;
+  activeFilterCount: number;
+}
+
 export interface WorkshopsTableContentProps {
-  tableState: any;
+  tableState: WorkshopTableState;
   programTypeFilter: "pace" | "non_pace";
 }
 
@@ -181,18 +188,18 @@ export interface WorkshopModalsProps {
   onApplyFilters: (filters: WorkshopFilterOptions) => void;
   onClearFilters: () => void;
   currentFilters: WorkshopFilterOptions;
-  availableOptions: any;
+  availableOptions: AvailableFilterOptions;
   programTypeFilter: "pace" | "non_pace";
   
   // New workshop modal props
   isNewOpen: boolean;
   onNewClose: () => void;
-  onCreateWorkshop: (data: any) => Promise<{ success: boolean; error?: string }>;
+  onCreateWorkshop: (data: NewWorkshopFormData) => Promise<{ success: boolean; error?: string }>;
   
   // Edit workshop modal props
   isEditOpen: boolean;
   onEditClose: () => void;
-  onUpdateWorkshop: (data: any) => Promise<{ success: boolean; error?: string }>;
+  onUpdateWorkshop: (data: Partial<Workshop>) => Promise<{ success: boolean; error?: string }>;
   selectedWorkshopForEdit: Workshop | null;
   
   // Details modal props

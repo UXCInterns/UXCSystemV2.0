@@ -1,15 +1,21 @@
 import Label from "@/components/form/Label";
 import Avatar from "@/components/ui/avatar/Avatar";
 
+interface TeamMember {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+}
+
 interface Props {
   label: string;
-  members: any[];
+  members: (TeamMember | string)[];
   isEditing: boolean;
   type: 'core' | 'support';
   onOpenTeamModal: (type: 'core' | 'support') => void;
 }
 
-const renderTeamMember = (member: any, idx: number, type: 'core' | 'support') => {
+const renderTeamMember = (member: TeamMember | string, idx: number, type: 'core' | 'support') => {
   const memberName = typeof member === 'string' ? member : member.name;
   const memberAvatar = typeof member === 'string' ? null : member.avatar_url;
   const memberId = typeof member === 'string' ? `${type}-${idx}` : member.id;

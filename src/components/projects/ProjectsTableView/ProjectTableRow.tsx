@@ -1,4 +1,4 @@
-import Badge from "@/components/ui/badge/Badge";
+import Badge, { BadgeColor, BadgeVariant } from "@/components/ui/badge/Badge";
 import Avatar from "@/components/ui/avatar/Avatar";
 import { Project } from "@/types/ProjectsTypes/project";
 
@@ -6,7 +6,10 @@ interface Props {
   project: Project;
   onClick: () => void;
   showDates: boolean;
-  getStatusBadgeProps: (status: string) => any;
+  getStatusBadgeProps: (status: string) => {
+    color?: BadgeColor;
+    variant?: BadgeVariant;
+  };
 }
 
 export default function ProjectTableRow({ project, onClick, showDates, getStatusBadgeProps }: Props) {

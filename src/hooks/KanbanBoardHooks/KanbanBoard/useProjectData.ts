@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import type { Profile } from '@/types/ProjectsTypes/project';
+import type { Profile, Project, TeamMember } from '@/types/ProjectsTypes/project';
+
+// Type for the API response
+type ProjectsApiResponse = {
+  projects: Project[];
+  error?: string;
+};
 
 export function useProjectData(projectId: string) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -10,13 +16,13 @@ export function useProjectData(projectId: string) {
     const fetchProfiles = async () => {
       try {
         const response = await fetch('/api/projects');
-        const data = await response.json();
+        const data: ProjectsApiResponse = await response.json();
 
         if (!response.ok) {
           throw new Error(data.error || 'Failed to fetch projects');
         }
 
-        const foundProject = data.projects.find((p: any) => p.id === projectId);
+        const foundProject = data.projects.find((p: Project) => p.id === projectId);
         
         if (!foundProject) {
           console.error('Project not found');
@@ -29,13 +35,13 @@ export function useProjectData(projectId: string) {
         const teamProfiles: Profile[] = [];
         const addedIds = new Set<string>();
 
-        const addProfile = (member: any) => {
+        const addProfile = (member: TeamMember) => {
           if (member && member.id && !addedIds.has(member.id)) {
             teamProfiles.push({
               id: member.id,
               full_name: member.name,
               email: member.email,
-              avatar_url: member.avatar_url || undefined,
+              avatar_url: member.avatar_url || null,
             });
             addedIds.add(member.id);
           }
@@ -50,11 +56,19 @@ export function useProjectData(projectId: string) {
         }
 
         if (Array.isArray(foundProject.core_team)) {
-          foundProject.core_team.forEach(addProfile);
+          foundProject.core_team.forEach((member) => {
+            if (typeof member !== 'string') {
+              addProfile(member);
+            }
+          });
         }
 
         if (Array.isArray(foundProject.support_team)) {
-          foundProject.support_team.forEach(addProfile);
+          foundProject.support_team.forEach((member) => {
+            if (typeof member !== 'string') {
+              addProfile(member);
+            }
+          });
         }
 
         setProfiles(teamProfiles);

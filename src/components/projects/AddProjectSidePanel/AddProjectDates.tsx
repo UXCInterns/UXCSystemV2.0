@@ -13,7 +13,7 @@ interface Props {
     start_date: string;
     end_date: string;
   };
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string | number) => void;
 }
 
 export default function AddProjectDates({ onUpdate }: Props) {

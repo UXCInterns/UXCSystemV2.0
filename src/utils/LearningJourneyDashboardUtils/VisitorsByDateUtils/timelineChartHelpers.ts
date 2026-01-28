@@ -1,10 +1,15 @@
 interface PeriodConfig {
-  type: string;
+  type: 'calendar' | 'financial' | 'quarterly' | 'custom';
+  startDate?: string;
+  endDate?: string;
+  year?: number;
+  quarter?: number;
+  [key: string]: unknown; // Allow additional properties
 }
 
 export const getChartTitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig | null,
   getPeriodLabel: () => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
@@ -18,9 +23,9 @@ export const getChartSubtitle = (
   primarySeries: number[],
   comparisonSeries: number[],
   isComparisonMode: boolean,
-  comparisonPeriod: any,
+  comparisonPeriod: PeriodConfig | null,
   currentPeriod: PeriodConfig,
-  getPeriodLabel: (period?: any) => string
+  getPeriodLabel: (period?: PeriodConfig) => string
 ): string => {
   if (categories.length === 0) return "No visits recorded for this period";
 

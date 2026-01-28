@@ -1,6 +1,6 @@
 // hooks/useWorkshopPagination.ts
 import { useMemo } from 'react';
-import { Workshop } from '@/types/WorkshopTypes/workshop';
+import { Workshop, WorkshopFilterOptions } from '@/types/WorkshopTypes/workshop';
 
 export const useWorkshopPagination = (
   tableData: Workshop[],
@@ -8,9 +8,9 @@ export const useWorkshopPagination = (
   sortBy: string,
   currentPage: number,
   programTypeFilter: "pace" | "non_pace",
-  activeFilters: any,
+  activeFilters: WorkshopFilterOptions,
   itemsPerPage: number,
-  applyFilters: (data: Workshop[], filters: any) => Workshop[]
+  applyFilters: (data: Workshop[], filters: WorkshopFilterOptions) => Workshop[]
 ) => {
   return useMemo(() => {
     // First filter by program type

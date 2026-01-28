@@ -3,15 +3,14 @@ import FilterComponent from "../FilterComponent/FilterComponent";
 import VisitDetailsModal from "../ViewDetailsModal/ViewDetailsModal";
 import NewVisitForm from "../NewVisitModal/NewVisitModal";
 import EditVisitForm from "../EditVisitModal/EditVisitModal";
-import { Visit } from '@/types/LearningJourneyAttendanceTypes/visit';
-import { FilterState } from '@/types/LearningJourneyAttendanceTypes/visit';
+import { Visit, FilterState, VisitFormData } from '@/types/LearningJourneyAttendanceTypes/visit';
 
 interface ModalsContainerProps {
   // Filter Modal
   isFilterOpen: boolean;
   onFilterClose: () => void;
   currentFilters: FilterState;
-  onApplyFilters: (filters: any) => void;
+  onApplyFilters: (filters: FilterState) => void;
   onClearFilters: () => void;
   
   // View Modal
@@ -21,12 +20,12 @@ interface ModalsContainerProps {
   // Add Modal
   isAddVisitOpen: boolean;
   onAddClose: () => void;
-  onAddSubmit: (visitData: any) => void;
+  onAddSubmit: (visitData: VisitFormData) => void;
   
   // Edit Modal
   editVisit: Visit | null;
   onEditClose: () => void;
-  onEditSubmit: (visitData: any) => void;
+  onEditSubmit: (visitData: VisitFormData) => void;
 }
 
 const ModalsContainer: React.FC<ModalsContainerProps> = ({

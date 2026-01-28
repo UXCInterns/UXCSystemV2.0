@@ -1,21 +1,12 @@
 // hooks/useWorkshopData.ts
-import { useState, useEffect } from 'react';
-import { Workshop } from '@/types/WorkshopTypes/workshop';
+import { useState, useEffect, useCallback } from 'react';
+import { Workshop, NewWorkshopFormData } from '@/types/WorkshopTypes/workshop';
 
 export const useWorkshopData = (initialData: Workshop[]) => {
   const [tableData, setTableData] = useState<Workshop[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize data
-  useEffect(() => {
-    if (initialData.length === 0) {
-      fetchWorkshops();
-    } else {
-      setTableData(initialData);
-    }
-  }, [initialData]);
-
-  const fetchWorkshops = async () => {
+  const fetchWorkshops = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/workshops');
@@ -30,9 +21,18 @@ export const useWorkshopData = (initialData: Workshop[]) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleCreateWorkshop = async (workshopData: any) => {
+  // Initialize data
+  useEffect(() => {
+    if (initialData.length === 0) {
+      fetchWorkshops();
+    } else {
+      setTableData(initialData);
+    }
+  }, [initialData, fetchWorkshops]);
+
+  const handleCreateWorkshop = async (workshopData: NewWorkshopFormData) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/workshops', {
@@ -60,7 +60,7 @@ export const useWorkshopData = (initialData: Workshop[]) => {
     }
   };
 
-  const handleUpdateWorkshop = async (workshopData: any) => {
+  const handleUpdateWorkshop = async (workshopData: Partial<Workshop>) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/workshops', {

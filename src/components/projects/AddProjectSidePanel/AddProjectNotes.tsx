@@ -2,7 +2,7 @@ import TextArea from "@/components/form/input/TextArea";
 
 interface Props {
   value: string;
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string | number) => void;
 }
 
 export default function AddProjectNotes({ value, onUpdate }: Props) {

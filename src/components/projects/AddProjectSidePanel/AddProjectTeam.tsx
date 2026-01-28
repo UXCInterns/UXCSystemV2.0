@@ -11,7 +11,7 @@ interface Props {
   showDropdown: string | null;
   coreTeamMembers: string[];
   supportTeamMembers: string[];
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string | number) => void;
   onDropdownToggle: (key: string | null) => void;
   onOpenTeamModal: (type: 'core' | 'support') => void;
 }

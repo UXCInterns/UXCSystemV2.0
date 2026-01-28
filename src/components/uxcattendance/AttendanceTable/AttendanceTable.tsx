@@ -17,11 +17,12 @@ import TableHeaderRow from './TableHeaderRow';
 import VisitsTableBody from './VisitsTableBody';
 import ModalsContainer from './ModalsContainer';
 import VisitMobileCard from './VisitMobileCard';
+import type { Visit, FilterOptions } from '@/types/LearningJourneyAttendanceTypes/visit';
 
 export interface UXCAttendanceTableRef {
-  getFilteredData: () => any[];
-  getAllData: () => any[];
-  getActiveFilters: () => any;
+  getFilteredData: () => Visit[];
+  getAllData: () => Visit[];
+  getActiveFilters: () => FilterOptions;
   getSearchQuery: () => string;
 }
 

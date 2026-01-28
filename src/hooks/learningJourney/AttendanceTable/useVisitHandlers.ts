@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
+import type { Visit, VisitFormData } from '@/types/LearningJourneyAttendanceTypes/visit';
 
 interface VisitHandlersProps {
-  addVisit: (visitData: any) => Promise<{ success: boolean; error?: unknown }>;
-  updateVisit: (visitData: any) => Promise<{ success: boolean; error?: unknown }>;
+  addVisit: (visitData: VisitFormData) => Promise<{ success: boolean; error?: unknown }>;
+  updateVisit: (visitData: Partial<Visit>) => Promise<{ success: boolean; error?: unknown }>;
   deleteVisit: (visitId: string) => Promise<{ success: boolean; error?: unknown; cancelled?: boolean }>;
   onAddSuccess: () => void;
   onEditSuccess: () => void;
@@ -16,7 +17,7 @@ export const useVisitHandlers = ({
   onEditSuccess,
 }: VisitHandlersProps) => {
   
-  const handleAddVisit = useCallback(async (visitData: any) => {
+  const handleAddVisit = useCallback(async (visitData: VisitFormData) => {
     const result = await addVisit(visitData);
     if (result.success) {
       onAddSuccess();
@@ -29,7 +30,7 @@ export const useVisitHandlers = ({
     }
   }, [addVisit, onAddSuccess]);
 
-  const handleEditVisit = useCallback(async (visitData: any) => {
+  const handleEditVisit = useCallback(async (visitData: Partial<Visit>) => {
     const result = await updateVisit(visitData);
     if (result.success) {
       onEditSuccess();

@@ -108,13 +108,15 @@ export const useVisitForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const processFormDataForSubmission = (data: VisitFormData) => {
-    const processedData = { ...data };
+  const processFormDataForSubmission = (data: VisitFormData): Partial<VisitFormData> => {
+    const processedData: Partial<VisitFormData> = { ...data };
     
-    Object.keys(processedData).forEach(key => {
-      const value = processedData[key as keyof VisitFormData];
+    // Convert empty strings to null for optional fields
+    (Object.keys(processedData) as Array<keyof VisitFormData>).forEach(key => {
+      const value = processedData[key];
       if (typeof value === 'string' && value.trim() === '') {
-        (processedData as any)[key] = null;
+        // Type assertion needed here because we're setting to null
+        (processedData as Record<string, unknown>)[key] = null;
       }
     });
     

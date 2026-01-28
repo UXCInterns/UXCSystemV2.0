@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { Project } from "@/types/ProjectsTypes/project";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
+import type { BadgeColor, BadgeVariant } from "@/components/ui/badge/Badge";
 
 interface Props {
   project: Project;
@@ -12,7 +13,10 @@ interface Props {
   showDropdown: string | null;
   onUpdate: (updates: Partial<Project>) => void;
   onDropdownToggle: (key: string | null) => void;
-  getStatusBadgeProps: (status: string) => any;
+  getStatusBadgeProps: (status: string) => {
+    color?: BadgeColor;
+    variant?: BadgeVariant;
+  };
 }
 
 const STATUS_OPTIONS = [

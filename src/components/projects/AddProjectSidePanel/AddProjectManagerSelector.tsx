@@ -11,7 +11,7 @@ interface Props {
   profiles: Profile[];
   showDropdown: boolean;
   fieldName: string;
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: string | number) => void;
   onDropdownToggle: () => void;
   onClose: () => void;
 }

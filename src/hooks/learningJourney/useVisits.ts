@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
-import { Visit } from '../../types/LearningJourneyAttendanceTypes/visit';
+import { Visit, VisitFormData } from '../../types/LearningJourneyAttendanceTypes/visit';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -13,10 +13,35 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
+// Type for raw visit data from API before transformation
+type RawVisitData = {
+  id: string;
+  company_name: string;
+  date_of_visit: string;
+  total_attended: number;
+  total_registered: number;
+  uen_number?: string | null;
+  start_time: string;
+  end_time: string;
+  duration?: string | null;
+  session_type?: string | null;
+  consultancy: boolean;
+  training: boolean;
+  revenue?: number | null;
+  sector?: string | null;
+  size?: string | null;
+  industry?: string | null;
+  notes?: string | null;
+  pace: boolean;
+  informal: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 export const useVisits = () => {
   const [isLoading, setIsLoading] = useState(false);
   
-  const { data: rawData, error, isLoading: swrLoading } = useSWR('/api/learning-journeys', fetcher, {
+  const { data: rawData, error, isLoading: swrLoading } = useSWR<RawVisitData[]>('/api/learning-journeys', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     dedupingInterval: 60000,
@@ -30,7 +55,7 @@ export const useVisits = () => {
     return "No Conversion";
   };
 
-  const mapVisitData = (row: any): Visit => ({
+  const mapVisitData = (row: RawVisitData): Visit => ({
     id: row.id,
     company_name: row.company_name,
     date_of_visit: row.date_of_visit,
@@ -58,7 +83,7 @@ export const useVisits = () => {
   const visits = rawData ? rawData.map(mapVisitData) : [];
 
   // CRUD operations
-  const addVisit = async (visitData: any) => {
+  const addVisit = async (visitData: VisitFormData) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/learning-journeys", {
@@ -82,7 +107,7 @@ export const useVisits = () => {
     }
   };
 
-  const updateVisit = async (visitData: any) => {
+  const updateVisit = async (visitData: Partial<Visit>) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/learning-journeys", {

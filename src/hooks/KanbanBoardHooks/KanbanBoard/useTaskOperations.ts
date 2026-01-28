@@ -1,5 +1,6 @@
 import { supabase } from '@/../../lib/supabase/supabaseClient';
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 
 interface UseTaskOperationsProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
@@ -165,8 +166,12 @@ const handleDeleteTask = async (taskId: string): Promise<boolean> => {
   }
 };
 
-  const handleDragStart = (event: any, dragStartColumnRef: React.MutableRefObject<{ [key: string]: string }>, tasks: Task[]) => {
-    const taskId = event.active.id;
+  const handleDragStart = (
+    event: DragStartEvent, 
+    dragStartColumnRef: React.MutableRefObject<{ [key: string]: string }>, 
+    tasks: Task[]
+  ) => {
+    const taskId = event.active.id as string;
     const task = tasks.find(t => t.id === taskId);
     if (task) {
       dragStartColumnRef.current[taskId] = task.column;
@@ -174,11 +179,11 @@ const handleDeleteTask = async (taskId: string): Promise<boolean> => {
   };
 
   const handleDragEnd = async (
-    event: any, 
+    event: DragEndEvent, 
     dragStartColumnRef: React.MutableRefObject<{ [key: string]: string }>,
     tasks: Task[]
   ) => {
-    const taskId = event.active.id;
+    const taskId = event.active.id as string;
     const task = tasks.find(t => t.id === taskId);
     
     if (task && dragStartColumnRef.current[taskId]) {

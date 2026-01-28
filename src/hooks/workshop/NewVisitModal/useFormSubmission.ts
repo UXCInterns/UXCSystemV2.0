@@ -1,5 +1,15 @@
 import { useState } from "react";
 
+// Type for API error responses
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+};
+
 export const useFormSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -12,10 +22,21 @@ export const useFormSubmission = () => {
     setShowNotification(true);
   };
 
-  const handleError = (error: any) => {
-    const errorMsg = error?.response?.data?.message || 
-                    error?.message || 
-                    "An unexpected error occurred. Please try again.";
+  const handleError = (error: unknown) => {
+    let errorMsg = "An unexpected error occurred. Please try again.";
+    
+    // Type guard to check if error matches ApiError structure
+    if (error && typeof error === 'object') {
+      const apiError = error as ApiError;
+      errorMsg = apiError?.response?.data?.message || 
+                 apiError?.message || 
+                 errorMsg;
+    } else if (error instanceof Error) {
+      errorMsg = error.message;
+    } else if (typeof error === 'string') {
+      errorMsg = error;
+    }
+    
     setErrorMessage(errorMsg);
     setShowErrorModal(true);
   };

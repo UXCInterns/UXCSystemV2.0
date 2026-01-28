@@ -1,6 +1,7 @@
 import { X, Edit2, Trash2, Check } from "lucide-react";
 import { Project, Profile } from "@/types/ProjectsTypes/project";
 import ProjectDetailsForm from "./ProjectDetailsForm";
+import { BadgeColor, BadgeVariant } from "@/components/ui/badge/Badge";
 
 interface Props {
   project: Project;
@@ -16,7 +17,10 @@ interface Props {
   onDropdownToggle: (key: string | null) => void;
   onUpdateManager: (id: string, role: 'manager' | 'lead') => void;
   onOpenTeamModal: (type: 'core' | 'support') => void;
-  getStatusBadgeProps: (status: string) => any;
+  getStatusBadgeProps: (status: string) => {
+    color?: BadgeColor;
+    variant?: BadgeVariant;
+  };
 }
 
 export default function ProjectSidePanel({

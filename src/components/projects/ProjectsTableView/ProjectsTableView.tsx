@@ -6,7 +6,7 @@ import Button from "@/components/ui/button/Button";
 import { PlusIcon } from "@/icons";
 import SearchQuery from "@/components/common/SearchQuery";
 import { Table, TableHeader, TableBody, TableRow, TableCell } from "@/components/ui/table/index";
-import Badge from "@/components/ui/badge/Badge";
+import Badge, { BadgeColor, BadgeVariant } from "@/components/ui/badge/Badge";
 import Avatar from "@/components/ui/avatar/Avatar";
 
 interface Props {
@@ -22,7 +22,10 @@ interface Props {
   onPageChange: (page: number) => void;
   onNewProject: () => void;
   onSelectProject: (project: Project) => void;
-  getStatusBadgeProps: (status: string) => any;
+  getStatusBadgeProps: (status: string) => {
+    color?: BadgeColor;
+    variant?: BadgeVariant;
+  };
 }
 
 export default function ProjectsTableView({
@@ -186,7 +189,7 @@ export default function ProjectsTableView({
                         <h3 className="text-base font-semibold text-gray-900 dark:text-white flex-1 pr-2 line-clamp-2">
                           {project.project_name}
                         </h3>
-                        <Badge size="sm" {...getStatusBadgeProps(project.status)} className="shrink-0 ml-2">
+                        <Badge size="sm" {...getStatusBadgeProps(project.status)}>
                           {project.status}
                         </Badge>
                       </div>
