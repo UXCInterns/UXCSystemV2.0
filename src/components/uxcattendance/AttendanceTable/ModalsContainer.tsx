@@ -20,12 +20,12 @@ interface ModalsContainerProps {
   // Add Modal
   isAddVisitOpen: boolean;
   onAddClose: () => void;
-  onAddSubmit: (visitData: VisitFormData) => void;
+  onAddSubmit: (visitData: Partial<VisitFormData>) => void; // ✅ Changed to Partial
   
   // Edit Modal
   editVisit: Visit | null;
   onEditClose: () => void;
-  onEditSubmit: (visitData: VisitFormData) => void;
+  onEditSubmit: (visitData: Partial<Visit>) => void; // ✅ This should also be Partial<Visit> to match EditVisitFormProps
 }
 
 const ModalsContainer: React.FC<ModalsContainerProps> = ({
