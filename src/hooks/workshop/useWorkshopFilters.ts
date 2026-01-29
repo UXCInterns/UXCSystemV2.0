@@ -30,7 +30,7 @@ export interface WorkshopFilterOptions {
   cscOnly: boolean; // for non-PACE workshops
 }
 
-export const useWorkshopFilters = (_workshops: Workshop[]) => {
+export const useWorkshopFilters = () => {
   const [activeFilters, setActiveFilters] = useState<WorkshopFilterOptions>({
     programTypes: [],
     schoolDepts: [],

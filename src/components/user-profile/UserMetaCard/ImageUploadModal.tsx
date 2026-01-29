@@ -24,8 +24,8 @@ const compressImage = async (file: File, maxSizeBytes: number): Promise<File> =>
         }
         
         // Start with original dimensions
-        let width = img.width;
-        let height = img.height;
+        const width = img.width;
+        const height = img.height;
         
         // If image is already small enough, try with original size first
         canvas.width = width;

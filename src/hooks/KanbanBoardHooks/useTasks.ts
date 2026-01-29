@@ -30,7 +30,7 @@ export function useTasks(projectId: string) {
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
-
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any 
       const transformedTasks = (data || []).map((task: any) => ({
         ...task,
         id: task.task_id,

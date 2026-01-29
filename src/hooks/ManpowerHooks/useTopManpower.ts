@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { onProjectUpdate } from "@/lib/projectEvents";
 import { ManpowerAllocation } from "@/types/ManpowerTypes/manpower";
 
@@ -6,7 +6,7 @@ export const useTopManpower = (limit: number = 10) => {
   const [manpower, setManpower] = useState<ManpowerAllocation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchManpower = async () => {
+  const fetchManpower = useCallback(async () => {
     try {
       const response = await fetch('/api/manpower');
       if (!response.ok) throw new Error('Failed to fetch manpower data');
@@ -23,13 +23,13 @@ export const useTopManpower = (limit: number = 10) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
 
   useEffect(() => {
     fetchManpower();
     const unsubscribe = onProjectUpdate(fetchManpower);
     return unsubscribe;
-  }, []);
+  }, [fetchManpower]);
 
   return { manpower, loading };
 };

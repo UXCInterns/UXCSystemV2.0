@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { UserInfoProfile } from "@/types/UserProfileTypes/UserInfo";
 
 export function useUserInfoProfile(userId: string | null) {
@@ -19,13 +19,9 @@ export function useUserInfoProfile(userId: string | null) {
     phone: ""
   });
 
-  useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
+    if (!userId) return;
+    
     setLoading(true);
     try {
       const response = await fetch(`/api/profiles?id=${userId}`);
@@ -40,7 +36,13 @@ export function useUserInfoProfile(userId: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId, fetchProfile]);
 
   const handleInputChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;

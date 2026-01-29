@@ -60,8 +60,11 @@ export const BIALevelMetrics: React.FC<BIALevelMetricsProps> = ({ programType })
     refreshInterval: 30000,
   });
 
-  const biaLevels = data?.biaLevels || [];
-  const comparisonBiaLevels = data?.comparisonBIALevels || [];
+  // Memoize biaLevels to prevent recreating on every render
+  const biaLevels = useMemo(() => data?.biaLevels || [], [data?.biaLevels]);
+  
+  // Memoize comparisonBiaLevels to prevent recreating on every render
+  const comparisonBiaLevels = useMemo(() => data?.comparisonBIALevels || [], [data?.comparisonBIALevels]);
   
   const totalWorkshops = useMemo(() => 
     biaLevels.reduce((sum: number, level: BIALevel) => sum + level.count, 0),

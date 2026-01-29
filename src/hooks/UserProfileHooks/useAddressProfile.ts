@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AddressProfile } from "../../types/UserProfileTypes/Address";
 
 export function useAddressProfile(userId: string | null) {
@@ -17,13 +17,9 @@ export function useAddressProfile(userId: string | null) {
     address: ""
   });
 
-  useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
+    if (!userId) return;
+    
     setLoading(true);
     try {
       const response = await fetch(`/api/profiles?id=${userId}`);
@@ -38,7 +34,13 @@ export function useAddressProfile(userId: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId, fetchProfile]);
 
   const handleInputChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;

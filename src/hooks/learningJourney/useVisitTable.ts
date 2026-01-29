@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Visit } from '../../types/LearningJourneyAttendanceTypes/visit';
 
-export const useVisitTable = (visits: any) => {
+export const useVisitTable = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const [currentPage, setCurrentPage] = useState(1);
