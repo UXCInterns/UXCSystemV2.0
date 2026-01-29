@@ -1,19 +1,8 @@
-type Profile = {
-  id: string;
-  name: string;
-  email: string;
-  avatar_url: string | null;
-};
+// src/utils/KanbanHeaderViewUtils/kanbanHeaderUtils.ts
+import type { Project, TeamMember } from "@/types/ProjectsTypes/project";
 
-type Project = {
-  project_manager: Profile;
-  project_lead: Profile;
-  core_team: Profile[];
-  support_team: Profile[];
-};
-
-export const getAllTeamMembers = (project: Project): Profile[] => {
-  const allTeamMembers: Profile[] = [];
+export const getAllTeamMembers = (project: Project): TeamMember[] => {
+  const allTeamMembers: TeamMember[] = [];
   
   if (project.project_manager?.id) {
     allTeamMembers.push(project.project_manager);

@@ -58,7 +58,7 @@ export function TaskSidePanel({
     setEditedTask(task);
     setSelectedAssignees(task.assignees?.map(a => a.id) || []);
     setShowDropdown(null);
-  }, [task]);
+  }, [task.id]);
 
   const handleEdit = () => {
     if (!canEdit) return;

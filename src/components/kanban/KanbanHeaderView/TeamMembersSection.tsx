@@ -1,15 +1,9 @@
 import React from 'react';
 import Avatar from '@/components/ui/avatar/Avatar';
-
-type Profile = {
-  id: string;
-  name: string;
-  email: string;
-  avatar_url: string | null;
-};
+import type { TeamMember } from '@/types/ProjectsTypes/project';
 
 interface TeamMembersSectionProps {
-  teamMembers: Profile[];
+  teamMembers: TeamMember[];
   maxVisible?: number;
 }
 
@@ -25,7 +19,7 @@ export const TeamMembersSection: React.FC<TeamMembersSectionProps> = ({
           <div className="flex -space-x-2">
             {teamMembers.slice(0, maxVisible).map((member) => (
               <div
-                key={member.id}
+                key={member.id ?? member.email}
                 className="relative group"
                 title={`${member.name} (${member.email})`}
               >

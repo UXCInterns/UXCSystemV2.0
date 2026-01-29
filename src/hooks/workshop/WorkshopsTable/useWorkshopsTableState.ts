@@ -31,7 +31,7 @@ export const useWorkshopsTableState = (data: Workshop[], programTypeFilter: "pac
     activeFilterCount,
     clearFilters,
     removeFilter,
-  } = useWorkshopFilters(tableData);
+  } = useWorkshopFilters();
 
   // Modal management
   const {

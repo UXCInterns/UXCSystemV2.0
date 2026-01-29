@@ -1,7 +1,8 @@
+// useTeamManagement.ts
 import { useState } from "react";
 import { Project, Profile } from "@/types/ProjectsTypes/project";
 import { emitProjectUpdate } from "@/lib/projectEvents";
-import { supabase } from "../../../lib/supabase/supabaseClient"; // ✅ Import supabase
+import { supabase } from "../../../lib/supabase/supabaseClient";
 
 export function useTeamManagement(
   showAddPanel: boolean,
@@ -25,9 +26,11 @@ export function useTeamManagement(
       setSelectedTeamMembers(currentTeam);
       setShowTeamModal({ type, isNewProject: true });
     } else if (editedProject) {
-      // For existing project
+      // For existing project - filter out null IDs
       const currentTeam = type === 'core' ? editedProject.core_team : editedProject.support_team;
-      const currentIds = currentTeam.map(m => typeof m === 'string' ? m : m.id);
+      const currentIds = currentTeam
+        .map(m => typeof m === 'string' ? m : m.id)
+        .filter((id): id is string => id !== null); // ✅ Type guard to filter nulls
       setSelectedTeamMembers(currentIds);
       setShowTeamModal({ type, isNewProject: false });
     }
@@ -56,7 +59,9 @@ export function useTeamManagement(
       // For existing project, make API calls
       const teamType = showTeamModal.type;
       const currentTeam = teamType === 'core' ? editedProject.core_team : editedProject.support_team;
-      const currentIds = currentTeam.map(m => typeof m === 'string' ? m : m.id);
+      const currentIds = currentTeam
+        .map(m => typeof m === 'string' ? m : m.id)
+        .filter((id): id is string => id !== null); // ✅ Type guard to filter nulls
 
       const toAdd = selectedTeamMembers.filter(id => !currentIds.includes(id));
       const toRemove = currentIds.filter(id => !selectedTeamMembers.includes(id));
@@ -72,30 +77,42 @@ export function useTeamManagement(
 
         // Add team members
         for (const profileId of toAdd) {
-          await fetch(`/api/projects/${editedProject.id}/team`, {
+          const response = await fetch(`/api/projects/${editedProject.id}/team`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               profile_id: profileId, 
               team_type: teamType,
-              _current_user_id: user.id // ✅ Add this
+              _current_user_id: user.id
             }),
           });
+
+          if (!response.ok) {
+            throw new Error('Failed to add team member');
+          }
         }
 
         // Remove team members
         for (const profileId of toRemove) {
-          await fetch(`/api/projects/${editedProject.id}/team?profile_id=${profileId}&team_type=${teamType}&_current_user_id=${user.id}`, { // ✅ Add to query string
-            method: 'DELETE',
-          });
+          const response = await fetch(
+            `/api/projects/${editedProject.id}/team?profile_id=${profileId}&team_type=${teamType}&_current_user_id=${user.id}`,
+            { method: 'DELETE' }
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to remove team member');
+          }
         }
 
-        const updatedTeam = profiles.filter(p => selectedTeamMembers.includes(p.id)).map(p => ({
-          id: p.id,
-          name: p.full_name,
-          email: p.email,
-          avatar_url: p.avatar_url
-        }));
+        // ✅ Only update state after successful API calls
+        const updatedTeam = profiles
+          .filter(p => p.id && selectedTeamMembers.includes(p.id))
+          .map(p => ({
+            id: p.id,
+            name: p.full_name,
+            email: p.email,
+            avatar_url: p.avatar_url
+          }));
 
         if (teamType === 'core') {
           setEditedProject({ ...editedProject, core_team: updatedTeam });
@@ -108,12 +125,15 @@ export function useTeamManagement(
       } catch (err) {
         console.error('Error updating team:', err);
         alert('Error updating team members');
+        // ✅ Don't close modal on error, so user can retry or cancel
       }
     }
   };
 
   const closeTeamModal = () => {
     setShowTeamModal({ type: null, isNewProject: false });
+    // ✅ Reset selectedTeamMembers when closing to prevent stale state
+    setSelectedTeamMembers([]);
   };
 
   return {

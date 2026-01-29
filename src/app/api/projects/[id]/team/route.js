@@ -3,6 +3,8 @@ import { supabaseAdmin } from '../../../supabaseAdmin';
 
 export async function POST(request, { params }) {
   try {
+    // ✅ Await params before accessing properties
+    const { id } = await params;
     const body = await request.json();
     const { profile_id, team_type, _current_user_id } = body;
 
@@ -36,9 +38,9 @@ export async function POST(request, { params }) {
       );
     }
 
-    // ✅ Use wrapper RPC function
+    // ✅ Use id instead of params.id
     const { error: rpcError } = await supabaseAdmin.rpc('add_team_member_with_user', {
-      p_project_id: params.id,
+      p_project_id: id,
       p_profile_id: profile_id,
       p_team_type: team_type,
       p_user_id: _current_user_id
@@ -93,6 +95,8 @@ export async function POST(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
+    // ✅ Await params before accessing properties
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const profile_id = searchParams.get('profile_id');
     const team_type = searchParams.get('team_type');
@@ -128,9 +132,9 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // ✅ Use wrapper RPC function
+    // ✅ Use id instead of params.id
     const { error: rpcError } = await supabaseAdmin.rpc('remove_team_member_with_user', {
-      p_project_id: params.id,
+      p_project_id: id,
       p_profile_id: profile_id,
       p_team_type: team_type,
       p_user_id: _current_user_id

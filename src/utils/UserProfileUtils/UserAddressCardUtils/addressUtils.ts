@@ -1,4 +1,4 @@
-import { AddressProfile } from "../../types/UserProfileTypes/Address";
+import { AddressProfile } from "@/types/UserProfileTypes/Address";
 
 export const formatAddressDisplay = (value: string | undefined | null): string => {
   return value || "Not set";
