@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
-import { Visit, VisitFormData } from '../../types/LearningJourneyAttendanceTypes/visit';
+import { Visit, VisitFormData } from '@/types/LearningJourneyAttendanceTypes/visit';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -83,7 +83,7 @@ export const useVisits = () => {
   const visits = rawData ? rawData.map(mapVisitData) : [];
 
   // CRUD operations
-  const addVisit = async (visitData: VisitFormData) => {
+  const addVisit = async (visitData: Partial<VisitFormData>) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/learning-journeys", {
