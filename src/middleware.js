@@ -7,7 +7,7 @@ export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/signin', '/auth/callback'];
+  const publicRoutes = ['/signin', '/auth/callback', '/participant'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
   // Always allow public routes
@@ -74,6 +74,6 @@ export const config = {
      * - public folder files (images, etc.)
      * - api routes
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api|participant|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
