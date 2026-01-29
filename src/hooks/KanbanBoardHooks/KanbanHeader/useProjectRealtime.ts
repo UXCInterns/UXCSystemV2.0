@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/../../lib/supabase/supabaseClient';
+import { supabase } from '../../../../lib/supabase/supabaseClient';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export const useProjectRealtime = (projectId: string) => {

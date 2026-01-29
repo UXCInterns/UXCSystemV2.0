@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { supabase } from '@/../../lib/supabase/supabaseClient';
+import { supabase } from '../../../lib/supabase/supabaseClient';
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
 import { formatDateForStorage } from '@/utils/GanttChartUtils/GanttChartViewUtils/ganttUtils';
 
