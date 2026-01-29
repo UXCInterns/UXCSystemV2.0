@@ -1,11 +1,6 @@
 import Label from "@/components/form/Label";
 import Avatar from "@/components/ui/avatar/Avatar";
-
-interface TeamMember {
-  id: string;
-  name: string;
-  avatar_url: string | null;
-}
+import { TeamMember } from "@/types/ProjectsTypes/project";
 
 interface Props {
   label: string;

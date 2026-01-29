@@ -2,7 +2,7 @@
 
 // Type for team member data
 export type TeamMember = {
-  id: string | null;
+  id: string;
   name: string;
   email: string;
   avatar_url?: string | null;
