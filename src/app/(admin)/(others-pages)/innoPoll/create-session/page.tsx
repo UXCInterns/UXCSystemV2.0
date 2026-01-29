@@ -66,7 +66,7 @@ const [questions, setQuestions] = useState([
             </div>
           }
         >
-          <CreateSessionSidebar />
+          <CreateSessionSidebar questions={questions} setQuestions={setQuestions} />
         </ComponentCard>
 
         <ComponentCard
@@ -88,5 +88,3 @@ const [questions, setQuestions] = useState([
     </div>
   );
 }
-
-
