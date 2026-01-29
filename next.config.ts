@@ -19,6 +19,15 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  // ✅ Add Turbopack config to handle SVGs the same way
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
   async headers() {
     return [
       {
