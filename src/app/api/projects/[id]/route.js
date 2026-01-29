@@ -1,7 +1,8 @@
 // app/api/projects/[id]/route.js
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { supabaseAdmin } from '../../supabaseAdmin';
 
-export async function GET({ params }) {
+export async function GET(request, { params }) {
   try {
     const { id } = await params;
     console.log('🔍 GET: Fetching project with ID:', id);
