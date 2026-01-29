@@ -166,6 +166,7 @@ export interface WorkshopsTablePaginationProps {
   onPageChange: (page: number) => void;
 }
 
+// In your workshop.ts types file
 export interface WorkshopTableState {
   searchQuery: string;
   sortBy: string;
@@ -174,6 +175,20 @@ export interface WorkshopTableState {
   isLoading: boolean;
   hasActiveFilters: boolean;
   activeFilterCount: number;
+  // Add handler functions
+  setSearchQuery: (query: string) => void;
+  setSortBy: (sort: string) => void;
+  setIsFilterOpen: (open: boolean) => void;
+  openModal: () => void;
+  activeFilters: WorkshopFilterOptions;
+  handleRemoveFilter: (filterType: string, value?: string) => void;
+  handleClearFilters: () => void;
+  paginatedData: Workshop[];
+  sortedData: Workshop[];
+  filteredByTypeData: Workshop[];
+  openDetailsModal: (workshop: Workshop) => void;
+  openEditModal: (workshop: Workshop) => void;
+  handleDeleteWorkshop: (workshop: Workshop) => void;
 }
 
 export interface WorkshopsTableContentProps {
