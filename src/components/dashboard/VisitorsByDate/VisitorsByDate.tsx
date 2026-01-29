@@ -36,13 +36,14 @@ export default function VisitorsByDate() {
     isComparisonMode,
   } = useTimelineData();
 
-  const chartTitle = getChartTitle(isComparisonMode, comparisonPeriod, getPeriodLabel);
+  // In VisitorsByDate.tsx
+  const chartTitle = getChartTitle(isComparisonMode, comparisonPeriod ?? null, getPeriodLabel);
   const chartSubtitle = getChartSubtitle(
     categories,
     primarySeries,
     comparisonSeries,
     isComparisonMode,
-    comparisonPeriod,
+    comparisonPeriod ?? null,
     currentPeriod,
     getPeriodLabel
   );

@@ -1,15 +1,8 @@
-interface PeriodConfig {
-  type: 'calendar' | 'financial' | 'quarterly' | 'custom';
-  startDate?: string;
-  endDate?: string;
-  year?: number;
-  quarter?: number;
-  [key: string]: unknown; // Allow additional properties
-}
+import type { Period } from '@/context/PeriodContext';
 
 export const getChartTitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: PeriodConfig | null,
+  comparisonPeriod: Period | null,
   getPeriodLabel: () => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
@@ -23,9 +16,9 @@ export const getChartSubtitle = (
   primarySeries: number[],
   comparisonSeries: number[],
   isComparisonMode: boolean,
-  comparisonPeriod: PeriodConfig | null,
-  currentPeriod: PeriodConfig,
-  getPeriodLabel: (period?: PeriodConfig) => string
+  comparisonPeriod: Period | null,
+  currentPeriod: Period,
+  getPeriodLabel: (period?: Period) => string
 ): string => {
   if (categories.length === 0) return "No visits recorded for this period";
 

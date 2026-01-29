@@ -33,14 +33,14 @@ export default function VisitorsByMonth() {
 
   const chartTitle = getMonthlyChartTitle(
     isComparisonMode,
-    comparisonPeriod,
+    comparisonPeriod ?? null,
     currentPeriod,
     getPeriodLabel
   );
 
   const chartSubtitle = getMonthlyChartSubtitle(
     isComparisonMode,
-    comparisonPeriod,
+    comparisonPeriod ?? null,
     getPeriodLabel
   );
 

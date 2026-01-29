@@ -1,17 +1,10 @@
-interface PeriodConfig {
-  type: 'calendar' | 'financial' | 'quarterly' | 'custom';
-  startDate?: string;
-  endDate?: string;
-  year?: number;
-  quarter?: number;
-  [key: string]: unknown; // Allow additional properties
-}
+import type { Period } from '@/context/PeriodContext';
 
 export const getPeriodComparisonLabel = (
   isComparisonMode: boolean,
-  comparisonPeriod: PeriodConfig | null,
-  currentPeriod: PeriodConfig,
-  getPeriodLabel: (period?: PeriodConfig) => string
+  comparisonPeriod: Period | undefined,
+  currentPeriod: Period,
+  getPeriodLabel: (period?: Period) => string
 ): string => {
   if (!isComparisonMode || !comparisonPeriod) {
     switch (currentPeriod.type) {

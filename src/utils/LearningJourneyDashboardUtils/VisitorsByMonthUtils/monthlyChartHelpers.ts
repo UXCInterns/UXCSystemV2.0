@@ -1,16 +1,9 @@
-interface PeriodConfig {
-  type: 'calendar' | 'financial' | 'quarterly' | 'custom';
-  year: number;
-  quarter?: number;
-  startDate?: string;
-  endDate?: string;
-  [key: string]: unknown; // Allow additional properties
-}
+import type { Period } from '@/context/PeriodContext';
 
 export const getMonthlyChartTitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: PeriodConfig | null,
-  currentPeriod: PeriodConfig,
+  comparisonPeriod: Period | null,
+  currentPeriod: Period,
   getPeriodLabel: () => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
@@ -31,8 +24,8 @@ export const getMonthlyChartTitle = (
 
 export const getMonthlyChartSubtitle = (
   isComparisonMode: boolean,
-  comparisonPeriod: PeriodConfig | null,
-  getPeriodLabel: (period?: PeriodConfig) => string
+  comparisonPeriod: Period | null,
+  getPeriodLabel: (period?: Period) => string
 ): string => {
   if (isComparisonMode && comparisonPeriod) {
     return `${getPeriodLabel()} vs ${getPeriodLabel(comparisonPeriod)}`;
