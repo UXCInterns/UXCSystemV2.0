@@ -1,14 +1,6 @@
 import React from 'react';
 import { ConversionData, ConversionMetrics } from '@/types/LearningJourneyDashboardTypes/conversionsOverview';
-
-type Period = {
-  year?: number;
-  month?: number;
-  quarter?: number;
-  startDate?: string;
-  endDate?: string;
-  [key: string]: unknown;
-};
+import { Period } from '@/context/PeriodContext';
 
 interface ConversionsCardBackProps {
   data: ConversionData;

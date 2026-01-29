@@ -4,15 +4,7 @@ import { ChangeIndicator } from './ChangeIndicator';
 import { StackedProgressBar } from './StackedProgressBar';
 import { TotalConversionsBar } from './TotalConversionsBar';
 import { ConversionMetrics, DataBar } from '@/types/LearningJourneyDashboardTypes/conversionsOverview';
-
-type Period = {
-  year?: number;
-  month?: number;
-  quarter?: number;
-  startDate?: string;
-  endDate?: string;
-  [key: string]: unknown;
-};
+import { Period } from '@/context/PeriodContext';
 
 interface ConversionsCardFrontProps {
   metrics: ConversionMetrics;
