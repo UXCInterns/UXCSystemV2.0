@@ -77,7 +77,7 @@ const UXCAttendanceTable = forwardRef<UXCAttendanceTableRef>((props, ref) => {
     setCurrentPage,
     sortOptions,
     processTableData,
-  } = useVisitTable(visits);
+  } = useVisitTable();
 
   // Event handlers
   const { handleAddVisit, handleEditVisit, handleDeleteVisit } = useVisitHandlers({

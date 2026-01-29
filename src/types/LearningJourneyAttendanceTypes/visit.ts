@@ -72,7 +72,7 @@ export interface VisitFormData {
 export interface NewVisitFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (visitData: VisitFormData) => void;
+  onSubmit: (visitData: Partial<VisitFormData>) => void; 
 }
 
 export type FormErrors = Record<string, string>;
