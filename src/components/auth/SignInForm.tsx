@@ -28,10 +28,15 @@ const SignInForm: React.FC = () => {
     setErrorMessage("");
 
     try {
+      // ✅ Use environment variable or automatically detect the correct URL
+      const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl, // ✅ Use the correct URL
           queryParams: {
             access_type: "offline",
             prompt: "consent",
