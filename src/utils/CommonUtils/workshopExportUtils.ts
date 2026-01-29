@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { Workshop } from '@/types/WorkshopTypes/workshop';
-import { ExportFilters } from '@/components/workshops/WorkshopExportModal';
+import { ExportFilters } from '@/components/cetattendace/WorkshopsTable/WorkshopExportModal';
 
 export const exportWorkshopsToExcel = (data: Workshop[], filename: string = 'workshops') => {
   // Transform data for export
@@ -209,13 +209,6 @@ export const exportWorkshopsWithFilters = (
   if (filters.category && filters.category.length > 0) {
     filteredData = filteredData.filter(w => 
       w.category && filters.category!.includes(w.category)
-    );
-  }
-
-  // Apply school/dept filter
-  if (filters.schoolDept && filters.schoolDept.length > 0) {
-    filteredData = filteredData.filter(w => 
-      filters.schoolDept!.includes(w.school_dept)
     );
   }
 
