@@ -1,4 +1,3 @@
-import React from 'react';
 import Badge from "@/components/ui/badge/Badge";
 import { getPriorityBadgeProps } from '@/utils/CommonUtils/badgeUtils';
 import type { Task } from '@/types/KanbanBoardTypes/kanban';
@@ -9,11 +8,11 @@ import { Eye } from 'lucide-react';
 type Props = {
   task: Task;
   onExpand: (task: Task) => void;
-  canEdit?: boolean; // NEW: Permission prop
+  canEdit?: boolean; // Permission prop
 };
 
 export function TaskCard({ task, onExpand, canEdit = true }: Props) {
-  // ✅ Format due date to "28 August 2025"
+  // Format due date to "28 August 2025"
   const formattedDueDate = task.due_date
     ? new Date(task.due_date).toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -24,20 +23,18 @@ export function TaskCard({ task, onExpand, canEdit = true }: Props) {
 
   return (
     <div className={`-m-3 p-3 rounded-lg ${!canEdit ? 'opacity-75' : ''}`}>
-      {/* Read-only indicator */}
-      {!canEdit && (
-        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
-          <Eye size={12} />
-          <span>View only</span>
-        </div>
-      )}
-
       {/* Header with expand button */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex-1">
-          <p className="m-0 font-medium text-sm text-gray-800 dark:text-white mb-1">
-            {task.task_name}
-          </p>
+          {/* Task Name with Eye Icon */}
+          <div className="flex items-center gap-2 mb-1">
+            {!canEdit && (
+              <Eye size={12} className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
+            )}
+            <p className="m-0 font-medium text-sm text-gray-800 dark:text-white">
+              {task.task_name}
+            </p>
+          </div>
           <Badge size="sm" {...getPriorityBadgeProps(task.priority)}>
             {task.priority}
           </Badge>
@@ -82,7 +79,7 @@ export function TaskCard({ task, onExpand, canEdit = true }: Props) {
         </p>
       )}
 
-      {/* ✅ Formatted Due date */}
+      {/* Formatted Due date */}
       {formattedDueDate && (
         <p className="m-0 text-xs text-gray-600 dark:text-gray-400 mb-2">
           Due: {formattedDueDate}

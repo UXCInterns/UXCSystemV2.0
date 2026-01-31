@@ -24,6 +24,7 @@ interface GanttTimelineContentProps {
   tasks: Task[];
   filteredTasks: Task[];
   onMove: (id: string, startAt: Date, endAt: Date | null) => void;
+  canEdit?: boolean; // Permission prop
 }
 
 export const GanttTimelineContent: React.FC<GanttTimelineContentProps> = ({
@@ -33,6 +34,7 @@ export const GanttTimelineContent: React.FC<GanttTimelineContentProps> = ({
   tasks,
   filteredTasks,
   onMove,
+  canEdit = true,
 }) => {
   if (filteredTasks.length === 0) {
     return <GanttEmptyState />;
@@ -67,13 +69,21 @@ export const GanttTimelineContent: React.FC<GanttTimelineContentProps> = ({
                   <GanttFeatureRow
                     key={feature.id}
                     features={[feature]}
-                    onMove={onMove}
+                    // CRITICAL: Don't pass onMove at all if user can't edit
+                    // This prevents the drag handlers from even being created
+                    {...(canEdit ? { onMove } : {})}
                   >
                     {(f) => (
-                      <GanttTaskRowContent 
-                        feature={f} 
-                        assignees={assignees}
-                      />
+                      <div 
+                        className={canEdit ? '' : 'pointer-events-none select-none'}
+                        style={canEdit ? {} : { cursor: 'default' }}
+                      >
+                        <GanttTaskRowContent 
+                          feature={f} 
+                          assignees={assignees}
+                          canEdit={canEdit}
+                        />
+                      </div>
                     )}
                   </GanttFeatureRow>
                 );

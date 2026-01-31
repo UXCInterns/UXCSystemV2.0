@@ -3,6 +3,7 @@ import Button from '@/components/ui/button/Button';
 import Toggle from '@/components/ui/toggle/Toggle';
 import type { Range } from '@/components/ui/shadcn-io/gantt';
 import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP } from '@/constants/GanttChartConstants/ganttConstants';
+import Badge from '@/components/ui/badge/Badge';
 
 interface GanttHeaderSectionProps {
   range: Range;
@@ -10,6 +11,7 @@ interface GanttHeaderSectionProps {
   totalTasks: number;
   filteredTasks: number;
   hasActiveFilters: boolean;
+  canEdit?: boolean; // NEW: Permission prop
   onRangeChange: (range: Range) => void;
   onZoomChange: (zoom: number) => void;
 }
@@ -20,13 +22,22 @@ export const GanttHeaderSection: React.FC<GanttHeaderSectionProps> = ({
   totalTasks,
   filteredTasks,
   hasActiveFilters,
+  canEdit = true, // NEW: Default to true for backward compatibility
   onRangeChange,
   onZoomChange,
 }) => {
   return (
     <div className="flex items-center gap-3">
       <div className="flex-1">
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white/90">Gantt Chart</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white/90">Gantt Chart</h1>
+          {/* Read-only badge - NEW */}
+          {!canEdit && (
+            <Badge>
+              View Only
+            </Badge>
+          )}
+        </div>
         {hasActiveFilters && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Showing {filteredTasks} of {totalTasks} tasks

@@ -1,30 +1,31 @@
 import React from 'react';
 import Avatar from '@/components/ui/avatar/Avatar';
+import { Eye } from 'lucide-react';
 import type { GanttFeature } from '@/components/ui/shadcn-io/gantt';
 import type { Assignee } from '@/types/KanbanBoardTypes/kanban';
 
 interface GanttTaskRowContentProps {
   feature: GanttFeature;
-  assignees?: Assignee[];
+  assignees: Assignee[];
+  canEdit?: boolean; // NEW: Permission prop
 }
 
 export const GanttTaskRowContent: React.FC<GanttTaskRowContentProps> = ({ 
   feature, 
-  assignees = [] 
+  assignees,
+  canEdit = true, // NEW: Default to true for backward compatibility
 }) => {
   return (
-    <div className="flex items-center gap-2 w-full px-2">
-      {/* Priority indicator circle */}
-      <div
-        className="h-2 w-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: feature.status.color }}
-      />
+    <div className="flex items-center gap-2 w-full">
+      {/* Read-only indicator - NEW */}
+      {!canEdit && (
+        <Eye size={12} className="text-gray-400 flex-shrink-0" />
+      )}
       
-      <p className="flex-1 truncate text-xs font-medium text-gray-800 dark:text-white">
-        {feature.name}
-      </p>
+      {/* Task Name */}
+      <p className="flex-1 truncate text-xs font-medium">{feature.name}</p>
       
-      {/* Assignee avatars */}
+      {/* Assignees */}
       {assignees.length > 0 && (
         <div className="flex -space-x-1 flex-shrink-0">
           {assignees.slice(0, 2).map((assignee) => (
