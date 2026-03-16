@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRealtimePollResults } from '@/hooks/innopoll/useRealTimeResults';
 import { useParams } from 'next/navigation';
 import RadialChart from '@/components/innopoll/RadialChart';
-import { useSidebar } from '@/context/SidebarContext';
+
 
 
 const questionCategoryMap: Record<string, string> = {
@@ -42,31 +42,8 @@ const BASE_QUESTIONS = [
 const InnovationPollPreview: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const params = useParams();
-  const [isFullpage, setIsFullpage] = useState(false);
   const roomCode = params.roomCode as string;
 
-  const { setHideHeader } = useSidebar();
-
-  useEffect(() => {
-    setHideHeader(isFullpage);
-
-    return () => setHideHeader(false);
-  }, [isFullpage, setHideHeader]);
-
-  //Escape full page 
-  useEffect(() => {
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsFullpage(false); // exit fullscreen
-      }
-    };
-
-    window.addEventListener('keydown', handleEsc);
-
-    return () => {
-      window.removeEventListener('keydown', handleEsc); // cleanup
-    };
-  }, []);
 
   const {
     pollData,
@@ -109,15 +86,11 @@ const InnovationPollPreview: React.FC = () => {
   return (
     <div
       className={`
-    ${isFullpage ? 'fixed inset-0 z-[9999]' : 'relative'}
-    w-full h-full
-    ${darkMode ? 'bg-slate-900' : 'bg-white'}
-    flex flex-col items-center justify-between
-    ${isFullpage ? 'pt-16' : ''}
-  `}
+relative w-full h-full
+${darkMode ? 'bg-slate-900' : 'bg-white'}
+flex flex-col items-center justify-between
+`}
     >
-
-
 
 
       {/* Mode Toggle Button */}
@@ -136,12 +109,12 @@ const InnovationPollPreview: React.FC = () => {
         </button>
 
         {/* Fullscreen Button */}
-        <button
+        {/* <button
           onClick={() => setIsFullpage(!isFullpage)}
           className="px-6 py-3 rounded-full font-semibold border border-gray-400 bg-white/10 hover:bg-white/20"
         >
           {isFullpage ? 'Exit Fullpage' : 'Go Fullpage'}
-        </button>
+        </button> */}
       </div>
 
 
@@ -189,9 +162,9 @@ const InnovationPollPreview: React.FC = () => {
 
         {/* Three Circles Grid */}
         <div className={`
-    grid grid-cols-3 gap-6 mb-8
-    ${isFullpage ? 'max-w-5xl mx-auto' : 'w-full'}
-  `}>
+  flex flex-col gap-8 w-full flex-1 justify-center px-4
+  md:grid md:grid-cols-3 md:gap-6 md:px-0 md:w-full}
+`}>
           {liveScores.map((score, index) => (
 
             <div key={index} className="flex flex-col items-center group">
