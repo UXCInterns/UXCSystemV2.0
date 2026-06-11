@@ -268,7 +268,7 @@ export default function FeedbackPage() {
               )}
             </div>
 
-            {/* ✅ UPDATED MCQ LAYOUT (VERTICAL) */}
+            {/* UPDATED MCQ LAYOUT (VERTICAL) */}
             <div className="flex flex-col gap-3 mt-6">
               {likertOptions.map((opt, optIdx) => {
                 const selected =
