@@ -1,28 +1,28 @@
 "use client";
 
 import React from "react";
-// import { GroupIcon, ShootingStarIcon, BoltIcon } from "@/icons";
+import { GroupIcon, ShootingStarIcon, BoltIcon } from "@/icons";
 import { useMetricsData } from "@/hooks/learningJourney/DashboardComponents/useMetricsData";
-import { MetricsHeader } from "./MetricsHeader";
-// import { LogoCard } from "./LogoCard";
-// import { MetricCard } from "./MetricCard";
-// import { createMetricBadge } from "./MetricBadgeFactory";
-// import { MultipleVisitsBadge } from "./MultipleVisitsBadge";
+// import { MetricsHeader } from "./MetricsHeader";
+import { LogoCard } from "./LogoCard";
+import { MetricCard } from "./MetricCard";
+import { createMetricBadge } from "./MetricBadgeFactory";
+import { MultipleVisitsBadge } from "./MultipleVisitsBadge";
 
-export const StatsMetrics = () => {
-  const { error, hasComparison } = useMetricsData();
+export const Stats2= () => {
+  const { data, error, isLoading, hasComparison } = useMetricsData();
 
-  // const companies = data?.companies || [];
-  // const totalCompanies = data?.totalCompanies || 0;
-  // const uniqueCompanies = data?.uniqueCompanies || [];
-  // const multipleVisits = data?.multipleVisits || [];
+  const companies = data?.companies || [];
+  const totalCompanies = data?.totalCompanies || 0;
+  const uniqueCompanies = data?.uniqueCompanies || [];
+  const multipleVisits = data?.multipleVisits || [];
 
-  // const comparisonData = data?.comparison;
-  // const comparisonMetrics = data?.comparisonMetrics;
+  const comparisonData = data?.comparison;
+  const comparisonMetrics = data?.comparisonMetrics;
 
   return (
     <div className="space-y-6">
-      <MetricsHeader hasComparison={!!hasComparison} />
+      {/* <MetricsHeader hasComparison={!!hasComparison} /> */}
 
       {/* Error state */}
       {error && (
@@ -34,7 +34,7 @@ export const StatsMetrics = () => {
       )}
 
       {/* Metrics Grid */}
-      {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
         <LogoCard />
 
         <MetricCard
@@ -84,7 +84,7 @@ export const StatsMetrics = () => {
           }
           loading={isLoading}
         />
-      </div> */}
+      </div>
     </div>
   );
 };
