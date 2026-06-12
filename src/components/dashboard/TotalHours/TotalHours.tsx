@@ -1,13 +1,30 @@
 "use client";
 
 import React from "react";
+import { useTheme } from "@/context/ThemeContext";
+import { usePeriod } from "@/context/PeriodContext";
 import { useTotalHoursMetrics } from "@/hooks/learningJourney/DashboardComponents/useTotalHoursMetrics";
 
+const MAX_HOURS = 200;
+
 export default function TotalHours() {
-  const { data, isLoading, error } = useTotalHoursMetrics();
+  const { theme } = useTheme();
+
+  const {
+    getPeriodLabel,
+    comparisonPeriod,
+    isComparisonMode,
+  } = usePeriod();
+
+  const { data, error, isLoading } = useTotalHoursMetrics();
 
   if (isLoading) {
-    return <div className="p-6">Loading...</div>;
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03] animate-pulse">
+        <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-6" />
+        <div className="h-44 w-44 mx-auto rounded-full bg-gray-200 dark:bg-gray-700" />
+      </div>
+    );
   }
 
   if (error) {
@@ -20,19 +37,96 @@ export default function TotalHours() {
     );
   }
 
+  const totalMinutes = data?.totalMinutes || 0;
+  const totalHours = totalMinutes / 60;
+
+  const displayHours = Math.floor(totalHours);
+  const displayMinutes = totalMinutes % 60;
+
+  const percentage = Math.min((totalHours / MAX_HOURS) * 100, 100);
+
+  // Progress Circle
+  const size = 180;
+  const stroke = 10;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  const trackColor = theme === "dark" ? "#1f2937" : "#e5e7eb";
+  const progressColor = theme === "dark" ? "#60a5fa" : "#3b82f6";
+
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Total Learning Hours
-      </p>
+    <div className="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.00]">
+      <div className="px-5 pt-5 bg-white shadow-default border-b border-gray-200 dark:border-gray-800 rounded-2xl pb-5 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
 
-      <h2 className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">
-        {data.hours}h {data.minutes}m
-      </h2>
+        {/* HEADER - Same style as VisitorsAttended */}
+        <div className="flex justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Learning Journey
+            </h3>
 
-      <p className="text-xs text-gray-400 mt-2">
-        Based on {data.totalMinutes} minutes
-      </p>
+            <p className="font-normal text-gray-500 text-theme-sm dark:text-gray-400">
+              {isComparisonMode
+                ? `${getPeriodLabel()} vs ${
+                    comparisonPeriod
+                      ? getPeriodLabel(comparisonPeriod)
+                      : ""
+                  }`
+                : `Total Learning Journey Hours - ${getPeriodLabel()}`}
+            </p>
+          </div>
+        </div>
+
+        {/* PROGRESS CIRCLE */}
+        <div className="relative flex justify-center py-6">
+          <svg width={size} height={size} className="rotate-[-90deg]">
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={trackColor}
+              strokeWidth={stroke}
+              fill="none"
+            />
+
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={progressColor}
+              strokeWidth={stroke}
+              fill="none"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              style={{
+                transition: "stroke-dashoffset 0.6s ease",
+              }}
+            />
+          </svg>
+
+          {/* CENTER TEXT */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {displayHours}h {displayMinutes}m
+            </h2>
+
+            <p className="text-xs font-bold text-black-400 mt-1">
+              {Math.round(percentage)}% of goal
+            </p>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div className="text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            We have accumulated {displayHours} hours and {displayMinutes} minutes of
+            learning journey during {getPeriodLabel()}. Room for growth in learning journey hours.
+          </p>
+        </div>
+
+      </div>
     </div>
   );
 }
