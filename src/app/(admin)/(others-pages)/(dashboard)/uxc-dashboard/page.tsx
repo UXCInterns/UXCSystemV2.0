@@ -30,7 +30,6 @@ export default function UXCDashboard() {
             <StatsMetrics />
           </div>
 
-          {/* change this to hours  */}
           <div className="col-span-12 xl:col-span-6">
             <VisitorsAttended />
           </div>
