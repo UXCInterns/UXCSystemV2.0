@@ -39,11 +39,11 @@ export default function UXCDashboard() {
             <TotalHours />
           </div>
 
-             <div className="col-span-12 space-y-6 xl:col-span-12">
+          <div className="col-span-12 xl:col-span-4">
             <Stats2 />
           </div>
           
-          <div className="col-span-12 space-y-6 xl:col-span-4">
+          <div className="col-span-12 xl:col-span-5">
             <ConversionsOverview />
           </div>
 
