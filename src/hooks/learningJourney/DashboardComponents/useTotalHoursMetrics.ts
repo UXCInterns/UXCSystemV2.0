@@ -46,14 +46,18 @@ export function useTotalHoursMetrics() {
   });
 
   const processedData = useMemo(() => {
-    const totalMinutes = data?.totalDuration || 0;
+  const totalMinutes = data?.totalDuration || 0;
 
-    return {
-      totalMinutes,
-      hours: Math.floor(totalMinutes / 60),
-      minutes: totalMinutes % 60,
-    };
-  }, [data]);
+  const comparisonTotalMinutes =
+    data?.comparison?.totalDuration || 0;
+
+  return {
+    totalMinutes,
+    comparisonTotalMinutes,
+    hours: Math.floor(totalMinutes / 60),
+    minutes: totalMinutes % 60,
+  };
+}, [data]);
 
   return {
     data: processedData,
