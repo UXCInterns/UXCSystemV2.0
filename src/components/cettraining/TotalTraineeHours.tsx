@@ -279,7 +279,7 @@ export default function TotalTraineeHours({ programType }: TotalTraineeHoursProp
           ) : (
             <>
               We have{" "}
-              {primaryHours.toLocaleString()} trainee hours during {getPeriodLabel().toLowerCase()}
+              {primaryHours.toLocaleString()} trainee hours during {getPeriodLabel()}
               {programType && ` for ${programType === "pace" ? "PACE" : "NON-PACE"} programs`}.
               {primaryHours >= maxValue * 0.7 
                 ? " Excellent training progress!" 
