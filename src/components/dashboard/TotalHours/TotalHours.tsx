@@ -5,6 +5,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { usePeriod } from "@/context/PeriodContext";
 import { useTotalHoursMetrics } from "@/hooks/learningJourney/DashboardComponents/useTotalHoursMetrics";
 
+// CHANGE THE TOTAL HOURS ACCORDINGLY 
 const MAX_HOURS = 200;
 
 export default function TotalHours() {
@@ -42,6 +43,18 @@ export default function TotalHours() {
 
   const displayHours = Math.floor(totalHours);
   const displayMinutes = totalMinutes % 60;
+
+  /* COMPARISON CALCULATIONS */
+  const comparisonMinutes = data?.comparisonTotalMinutes || 0;
+
+  const differenceMinutes = totalMinutes - comparisonMinutes;
+
+  const differenceHours = Math.floor(
+    Math.abs(differenceMinutes) / 60
+  );
+
+  const differenceRemainingMinutes =
+    Math.abs(differenceMinutes) % 60;
 
   const percentage = Math.min((totalHours / MAX_HOURS) * 100, 100);
 
@@ -123,8 +136,28 @@ export default function TotalHours() {
         {/* "-mt-2" for negative -8px for margin top due to too much space & need alignment */}
         <div className="text-center">
           <p className="mx-auto -mt-2 w-full text-center text-sm text-gray-500 dark:text-gray-500 sm:text-base">
-            We have accumulated {displayHours} hours and {displayMinutes} minutes of
-            learning journey during {getPeriodLabel()}. Room for growth in learning journey hours.
+            {isComparisonMode ? (
+              <>
+                We have{" "}
+                {differenceMinutes >= 0
+                  ? `${differenceHours} hours and ${differenceRemainingMinutes} minutes more learning journey hours than the ${
+                      comparisonPeriod
+                        ? getPeriodLabel(comparisonPeriod)
+                        : "previous period"
+                    }. Good job!`
+                  : `${differenceHours} hours and ${differenceRemainingMinutes} minutes less learning journey hours than the ${
+                      comparisonPeriod
+                        ? getPeriodLabel(comparisonPeriod)
+                        : "previous period"
+                    }. Keep fighting!`}
+              </>
+            ) : (
+              <>
+                We have accumulated {displayHours} hours and {displayMinutes} minutes of
+                learning journey during {getPeriodLabel()}. Room for growth in learning
+                journey hours.
+              </>
+            )}
           </p>
         </div>
       </div>
