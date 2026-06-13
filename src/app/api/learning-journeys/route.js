@@ -1,5 +1,30 @@
 import { supabaseAdmin } from '../supabaseAdmin';
 
+function parseDuration(value) {
+  if (value === null || value === undefined) return null;
+
+  if (typeof value === "number") return value;
+
+  if (!isNaN(value)) return Number(value);
+
+  if (typeof value === "string") {
+    const match = value.match(/\d+/g);
+
+    if (!match) return null;
+
+    // if format like "2h 30m"
+    if (value.includes("h")) {
+      const hours = Number(match[0] || 0);
+      const mins = Number(match[1] || 0);
+      return hours * 60 + mins;
+    }
+
+    return Number(match[0]);
+  }
+
+  return null;
+}
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -35,8 +60,12 @@ export async function POST(request) {
 
     const { data, error } = await supabaseAdmin
       .from('learning_journeys')
-      .insert([body])
-      .select(); // Return the inserted record
+      const { duration, ...rest } = body;
+
+      const insertData = {
+        ...rest,
+        duration: parseDuration(duration),
+      };
 
     if (error) throw error;
 
@@ -73,7 +102,12 @@ export async function PUT(request) {
     }
 
     // Extract id from body and create update object without id
-    const { id, ...updateData } = body;
+    const { id, duration, ...rest } = body;
+
+    const updateData = {
+      ...rest,
+      duration: parseDuration(duration),
+    };
 
     const { data, error } = await supabaseAdmin
       .from('learning_journeys')
