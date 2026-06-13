@@ -17,9 +17,6 @@ export default function TotalHours() {
     isComparisonMode,
   } = usePeriod();
 
-  console.log("isComparisonMode:", isComparisonMode);
-console.log("comparisonPeriod:", comparisonPeriod);
-
   const { data, error, isLoading } = useTotalHoursMetrics();
 
   if (isLoading) {
