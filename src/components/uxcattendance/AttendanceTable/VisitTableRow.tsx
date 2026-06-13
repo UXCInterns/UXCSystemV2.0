@@ -3,6 +3,17 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import TableActionButtons from './TableActionButtons';
 import { Visit } from '@/types/LearningJourneyAttendanceTypes/visit';
 
+// convert minutes to hours and minutes eg 90 mins => 1h 30m
+const formatDuration = (mins: number) => {
+  const hours = Math.floor(mins / 60);
+  const remainingMins = mins % 60;
+
+  if (hours === 0) return `${remainingMins} mins`;
+  if (remainingMins === 0) return `${hours}h`;
+
+  return `${hours}h ${remainingMins}m`;
+};
+
 interface VisitTableRowProps {
   visit: Visit;
   isLoading: boolean;
@@ -37,7 +48,9 @@ const VisitTableRow: React.FC<VisitTableRowProps> = ({
         {visit.total_attended}
       </TableCell>
       <TableCell className="px-5 py-4 text-center text-theme-sm text-gray-500 dark:text-gray-400">
-        {visit.duration}
+        {/* {visit.duration} */}
+        {/* above this ^^^^^ will display what it is inside the database and not converting to hours & mins */}
+        {formatDuration(Number(visit.duration))}
       </TableCell>
       <TableCell className="px-5 py-4 text-center text-theme-sm text-gray-500 dark:text-gray-400">
         {visit.conversion_status}
