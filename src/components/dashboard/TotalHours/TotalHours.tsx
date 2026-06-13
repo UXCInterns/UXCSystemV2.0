@@ -107,25 +107,26 @@ export default function TotalHours() {
           </svg>
 
           {/* CENTER TEXT */}
+          {/* WHEN THE HOURS REACHES 1000 HOURS CHANGE THE "text-3xl" to "text-2xl" */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {displayHours}h {displayMinutes}m
             </h2>
 
-            <p className="text-xs font-bold text-black-400 mt-1">
+            <p className="text-xl font-bold text-black-400 mt-1">
               {Math.round(percentage)}% of goal
             </p>
           </div>
         </div>
 
         {/* FOOTER */}
+        {/* "-mt-2" for negative -8px for margin top due to too much space & need alignment */}
         <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="mx-auto -mt-2 w-full text-center text-sm text-gray-500 dark:text-gray-500 sm:text-base">
             We have accumulated {displayHours} hours and {displayMinutes} minutes of
             learning journey during {getPeriodLabel()}. Room for growth in learning journey hours.
           </p>
         </div>
-
       </div>
     </div>
   );
