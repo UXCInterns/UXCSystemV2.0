@@ -39,7 +39,7 @@ export const getAttendanceMessage = (visitors: number): string => {
   if (ratio >= ATTENDANCE_THRESHOLDS.GOOD) {
     return " Good turnout!";
   }
-  return " Room for growth in attendance.";
+  return " Room for growth in learning journey attendance.";
 };
 
 export const calculateChartSeries = (

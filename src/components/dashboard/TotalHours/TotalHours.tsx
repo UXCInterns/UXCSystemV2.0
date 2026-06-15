@@ -69,8 +69,8 @@ export default function TotalHours() {
   const progressColor = theme === "dark" ? "#60a5fa" : "#3b82f6";
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.00]">
-      <div className="px-5 pt-5 bg-white shadow-default border-b border-gray-200 dark:border-gray-800 rounded-2xl pb-5 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+    <div className="w-full h-full rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.00]">
+      <div className="h-full flex flex-col px-5 pt-5 bg-white shadow-default rounded-2xl pb-5 border-b border-gray-200 dark:border-gray-800 rounded-2xl pb-5 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
 
         {/* HEADER - Same style as VisitorsAttended */}
         <div className="flex justify-between">
@@ -92,7 +92,7 @@ export default function TotalHours() {
         </div>
 
         {/* PROGRESS CIRCLE */}
-        <div className="relative flex justify-center py-6">
+        <div className="relative flex justify-center items-center h-[230px]">
           <svg width={size} height={size} className="rotate-[-90deg]">
             <circle
               cx={size / 2}
@@ -134,7 +134,7 @@ export default function TotalHours() {
 
         {/* FOOTER */}
         {/* "-mt-2" for negative -8px for margin top due to too much space & need alignment */}
-        <div className="text-center">
+        <div className="mt-auto text-center">
           <p className="mx-auto -mt-2 w-full text-center text-sm text-gray-500 dark:text-gray-500 sm:text-base">
             {isComparisonMode ? (
               <>

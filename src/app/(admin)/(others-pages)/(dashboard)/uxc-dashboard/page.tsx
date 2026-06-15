@@ -30,11 +30,11 @@ export default function UXCDashboard() {
             <StatsMetrics />
           </div>
 
-          <div className="col-span-12 xl:col-span-6">
+          <div className="col-span-12 xl:col-span-6 flex">
             <VisitorsAttended />
           </div>
 
-          <div className="col-span-12 xl:col-span-6">
+          <div className="col-span-12 xl:col-span-6 flex">
             <TotalHours />
           </div>
 
@@ -42,11 +42,11 @@ export default function UXCDashboard() {
             <Stats2 />
           </div>
           
-          <div className="col-span-12 xl:col-span-5">
+          <div className="col-span-12 xl:col-span-4">
             <ConversionsOverview />
           </div>
 
-          <div className="col-span-12 xl:col-span-3">
+          <div className="col-span-12 xl:col-span-4">
             <IndustryMetrics />
           </div>
 
