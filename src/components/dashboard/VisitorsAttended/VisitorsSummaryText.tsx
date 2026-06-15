@@ -28,8 +28,8 @@ export const VisitorsSummaryText = ({
         </>
       ) : (
         <>
-          We have{" "}
-          {primaryVisitors} visitors attended during {periodLabel.toLowerCase()}.
+          We have a total of{" "}
+          {primaryVisitors} visitors attended during {periodLabel}.
           {attendanceMessage}
         </>
       )}

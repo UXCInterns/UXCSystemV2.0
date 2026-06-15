@@ -24,9 +24,14 @@ export async function GET(request) {
       // Primary period data
       supabaseAdmin
         .from("learning_journeys")
+        // .select(
+        //   "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal"
+        // )
+
         .select(
-          "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal"
+          "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal, duration"
         )
+
         .gte("date_of_visit", startDate || "1900-01-01")
         .lte("date_of_visit", endDate || "2999-12-31")
         .order("date_of_visit", { ascending: false })
@@ -37,9 +42,14 @@ export async function GET(request) {
       queries.push(
         supabaseAdmin
           .from("learning_journeys")
+          // .select(
+          //   "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal"
+          // )
+
           .select(
-            "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal"
+            "company_name, training, consultancy, industry, sector, total_attended, date_of_visit, pace, informal, duration"
           )
+
           .gte("date_of_visit", comparisonStartDate)
           .lte("date_of_visit", comparisonEndDate)
           .order("date_of_visit", { ascending: false })
@@ -63,6 +73,11 @@ export async function GET(request) {
     const processDataSet = (dataset, periodStart = null, periodEnd = null) => {
       const companies = dataset.map((row) => row.company_name);
       const uniqueCompanies = Array.from(new Set(companies));
+
+      const totalDuration = dataset.reduce(
+        (sum, row) => sum + (row.duration || 0),
+        0
+      );
 
       const totalVisitors = dataset.reduce(
         (sum, row) => sum + (row.total_attended || 0),
@@ -199,6 +214,7 @@ export async function GET(request) {
         consultancy: Array.from(consultancySet),
         companies,
         totalCompanies: companies.length,
+        totalDuration,
         multipleVisits: uniqueCompanies.filter(
           (c) => companies.filter((x) => x === c).length > 1
         ),

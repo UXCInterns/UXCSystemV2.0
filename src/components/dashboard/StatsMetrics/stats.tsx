@@ -1,54 +1,26 @@
 "use client";
 
 import React from "react";
-// import { GroupIcon, ShootingStarIcon, BoltIcon } from "@/icons";
 import { useMetricsData } from "@/hooks/learningJourney/DashboardComponents/useMetricsData";
-import { MetricsHeader } from "./MetricsHeader";
-// import { LogoCard } from "./LogoCard";
-// import { MetricCard } from "./MetricCard";
-// import { createMetricBadge } from "./MetricBadgeFactory";
-// import { MultipleVisitsBadge } from "./MultipleVisitsBadge";
+// import { MetricsHeader } from "./MetricsHeader";
+import { MetricCard } from "./MetricCard";
+import { createMetricBadge } from "./MetricBadgeFactory";
+import { MultipleVisitsBadge } from "./MultipleVisitsBadge";
 
-// QUATERLY as default from line 11 to 39
-function getQuarter(date: Date) {
-  var month = date.getMonth();
+export const Stats2= () => {
+  const { data, error, isLoading, hasComparison } = useMetricsData();
 
-  if (month >= 0 && month <= 2) return 1;
-  if (month >= 3 && month <= 5) return 2;
-  if (month >= 6 && month <= 8) return 3;
-  return 4;
-}
+  const companies = data?.companies || [];
+  const totalCompanies = data?.totalCompanies || 0;
+  const uniqueCompanies = data?.uniqueCompanies || [];
+  const multipleVisits = data?.multipleVisits || [];
 
-function getQuarterRange(quarter: number, year: number) {
-  if (quarter === 1) {
-    return { start: new Date(year, 0, 1), end: new Date(year, 2, 31) };
-  }
-
-  if (quarter === 2) {
-    return { start: new Date(year, 3, 1), end: new Date(year, 5, 30) };
-  }
-
-  if (quarter === 3) {
-    return { start: new Date(year, 6, 1), end: new Date(year, 8, 30) };
-  }
-
-  return { start: new Date(year, 9, 1), end: new Date(year, 11, 31) };
-}
-
-export const StatsMetrics = () => {
-const { error, hasComparison } = useMetricsData();
-
-  // const companies = data?.companies || [];
-  // const totalCompanies = data?.totalCompanies || 0;
-  // const uniqueCompanies = data?.uniqueCompanies || [];
-  // const multipleVisits = data?.multipleVisits || [];
-
-  // const comparisonData = data?.comparison;
-  // const comparisonMetrics = data?.comparisonMetrics;
+  const comparisonData = data?.comparison;
+  const comparisonMetrics = data?.comparisonMetrics;
 
   return (
     <div className="space-y-6">
-      <MetricsHeader hasComparison={!!hasComparison} />
+      {/* <MetricsHeader hasComparison={!!hasComparison} /> */}
 
       {/* Error state */}
       {error && (
@@ -60,11 +32,10 @@ const { error, hasComparison } = useMetricsData();
       )}
 
       {/* Metrics Grid */}
-      {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
-        <LogoCard />
+      <div className="grid grid-cols-1 gap-4">
 
         <MetricCard
-          icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
+          icon={null}
           title="Total Companies"
           value={totalCompanies.toString()}
           badge={createMetricBadge(
@@ -79,7 +50,7 @@ const { error, hasComparison } = useMetricsData();
         />
 
         <MetricCard
-          icon={<ShootingStarIcon className="text-gray-800 dark:text-white/90" />}
+          icon={null}
           title="Unique Companies"
           value={uniqueCompanies.length.toString()}
           badge={createMetricBadge(
@@ -94,7 +65,7 @@ const { error, hasComparison } = useMetricsData();
         />
 
         <MetricCard
-          icon={<BoltIcon className="text-gray-800 dark:text-white/90" />}
+          icon={null}
           title="Visited Multiple Times"
           value={multipleVisits.length.toString()}
           badge={
@@ -110,7 +81,7 @@ const { error, hasComparison } = useMetricsData();
           }
           loading={isLoading}
         />
-      </div> */}
+      </div>
     </div>
   );
 };

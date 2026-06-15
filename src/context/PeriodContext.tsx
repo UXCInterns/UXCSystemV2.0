@@ -49,9 +49,22 @@ interface PeriodProviderProps {
 }
 
 export const PeriodProvider: React.FC<PeriodProviderProps> = ({ children }) => {
+    // QUATERLY as default from line 52 to 68
+    function getCurrentQuarter(date: Date) {
+    var month = date.getMonth();
+
+    if (month <= 2) return 1;
+    if (month <= 5) return 2;
+    if (month <= 8) return 3;
+    return 4;
+  }
+
+  const now = new Date();
+
   const [currentPeriod, setCurrentPeriod] = useState<Period>({
-    type: 'calendar',
-    year: new Date().getFullYear(),
+    type: 'quarterly',
+    year: now.getFullYear(),
+    quarter: getCurrentQuarter(now),
   });
 
   const [comparisonPeriod, setComparisonPeriodState] = useState<Period | undefined>();

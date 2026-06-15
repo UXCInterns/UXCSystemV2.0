@@ -9,6 +9,8 @@ import VisitorsAttended from "@/components/dashboard/VisitorsAttended/VisitorsAt
 import VisitorsByMonth from "@/components/dashboard/VisitorsByMonth/VisitorsByMonth";
 import VisitorsByDate from "@/components/dashboard/VisitorsByDate/VisitorsByDate";
 import VisitsComparison from "@/components/dashboard/VisitsComparison";
+import { Stats2 } from "@/components/dashboard/StatsMetrics/stats";
+import TotalHours from "@/components/dashboard/TotalHours/TotalHours";
 
 export default function UXCDashboard() {
   return (
@@ -23,19 +25,28 @@ export default function UXCDashboard() {
 
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <PeriodProvider>
+       
           <div className="col-span-12 space-y-6 xl:col-span-12">
             <StatsMetrics />
           </div>
 
-          <div className="col-span-12 xl:col-span-5">
+          <div className="col-span-12 xl:col-span-6 flex">
             <VisitorsAttended />
           </div>
+
+          <div className="col-span-12 xl:col-span-6 flex">
+            <TotalHours />
+          </div>
+
+          <div className="col-span-12 xl:col-span-4">
+            <Stats2 />
+          </div>
           
-          <div className="col-span-12 space-y-6 xl:col-span-4">
+          <div className="col-span-12 xl:col-span-4">
             <ConversionsOverview />
           </div>
 
-          <div className="col-span-12 xl:col-span-3">
+          <div className="col-span-12 xl:col-span-4">
             <IndustryMetrics />
           </div>
 

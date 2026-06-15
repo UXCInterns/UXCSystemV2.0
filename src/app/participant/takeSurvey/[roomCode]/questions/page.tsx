@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Question } from "@/types/question";
 
-
 const likertOptions = [
   { label: "Strongly Disagree", color: "bg-rose-100 hover:bg-rose-200 border-rose-300" },
   { label: "Disagree", color: "bg-orange-100 hover:bg-orange-200 border-orange-300" },
@@ -14,7 +13,7 @@ const likertOptions = [
 ];
 
 export default function FeedbackPage() {
-  const router = useRouter()
+  const router = useRouter();
   const { roomCode } = useParams();
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -24,18 +23,13 @@ export default function FeedbackPage() {
   const [showStatements, setShowStatements] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
 
-
   const [isReading, setIsReading] = useState(true);
   const [canTap, setCanTap] = useState(false);
-  const [progress, setProgress] = useState(0); // For progress bar
+  const [progress, setProgress] = useState(0);
 
   const [showThankYou, setShowThankYou] = useState(false);
 
-
-
-
-
-  // Fetch questions and initialize answers
+  // Fetch questions
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -45,7 +39,7 @@ export default function FeedbackPage() {
         const data = await res.json();
         if (data?.quiz?.questions) {
           setQuestions(data.quiz.questions);
-          setAnswers(new Array(data.quiz.questions.length).fill(undefined)); // pre-initialize
+          setAnswers(new Array(data.quiz.questions.length).fill(undefined));
         } else {
           setQuestions([]);
         }
@@ -60,26 +54,26 @@ export default function FeedbackPage() {
     if (roomCode) fetchQuestions();
   }, [roomCode]);
 
-  //the timer will then start
+  // start timer
   useEffect(() => {
     if (!startTime && questions.length > 0) {
       setStartTime(new Date());
     }
   }, [questions, startTime]);
 
-
-  // Reading phase with progress bar (5 seconds)
+  // reading timer
   useEffect(() => {
     if (!isReading) return;
 
     setCanTap(false);
     setProgress(0);
 
-    const duration = 5000; // 5 seconds
+    const duration = 5000;
     let startTime: number | null = null;
 
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
+
       const elapsed = timestamp - startTime;
       const newProgress = Math.min((elapsed / duration) * 100, 100);
       setProgress(newProgress);
@@ -92,12 +86,8 @@ export default function FeedbackPage() {
     };
 
     const animationFrame = requestAnimationFrame(step);
-
     return () => cancelAnimationFrame(animationFrame);
   }, [isReading]);
-
-
-
 
   const handleLikertChange = (questionIndex: number, value: number) => {
     const percentValue = (value - 1) * 25;
@@ -130,7 +120,7 @@ export default function FeedbackPage() {
 
     const endTime = new Date();
     const timeTaken = startTime
-      ? Math.floor((endTime.getTime() - startTime.getTime()) / 1000) // in seconds
+      ? Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
       : 0;
 
     const submission = {
@@ -156,7 +146,6 @@ export default function FeedbackPage() {
       }
 
       setShowThankYou(true);
-
     } catch (err) {
       console.error(err);
       alert("Failed to submit survey. Please try again.");
@@ -202,7 +191,6 @@ export default function FeedbackPage() {
     );
   }
 
-
   const currentQuestion = questions[currentStep];
 
   return (
@@ -214,23 +202,17 @@ export default function FeedbackPage() {
 
         <div className="mt-10 sm:mt-14"></div>
 
-
-
         {isReading ? (
           <div
             onClick={() => canTap && setIsReading(false)}
             className="flex flex-col min-h-[60vh] sm:h-96 cursor-pointer select-none px-4"
           >
-            {/* this is the one that should be the statement.text */}
-            {/* <p className="text-2xl font-semibold text-gray-800 mb-4">{currentQuestion.question}</p>  */}
-
             {currentQuestion.statements?.map((s, i) => (
               <p key={i} className="text-lg font-semibold text-gray-800 mb-6">
                 {s.text}
               </p>
             ))}
 
-            {/* Loading Bar */}
             <div className="w-full h-2 bg-gray-300 rounded-full mt-6 overflow-hidden">
               <div
                 className="h-full bg-emerald-500 transition-all duration-100"
@@ -240,7 +222,6 @@ export default function FeedbackPage() {
 
             {canTap && (
               <>
-                {/* Mobile */}
                 <button
                   onClick={() => setIsReading(false)}
                   className="mt-8 px-6 py-3 bg-emerald-600 text-white rounded-xl sm:hidden"
@@ -248,20 +229,16 @@ export default function FeedbackPage() {
                   Continue
                 </button>
 
-                {/* Desktop */}
                 <div className="mt-10 text-gray-400 text-sm hidden sm:block">
                   Tap anywhere to continue
                 </div>
               </>
             )}
-
           </div>
         ) : (
           <>
-            {/* Show question again in answer phase */}
             <div className="text-center mb-6">
               <p className="text-lg sm:text-xl font-semibold text-gray-800 mb-6">
-
                 {currentQuestion.question}
               </p>
 
@@ -269,7 +246,7 @@ export default function FeedbackPage() {
                 <div className="w-full mt-4">
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent tap-anywhere trigger
+                      e.stopPropagation();
                       setShowStatements(prev => !prev);
                     }}
                     className="w-full flex items-center justify-between px-4 py-2 border rounded-lg text-sm text-gray-700 bg-gray-50"
@@ -289,37 +266,49 @@ export default function FeedbackPage() {
                   )}
                 </div>
               )}
-
             </div>
 
-            <div className="flex flex-row gap-4 mt-6 overflow-x-auto">
-
+            {/* UPDATED MCQ LAYOUT (VERTICAL) */}
+            <div className="flex flex-col gap-3 mt-6">
               {likertOptions.map((opt, optIdx) => {
-                const selected = answers[currentStep] === optIdx * 25;
+                const selected =
+                  answers[currentStep] === optIdx * 25;
+
                 return (
                   <label
                     key={optIdx}
-                    onClick={() => handleLikertChange(currentStep, optIdx + 1)}
-                    className="flex items-center sm:flex-col gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50"
+                    onClick={() =>
+                      handleLikertChange(currentStep, optIdx + 1)
+                    }
+                    className={`
+                      flex items-center gap-3 cursor-pointer p-4 rounded-lg border transition
+                      ${
+                        selected
+                          ? "border-emerald-500 bg-emerald-50"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }
+                    `}
                   >
                     <div
                       className={`
-    w-14 h-14 min-w-[3.5rem] min-h-[3.5rem] shrink-0
-    rounded-full border flex items-center justify-center
-    transition-all duration-200
-    ${selected ? opt.color : "bg-white"}
-  `}
+                        w-4 h-4 rounded-full border flex items-center justify-center
+                        ${
+                          selected
+                            ? "bg-emerald-500 border-emerald-500"
+                            : "bg-white border-gray-400"
+                        }
+                      `}
                     />
 
-                    <span className="text-sm text-center">{opt.label}</span>
+                    <span className="text-sm sm:text-base text-gray-800">
+                      {opt.label}
+                    </span>
                   </label>
-
                 );
               })}
             </div>
 
             <div className="mt-8 flex justify-end">
-
               {currentStep + 1 < questions.length ? (
                 <button
                   onClick={goNext}
