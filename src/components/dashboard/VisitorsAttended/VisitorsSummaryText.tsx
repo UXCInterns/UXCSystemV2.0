@@ -28,7 +28,7 @@ export const VisitorsSummaryText = ({
         </>
       ) : (
         <>
-          We have{" "}
+          We have a total of{" "}
           {primaryVisitors} visitors attended during {periodLabel}.
           {attendanceMessage}
         </>
