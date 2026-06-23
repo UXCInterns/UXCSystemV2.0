@@ -6,7 +6,7 @@ import { usePeriod } from "@/context/PeriodContext";
 import { useTotalHoursMetrics } from "@/hooks/learningJourney/DashboardComponents/useTotalHoursMetrics";
 
 // CHANGE THE TOTAL HOURS ACCORDINGLY 
-const MAX_HOURS = 200;
+const MAX_HOURS = 100;
 
 export default function TotalHours() {
   const { theme } = useTheme();
