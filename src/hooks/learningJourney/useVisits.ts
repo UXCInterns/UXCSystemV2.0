@@ -23,7 +23,7 @@ type RawVisitData = {
   uen_number?: string | null;
   start_time: string;
   end_time: string;
-  duration?: string | null;
+  duration?: number | null;
   session_type?: string | null;
   consultancy: boolean;
   training: boolean;
@@ -64,7 +64,7 @@ export const useVisits = () => {
     uen_number: row.uen_number || "-",
     start_time: row.start_time,
     end_time: row.end_time,
-    duration: row.duration || "-",
+    duration: row.duration ?? 0,
     session_type: row.session_type || "-",
     consultancy: row.consultancy,
     training: row.training,
