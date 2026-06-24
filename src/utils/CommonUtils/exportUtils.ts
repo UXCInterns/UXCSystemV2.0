@@ -2,6 +2,14 @@ import * as XLSX from 'xlsx';
 import { Visit } from '@/types/LearningJourneyAttendanceTypes/visit';
 import { ExportFilters } from '@/components/uxcattendance/AttendanceTable/ExportModal';
 
+const formatDurationHours = (minutes: any) => {
+  const num = Number(minutes);
+
+  if (isNaN(num)) return minutes; // fallback safety
+
+  return (num / 60).toFixed(2) ;
+};
+
 export const exportToExcel = (data: Visit[], filename: string = 'uxc-learning-journey') => {
   // Transform data for export
   const exportData = data.map((visit) => ({
@@ -14,7 +22,7 @@ export const exportToExcel = (data: Visit[], filename: string = 'uxc-learning-jo
     }),
     'Start Time': visit.start_time,
     'End Time': visit.end_time,
-    'Duration': visit.duration,
+    'Duration': formatDurationHours(visit.duration),
     'Session Type': visit.session_type,
     'Total Registered': visit.total_registered,
     'Total Attended': visit.total_attended,
