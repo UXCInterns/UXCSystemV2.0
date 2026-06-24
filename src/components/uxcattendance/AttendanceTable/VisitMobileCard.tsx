@@ -60,9 +60,7 @@ const VisitMobileCard: React.FC<VisitMobileCardProps> = ({
             </div>
             <p className="text-[11px] text-gray-500 dark:text-gray-400">Duration</p>
             <p className="text-[11px] font-semibold text-gray-900 dark:text-white">
-                {visit.duration
-                .replace(/hours?/g, 'hr')
-                .replace(/minutes?/g, 'min')}
+              {visit.duration} min
             </p>
           </div>
 
