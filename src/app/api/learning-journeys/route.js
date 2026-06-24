@@ -112,18 +112,11 @@ export async function PUT(request) {
       duration: parseDuration(duration),
     };
 
-    // const { data, error } = await supabaseAdmin
-    //   .from('learning_journeys')
-    //   .update(updateData)
-    //   .eq('id', id)
-    //   .select(); // Return the updated record
-
-    // if (error) throw error;
-
     const { data, error } = await supabaseAdmin
-      .from('learning_journeys')
-      .insert([insertData])
-      .select();
+    .from('learning_journeys')
+    .update(updateData)
+    .eq('id', id)
+    .select();
 
     if (!data || data.length === 0) {
       return new Response(
