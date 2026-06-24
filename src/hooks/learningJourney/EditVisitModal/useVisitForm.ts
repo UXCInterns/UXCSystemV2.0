@@ -9,7 +9,7 @@ interface Visit {
   uen_number: string;
   start_time: string;
   end_time: string;
-  duration: string;
+  duration: number;
   session_type: string;
   consultancy: boolean;
   training: boolean;
@@ -32,7 +32,7 @@ const initialFormState = {
   date_of_visit: "",
   start_time: "",
   end_time: "",
-  duration: "",
+  duration: 0,
   session_type: "",
   total_registered: 0,
   total_attended: 0,
@@ -61,7 +61,7 @@ export const useVisitForm = (isOpen: boolean, visit?: Visit | null) => {
         date_of_visit: visit.date_of_visit,
         start_time: visit.start_time,
         end_time: visit.end_time,
-        duration: visit.duration === "-" ? "" : visit.duration,
+        duration: typeof visit.duration === "number" ? visit.duration : 0,
         session_type: visit.session_type === "-" ? "" : visit.session_type,
         total_registered: visit.total_registered,
         total_attended: visit.total_attended,
@@ -99,7 +99,10 @@ export const useVisitForm = (isOpen: boolean, visit?: Visit | null) => {
           durationStr += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
         }
         
-        setFormData(prev => ({ ...prev, duration: durationStr || "0 minutes" }));
+        setFormData(prev => ({
+          ...prev,
+          duration: diffHours * 60 + diffMinutes,
+        }));
       }
     }
   }, [formData.start_time, formData.end_time]);

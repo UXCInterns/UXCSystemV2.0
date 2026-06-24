@@ -9,7 +9,7 @@ export interface Visit {
   uen_number: string;
   start_time: string;
   end_time: string;
-  duration: string;
+  duration: number;
   session_type: string;
   consultancy: boolean;
   training: boolean;
@@ -57,7 +57,7 @@ export interface VisitFormData {
   date_of_visit: string;
   start_time: string;
   end_time: string;
-  duration: string;
+  duration: number;
   session_type: string;
   total_registered: number;
   total_attended: number;
