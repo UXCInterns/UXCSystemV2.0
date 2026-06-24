@@ -10,7 +10,7 @@ const initialFormData: VisitFormData = {
   date_of_visit: "",
   start_time: "",
   end_time: "",
-  duration: "",
+  duration: 0,
   session_type: "",
   total_registered: 0,
   total_attended: 0,
@@ -40,22 +40,15 @@ export const useVisitForm = () => {
     if (formData.start_time && formData.end_time) {
       const startTime = new Date(`2000-01-01T${formData.start_time}`);
       const endTime = new Date(`2000-01-01T${formData.end_time}`);
-      
+
       if (endTime > startTime) {
         const diffMs = endTime.getTime() - startTime.getTime();
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
-        let durationStr = "";
-        if (diffHours > 0) {
-          durationStr += `${diffHours} hour${diffHours > 1 ? 's' : ''}`;
-        }
-        if (diffMinutes > 0) {
-          if (durationStr) durationStr += " ";
-          durationStr += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
-        }
-        
-        setFormData(prev => ({ ...prev, duration: durationStr || "0 minutes" }));
+        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+        setFormData(prev => ({
+          ...prev,
+          duration: diffMinutes,
+        }));
       }
     }
   }, [formData.start_time, formData.end_time]);
