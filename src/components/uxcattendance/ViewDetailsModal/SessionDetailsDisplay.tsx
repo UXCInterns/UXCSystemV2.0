@@ -9,6 +9,23 @@ interface SessionDetailsDisplayProps {
   visit: Visit;
 }
 
+const formatDuration = (minutes: number | null | undefined) => {
+  if (!minutes) return "";
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (hours > 0 && remainingMinutes > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ${remainingMinutes} minute${remainingMinutes > 1 ? "s" : ""}`;
+  }
+
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""}`;
+  }
+
+  return `${remainingMinutes} minute${remainingMinutes > 1 ? "s" : ""}`;
+};
+
 const SessionDetailsDisplay: React.FC<SessionDetailsDisplayProps> = ({ visit }) => {
   const calculatedSessionType = getCalculatedSessionType(visit.start_time);
 
@@ -45,7 +62,7 @@ const SessionDetailsDisplay: React.FC<SessionDetailsDisplayProps> = ({ visit }) 
           <Label>Duration</Label>
           <Input
             type="text"
-            value={visit.duration || ""}
+            value={formatDuration(visit.duration)}
             disabled={true}
           />
         </div>
